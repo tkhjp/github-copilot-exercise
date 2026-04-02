@@ -7,10 +7,24 @@ read_hook_input
 
 TOOL_NAME="$(get_tool_name)"
 CMD="$(get_command)"
+FILE_PATH="$(get_file_path)"
 
-# Only inspect shell/terminal tool calls (broad match for VS Code + CLI)
+# Rule A: Directory creation (VS Code uses create_directory, not shell mkdir)
+if [[ "$TOOL_NAME" == "create_directory" ]]; then
+  local_path="$(get_tool_input | jq -r '.dirPath // .path // empty' 2>/dev/null || true)"
+  emit_decision "ask" "[確認] ディレクトリを作成します: ${local_path##*/}。実行内容を確認してください。"
+  exit 0
+fi
+
+# Rule B: File creation
+if [[ "$TOOL_NAME" == "create_file" ]]; then
+  emit_decision "ask" "[確認] ファイルを作成します: ${FILE_PATH##*/}。実行内容を確認してください。"
+  exit 0
+fi
+
+# Rules for shell/terminal commands
 case "$TOOL_NAME" in
-  *terminal*|*shell*|*bash*|*command*|*Terminal*|bash|shell) ;;
+  *terminal*|*shell*|*bash*|*command*|*Terminal*|run_in_terminal|bash|shell) ;;
   *) exit 0 ;;
 esac
 

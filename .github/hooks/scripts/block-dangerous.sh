@@ -21,7 +21,13 @@ if [[ -n "$FILE_PATH" ]] && echo "$FILE_PATH" | grep -qEi 'deploy|prod|\.secret'
   exit 0
 fi
 
-# Rule 3: Block shell commands that suppress output (hiding evidence)
+# Rule 3: Block shell commands that write to .env or deploy files
+if [[ -n "$CMD" ]] && echo "$CMD" | grep -qE '\.env($|[^.])|deploy|prod'; then
+  emit_decision "deny" "[Policy] ターミナルから保護ファイル（.env/deploy/prod）への書き込みは禁止されています。"
+  exit 0
+fi
+
+# Rule 4: Block shell commands that suppress output (hiding evidence)
 if [[ -n "$CMD" ]] && echo "$CMD" | grep -qE '>\s*/dev/null|2>&1\s*/dev/null'; then
   emit_decision "deny" "[Policy] 出力の抑制（/dev/null へのリダイレクト）は監査上禁止されています。"
   exit 0
