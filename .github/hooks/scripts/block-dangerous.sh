@@ -17,13 +17,8 @@ if [[ -z "$CMD" ]]; then
   exit 0
 fi
 
-# Rule 1: Block rm -rf with broad path or root
-if echo "$CMD" | grep -Eq 'rm\s+(-[a-zA-Z]*f[a-zA-Z]*\s+|)(-[a-zA-Z]*r[a-zA-Z]*\s+|)\s*/'; then
-  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] rm -rf targeting root or broad path is prohibited."}'
-  exit 0
-fi
-
-if echo "$CMD" | grep -Eq 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f|rm\s+-[a-zA-Z]*f[a-zA-Z]*r'; then
+# Rule 1: Block rm -rf (any flag order) targeting root or broad paths
+if echo "$CMD" | grep -Eq 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f[a-zA-Z]*\s|rm\s+-[a-zA-Z]*f[a-zA-Z]*r[a-zA-Z]*\s'; then
   echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] Recursive force-delete (rm -rf) is prohibited. Use targeted rm instead."}'
   exit 0
 fi
