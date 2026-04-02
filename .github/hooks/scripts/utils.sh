@@ -53,6 +53,26 @@ get_command() {
   echo "$input" | jq -r '.command // .input // empty' 2>/dev/null || true
 }
 
+# Output a permission decision in both CLI and VS Code formats.
+# Usage: emit_decision "deny" "Reason text here"
+#        emit_decision "ask" "Reason text here"
+emit_decision() {
+  local decision="$1"
+  local reason="$2"
+  jq -c -n \
+    --arg d "$decision" \
+    --arg r "$reason" \
+    '{
+      permissionDecision: $d,
+      permissionDecisionReason: $r,
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        decision: $d,
+        reason: $r
+      }
+    }'
+}
+
 # Resolve audit log directory using CLAUDE_PROJECT_DIR (v1.114) or cwd fallback.
 get_audit_dir() {
   local cwd
