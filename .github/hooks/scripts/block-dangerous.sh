@@ -5,33 +5,31 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 read_hook_input
 
-TOOL_NAME="$(get_field '.toolName')"
+TOOL_NAME="$(get_tool_name)"
+FILE_PATH="$(get_file_path)"
+CMD="$(get_command)"
 
-# Only inspect bash/shell tool calls
-if [[ "$TOOL_NAME" != "bash" && "$TOOL_NAME" != "shell" ]]; then
+# Rule 1: Block editing .env files (any tool that touches .env)
+if [[ -n "$FILE_PATH" ]] && echo "$FILE_PATH" | grep -qE '\.env($|\.)'; then
+  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] .env ファイルの編集は禁止されています。.env.example を参照してください。"}'
   exit 0
 fi
 
-CMD="$(get_field_safe '.toolArgs.command')"
-if [[ -z "$CMD" ]]; then
+# Rule 2: Block editing deploy/production files
+if [[ -n "$FILE_PATH" ]] && echo "$FILE_PATH" | grep -qEi 'deploy|prod|\.secret'; then
+  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] デプロイ・本番環境関連ファイルの直接編集は禁止されています。"}'
   exit 0
 fi
 
-# Rule 1: Block rm -rf (any flag order) targeting root or broad paths
-if echo "$CMD" | grep -Eq 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f[a-zA-Z]*\s|rm\s+-[a-zA-Z]*f[a-zA-Z]*r[a-zA-Z]*\s'; then
-  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] Recursive force-delete (rm -rf) is prohibited. Use targeted rm instead."}'
+# Rule 3: Block shell commands that suppress output (hiding evidence)
+if [[ -n "$CMD" ]] && echo "$CMD" | grep -qE '>\s*/dev/null|2>&1\s*/dev/null'; then
+  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] 出力の抑制（/dev/null へのリダイレクト）は監査上禁止されています。"}'
   exit 0
 fi
 
-# Rule 2: Block destructive SQL
-if echo "$CMD" | grep -Eiq 'DROP\s+TABLE|DROP\s+DATABASE|TRUNCATE\s+TABLE|DELETE\s+FROM\s+[a-zA-Z]+\s*;'; then
-  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] Destructive SQL (DROP/TRUNCATE/unqualified DELETE) is prohibited."}'
-  exit 0
-fi
-
-# Rule 3: Block reading .env files
-if echo "$CMD" | grep -Eq '(cat|less|more|head|tail|vim|nano|code)\s+.*\.env'; then
-  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] Direct reading of .env files is prohibited. Use .env.example as reference."}'
+# Rule 4: Block rm -rf (keep as safety net)
+if [[ -n "$CMD" ]] && echo "$CMD" | grep -qE 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f[a-zA-Z]*\s|rm\s+-[a-zA-Z]*f[a-zA-Z]*r[a-zA-Z]*\s'; then
+  echo '{"permissionDecision":"deny","permissionDecisionReason":"[Policy] rm -rf は禁止されています。"}'
   exit 0
 fi
 

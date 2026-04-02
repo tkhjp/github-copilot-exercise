@@ -5,33 +5,32 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 read_hook_input
 
-TOOL_NAME="$(get_field '.toolName')"
+TOOL_NAME="$(get_tool_name)"
+CMD="$(get_command)"
 
-# Only inspect bash/shell tool calls
-if [[ "$TOOL_NAME" != "bash" && "$TOOL_NAME" != "shell" ]]; then
+# Only inspect shell/terminal tool calls (broad match for VS Code + CLI)
+case "$TOOL_NAME" in
+  *terminal*|*shell*|*bash*|*command*|*Terminal*|bash|shell) ;;
+  *) exit 0 ;;
+esac
+
+[[ -z "$CMD" ]] && exit 0
+
+# Rule 1: git commit — confirm before committing
+if echo "$CMD" | grep -qE 'git\s+commit'; then
+  echo '{"permissionDecision":"ask","permissionDecisionReason":"[確認] git commit を実行します。コミットメッセージと変更内容を確認してください。"}'
   exit 0
 fi
 
-CMD="$(get_field_safe '.toolArgs.command')"
-if [[ -z "$CMD" ]]; then
+# Rule 2: Package install — confirm dependency changes
+if echo "$CMD" | grep -qEi 'pip\s+install|npm\s+install|brew\s+install|yarn\s+add'; then
+  echo '{"permissionDecision":"ask","permissionDecisionReason":"[確認] パッケージインストールを実行します。依存関係の変更を確認してください。"}'
   exit 0
 fi
 
-# Rule 1: git push --force — risky but sometimes intentional
-if echo "$CMD" | grep -Eq 'git\s+push\s+.*--force|git\s+push\s+-f'; then
-  echo '{"permissionDecision":"ask","permissionDecisionReason":"[Escalation] Force push detected. This rewrites remote history and may affect other developers. Confirm to proceed."}'
-  exit 0
-fi
-
-# Rule 2: git push to main/master — should usually go through PR
-if echo "$CMD" | grep -Eq 'git\s+push\s+\S+\s+(main|master)'; then
-  echo '{"permissionDecision":"ask","permissionDecisionReason":"[Escalation] Direct push to main/master detected. Consider using a pull request instead. Confirm to proceed."}'
-  exit 0
-fi
-
-# Rule 3: chmod 777 — overly permissive
-if echo "$CMD" | grep -Eq 'chmod\s+777'; then
-  echo '{"permissionDecision":"ask","permissionDecisionReason":"[Escalation] chmod 777 grants full access to all users. Consider more restrictive permissions (e.g., 755). Confirm to proceed."}'
+# Rule 3: File system modification via shell
+if echo "$CMD" | grep -qE '\bmkdir\b|\btouch\b|\bmv\s|\bcp\s|\brm\s'; then
+  echo '{"permissionDecision":"ask","permissionDecisionReason":"[確認] ファイルシステムを変更するコマンドです。実行内容を確認してください。"}'
   exit 0
 fi
 

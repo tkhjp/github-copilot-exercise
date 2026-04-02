@@ -6,9 +6,11 @@ source "$SCRIPT_DIR/utils.sh"
 read_hook_input
 
 AUDIT_DIR="$(get_audit_dir)"
-TOOL_NAME="$(get_field '.toolName')"
-RESULT_TYPE="$(get_field_safe '.toolResult.resultType')"
-RESULT_TEXT="$(get_field_safe '.toolResult.textResultForLlm')"
+TOOL_NAME="$(get_tool_name)"
+RESULT="$(get_tool_result)"
+
+RESULT_TYPE="$(echo "$RESULT" | jq -r '.resultType // .result_type // "unknown"' 2>/dev/null || echo "unknown")"
+RESULT_TEXT="$(echo "$RESULT" | jq -r '.textResultForLlm // .text // empty' 2>/dev/null || true)"
 
 # Truncate long results to keep audit log manageable
 RESULT_TRUNCATED="${RESULT_TEXT:0:500}"

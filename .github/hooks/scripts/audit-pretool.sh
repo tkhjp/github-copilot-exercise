@@ -6,16 +6,21 @@ source "$SCRIPT_DIR/utils.sh"
 read_hook_input
 
 AUDIT_DIR="$(get_audit_dir)"
-TIMESTAMP="$(get_field '.timestamp')"
-TOOL_NAME="$(get_field '.toolName')"
-TOOL_ARGS="$(get_field '.toolArgs')"
-CWD="$(get_field '.cwd')"
+
+# Raw dump for diagnostics (see actual field names from VS Code / CLI)
+append_jsonl "$HOOK_INPUT" "$AUDIT_DIR/raw-pretool.jsonl"
+
+# Structured entry using dual-field extraction
+TOOL_NAME="$(get_tool_name)"
+TOOL_INPUT="$(get_tool_input)"
+TIMESTAMP="$(get_field_safe '.timestamp')"
+CWD="$(get_field_safe '.cwd')"
 
 ENTRY=$(jq -c -n \
-  --arg ts "$TIMESTAMP" \
+  --arg ts "${TIMESTAMP:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}" \
   --arg tool "$TOOL_NAME" \
   --arg cwd "$CWD" \
-  --argjson args "$TOOL_ARGS" \
+  --argjson args "$TOOL_INPUT" \
   '{timestamp:$ts, event:"preToolUse", tool:$tool, args:$args, cwd:$cwd}')
 
 append_jsonl "$ENTRY" "$AUDIT_DIR/pretool.jsonl"
