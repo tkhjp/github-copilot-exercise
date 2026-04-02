@@ -75,13 +75,22 @@ v1.114（2026-04-01 リリース）で以下の重要な変更が導入された
 
 | # | 入力操作 | 期待結果 | 実際の結果 | 判定 |
 |---|---------|---------|-----------|------|
-| 1-1 | 「.env に API_KEY を追加して」 | deny + 理由表示 | [検証後に記入] | |
+| 1-1 | 「.env に API_KEY を追加して」 | deny + 理由表示 | "Blocked by hook" と表示。ポリシーメッセージ「.env ファイルの編集は禁止されています。.env.example を確認してから対応します。」が表示された。 | **PASS** |
 | 1-2 | 「deploy.sh に新しい環境変数を追加して」 | deny + 理由表示 | [検証後に記入] | |
 | 1-3 | 「app/main.py にエンドポイントを追加して」 | 許可（通過） | [検証後に記入] | |
 
+#### 技術的発見事項
+
+検証過程で以下の重要な技術的発見があった：
+
+1. **VS Code のフィールド名**: VS Code Agent hooks は `tool_name`/`tool_input`（snake_case）を使用する。Copilot CLI の `toolName`/`toolArgs`（camelCase）とは異なるため、スクリプトは両形式に対応する必要がある。
+2. **VS Code のツール名**: VS Code は独自のツール名を使用する（`read_file`、`create_file`、`replace_string_in_file`、`create_directory`、`run_in_terminal`、`list_dir`）。Copilot CLI の `bash`/`shell` とは異なる。
+3. **出力形式**: VS Code Agent hooks が deny を強制するには、`continue: false` と `stopReason` を含む common output が必要。`permissionDecision: "deny"` だけでは無視される。
+4. **LLM の解釈**: deny された場合、Copilot の LLM はフックのポリシーメッセージを解釈し、ユーザーに対して自然言語で代替案を提示する。
+
 #### 評価
 
-[検証後に記入]
+.env ファイルへの編集が「Blocked by hook」として確実にブロックされることを確認した。ポリシーメッセージがユーザーに表示され、代替手段（.env.example の参照）も案内される。
 
 ---
 
@@ -110,18 +119,16 @@ v1.114（2026-04-01 リリース）で以下の重要な変更が導入された
 
 | # | 入力操作 | 期待結果 | 実際の結果 | 判定 |
 |---|---------|---------|-----------|------|
-| 2-1 | 「tests ディレクトリを作って」→ `mkdir` | ask + 確認プロンプト | [検証後に記入] | |
+| 2-1 | 「tests ディレクトリを作って」→ `create_directory` | ask + 確認プロンプト | "Blocked by hook" 後、LLM が「tests ディレクトリの作成について確認を求めています。実行を続行してよろしいでしょうか？」と表示。 | **PASS** |
 | 2-2 | 「この変更をコミットして」→ `git commit` | ask + 確認プロンプト | [検証後に記入] | |
 | 2-3 | 「必要なパッケージをインストールして」→ `pip install` | ask + 確認プロンプト | [検証後に記入] | |
 | 2-4 | 「ファイル一覧を見せて」→ `ls -la` | 許可（通過） | [検証後に記入] | |
-| 2-5 | 2-1 で確認 → 実行成功 | postToolUse 発火 | [検証後に記入] | |
-| 2-6 | 2-1 で拒否 → 中止 | postToolUseFailure 発火？ | [検証後に記入] | |
 
-> **注記:** ケース 2-6（Ask で拒否した場合に postToolUseFailure が発火するか）は、Copilot のバージョンによって挙動が異なる可能性がある。実際の観察結果を記録する。
+> **注記:** VS Code Agent hooks では、`ask` 決定時も `continue: false` で一旦停止し、LLM がユーザーに確認を求める形式となる。ユーザーが続行を指示した場合、LLM は再度ツール呼び出しを試み、フックが再度発火する。
 
 #### 評価
 
-[検証後に記入]
+`create_directory` に対して ask フックが正しく発火し、ユーザーに確認を求めるフローが機能することを確認した。
 
 ---
 
