@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "command": "./.github/hooks/scripts/audit-posttool-failure.sh"
+      }
+    ]
+  }
+}
