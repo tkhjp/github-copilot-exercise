@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "./.github/hooks/scripts/ask-escalation.sh"
+      }
+    ]
+  }
+}
