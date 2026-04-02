@@ -59,10 +59,21 @@ get_command() {
 emit_decision() {
   local decision="$1"
   local reason="$2"
+  # VS Code common output: continue=false stops execution, systemMessage shows reason
+  # VS Code hookSpecificOutput: decision field for PreToolUse
+  # CLI: permissionDecision + permissionDecisionReason
+  local should_continue="true"
+  if [[ "$decision" == "deny" ]]; then
+    should_continue="false"
+  fi
   jq -c -n \
     --arg d "$decision" \
     --arg r "$reason" \
+    --argjson cont "$should_continue" \
     '{
+      continue: $cont,
+      stopReason: $r,
+      systemMessage: $r,
       permissionDecision: $d,
       permissionDecisionReason: $r,
       hookSpecificOutput: {
