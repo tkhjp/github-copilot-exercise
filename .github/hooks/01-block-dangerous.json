@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "./.github/hooks/scripts/block-dangerous.sh"
+      }
+    ]
+  }
+}
