@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "./.github/hooks/scripts/audit-pretool.sh"
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "./.github/hooks/scripts/audit-posttool.sh"
+      }
+    ]
+  }
+}
