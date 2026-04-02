@@ -1,0 +1,3 @@
+# Audit logs (generated at runtime, not committed)
+.copilot-audit/*.jsonl
+.copilot-audit/*.tsv
