@@ -10,9 +10,9 @@ CMD="$(get_command)"
 FILE_PATH="$(get_file_path)"
 
 # Rule A: Directory creation (VS Code uses create_directory, not shell mkdir)
+# === PATTERN TEST: change this block to test different output formats ===
 if [[ "$TOOL_NAME" == "create_directory" ]]; then
-  local_path="$(get_tool_input | jq -r '.dirPath // .path // empty' 2>/dev/null || true)"
-  emit_decision "ask" "[確認] ディレクトリを作成します: ${local_path##*/}。実行内容を確認してください。"
+  emit_decision "ask" "[確認] ディレクトリを作成します。実行内容を確認してください。"
   exit 0
 fi
 

@@ -108,7 +108,7 @@ if [[ -n "$FILE_PATH" ]] && echo "$FILE_PATH" | grep -qEi 'deploy|prod|\.secret'
 fi
 ```
 
-`emit_decision` は、VS Code が要求する出力形式（`continue: false`、`stopReason`、`hookSpecificOutput`）を生成する共通ヘルパー関数である。
+`emit_decision` は、VS Code と CLI の両方が要求する出力形式（`hookSpecificOutput.permissionDecision` + トップレベル `permissionDecision`）を生成する共通ヘルパー関数である。
 
 #### 検証結果
 
@@ -191,7 +191,7 @@ fi
 
 ![mkdir 確認プロンプト](images/03-ask-mkdir.png)
 
-**結果:** 「Blocked by hook」が表示された後、Copilot が「tests ディレクトリを copilot_demo に作成します。問題ありませんか？」とユーザーに確認を求めた。
+**結果:** VS Code の確認 UI（「Allow Once」/「Skip」ボタン付き）が表示された。フックのポリシーメッセージ「PreToolUse hook required confirmation」とともに、作成先ディレクトリのパスが表示される。「Allow Once」をクリックすると、ディレクトリが作成された。
 
 **ケース 2-2:「この変更を git commit して」**
 
@@ -203,8 +203,8 @@ fi
 
 | # | 入力操作 | 期待結果 | 実際の結果 | 判定 |
 |---|---------|---------|-----------|------|
-| 2-1 | 「tests ディレクトリを作って」 | ask | 確認プロンプト表示 | **PASS** |
-| 2-2 | 「この変更を git commit して」 | ask | 事前確認フロー発動 | **PASS** |
+| 2-1 | 「tests ディレクトリを作って」 | ask | VS Code 確認 UI（Allow Once / Skip）が表示。承認後に作成完了。 | **PASS** |
+| 2-2 | 「この変更を git commit して」 | ask | 確認 UI が表示。承認後に実行。 | **PASS** |
 | 2-3 | 「必要なパッケージをインストールして」 | ask | [検証後に記入] | |
 | 2-4 | 「ファイル一覧を見せて」 | 許可 | [検証後に記入] | |
 
@@ -386,26 +386,46 @@ v1.114:
 
 ## 5. 発見事項
 
-### 5.1 VS Code Agent Hooks の出力形式
+### 5.1 VS Code Agent Hooks の出力形式（最重要）
 
-**最も重要な発見:** VS Code Agent hooks で deny を実際に強制するには、以下の出力形式が必要である。
+**最も重要な発見:** VS Code は `hookSpecificOutput` 内の **`permissionDecision`** フィールドを読み取る。多くのドキュメントやサンプルで使用されている `decision` フィールドは**無視される**。
 
+**正しい出力形式:**
 ```json
 {
-  "continue": false,
-  "stopReason": "ポリシー違反の理由",
-  "systemMessage": "ポリシー違反の理由",
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "ポリシー違反の理由"
+  }
+}
+```
+
+**誤った出力形式（VS Code は無視する）:**
+```json
+{
+  "hookSpecificOutput": {
     "decision": "deny",
     "reason": "ポリシー違反の理由"
   }
 }
 ```
 
-Copilot CLI 形式の `permissionDecision: "deny"` だけでは、**VS Code は deny を無視する**。`continue: false` の指定が必須である。
+また、`continue: false` / `stopReason` を使用すると、ツール単体の拒否ではなく**エージェント全体が中止される**ため、使用すべきでない。`hookSpecificOutput.permissionDecision` のみで deny / ask の制御が可能である。
 
-### 5.2 フィールド名の互換性
+**ソースコード確認先:** `microsoft/vscode-copilot-chat` リポジトリ `chatHookService.ts` 381行目
+
+### 5.2 deny と ask の挙動の違い
+
+ソースコード解析と E2E 検証により、以下の挙動が確認された：
+
+| 決定 | VS Code の挙動 | ユーザー体験 |
+|------|--------------|------------|
+| `deny` | ツール実行を即座に拒否。LLM にエラーとして返却。 | 「Blocked by hook」表示。LLM が代替案を提示。 |
+| `ask` | VS Code の確認 UI（「Allow Once」/「Skip」）を表示。ユーザーの明示的な承認を待つ。 | 確認ダイアログでポリシーメッセージと操作内容が表示される。承認後に実行。 |
+| `allow` | 確認なしで即座に実行（auto-approve 相当）。 | ユーザーへの確認なし。 |
+
+### 5.3 フィールド名の互換性
 
 VS Code Agent hooks と Copilot CLI では、フックに渡される入力 JSON のフィールド名が異なる：
 
@@ -425,11 +445,11 @@ get_tool_name() {
 }
 ```
 
-### 5.3 VS Code のツール名体系
+### 5.4 VS Code のツール名体系
 
 VS Code Copilot Chat は独自のツール名体系を使用しており、Copilot CLI の `bash` / `shell` とは異なる。検証で確認されたツール名の一覧は 3.3 節の表を参照のこと。
 
-### 5.4 Agent Hooks のステータス
+### 5.5 Agent Hooks のステータス
 
 VS Code の Agent Hooks は本検証時点では **Preview** 機能であり、今後の バージョンアップで仕様が変更される可能性がある点に留意が必要である。
 
