@@ -1,3 +1,12 @@
 # Audit logs (generated at runtime, not committed)
 .copilot-audit/*.jsonl
 .copilot-audit/*.tsv
+
+# Override parent .gitignore which excludes any lib/ directory.
+# tools/lib/ is the source library for the image-describer CLI scripts.
+!tools/lib/
+!tools/lib/**
+
+# But still ignore Python build artifacts inside it
+tools/lib/__pycache__/
+**/__pycache__/

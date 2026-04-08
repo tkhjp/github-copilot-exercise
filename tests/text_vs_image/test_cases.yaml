@@ -1,0 +1,345 @@
+test_cases:
+- id: tc01
+  title: フローチャート
+  image: tests/text_vs_image/images/01_flowchart.png
+  image_type: flowchart
+  specialized_prompt: prompts/flowchart_mermaid.md
+  question: 'この画像のフローチャートについて、ステップ数、各ステップの名前、矢印の向き、タイトル、注釈テキストを教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f1
+    text: ステップは 3 つ
+  - id: f2
+    text: 1 番目のステップは 'Receive Order'
+  - id: f3
+    text: 2 番目のステップは 'Validate Payment'
+  - id: f4
+    text: 3 番目のステップは 'Ship Product'
+  - id: f5
+    text: 矢印は左から右への単方向
+  - id: f6
+    text: タイトルは 'Order Processing Flow'
+  - id: f7
+    text: '注釈に ''Success rate: 97.3% (Q1 2026)'' と記載'
+  - id: f8
+    text: Receive Order ボックスの背景色は薄い青
+  descriptions:
+    generic: "提供された画像について、ご指定の項目に沿って構造的に記述します。\n\n### 1. テキスト内容（OCR）\n画像内に含まれるテキストは以下の通りです。\n\n*   **左上部（タイトル）:**\n    * \
+      \  `Order Processing Flow`\n*   **左のボックス内:**\n    *   `Receive`\n    *   `Order`\n*   **中央のボックス内:**\n    *   `Validate`\n\
+      \    *   `Payment`\n*   **右のボックス内:**\n    *   `Ship`\n    *   `Product`\n*   **左下部（注釈）:**\n    *   `Success rate: 97.3%\
+      \ (Q1 2026)`\n\n### 2. 図表・ダイアグラムの構造\n左から右へと一直線に進む、3つのステップからなるフローチャートです。\n\n*   **ノード（ボックス）:**\n    *   **ノード1（左）:**\
+      \ テキスト「Receive Order」を含む。\n    *   **ノード2（中央）:** テキスト「Validate Payment」を含む。\n    *   **ノード3（右）:** テキスト「Ship Product」を含む。\n\
+      *   **接続（矢印）:**\n    *   ノード1の右辺中央から、ノード2の左辺中央へ向かう右向きの矢印。\n    *   ノード2の右辺中央から、ノード3の左辺中央へ向かう右向きの矢印。\n*   **階層:** 分岐や並列処理のない、フラットな単一階層の順次構造です。\n\
+      \n### 3. 色とレイアウト\n*   **背景色:** 全体の背景は白色です。\n*   **レイアウト:**\n    *   タイトルテキストは左上に配置されています。\n    *   3つのノード（ボックス）は、画像の中央部分に水平に等間隔で配置されています。\n\
+      \    *   注釈テキストは左下に配置されています。\n*   **要素の色:**\n    *   **ノード1（Receive Order）:** 背景色は薄い青色。\n    *   **ノード2（Validate Payment）:**\
+      \ 背景色は薄い黄色。\n    *   **ノード3（Ship Product）:** 背景色は薄い緑色。\n    *   **ボックスの枠線:** 全てのボックスは太い黒色の実線で縁取られています。\n    *   **矢印:**\
+      \ 線の部分、鏃（やじり）の部分ともに黒色です。\n    *   **テキスト:** タイトルとボックス内のテキストは黒色。左下の注釈テキストは濃いグレー色です。\n\n### 4. 主要な視覚要素\n*   **長方形のボックス:**\
+      \ 同一サイズ・同一形状の長方形が3つ使用されています。\n*   **矢印:** 直線と三角形の鏃（やじり）で構成された、太くシンプルな右向きの矢印が2本使用されています。\n*   フォントは全てサンセリフ体（ゴシック体）で統一されています。"
+    specialized: "## Mermaid 表記\n\n```mermaid\nflowchart LR\n    A[\"Receive<br>Order\"] --> B[\"Validate<br>Payment\"]\n\
+      \    B --> C[\"Ship<br>Product\"]\n```\n\n## 補足情報\n\n*   **タイトル**: Order Processing Flow (左上に配置)\n*   **注釈・補足テキスト**:\
+      \ Success rate: 97.3% (Q1 2026) (左下にグレーの文字で配置)\n*   **色分けの意味**: 画像内に凡例はありませんが、各プロセスで背景色が異なります。\n    *   Receive Order:\
+      \ 薄い水色\n    *   Validate Payment: 薄い黄色\n    *   Ship Product: 薄い緑色\n*   **手書き or 印字の区別**: すべて印字（デジタルで作成された図）\n*   **その他特筆すべき視覚要素**:\
+      \ 各プロセスのノードは長方形で、太い黒の枠線が描画されています。"
+  description_scores:
+    generic: {}
+    specialized: {}
+  case1:
+    copilot_answer: ''
+    fact_scores: {}
+  case2:
+    copilot_answer: ''
+    fact_scores: {}
+- id: tc02
+  title: 棒グラフ
+  image: tests/text_vs_image/images/02_barchart.png
+  image_type: chart
+  specialized_prompt: prompts/chart_table.md
+  question: 'この棒グラフのタイトル、各棒のラベルと値、最大値、グラフの種別を教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f1
+    text: タイトルは 'Monthly Revenue (million JPY)'
+  - id: f2
+    text: 棒は 4 本
+  - id: f3
+    text: Jan の値は 120
+  - id: f4
+    text: Feb の値は 85
+  - id: f5
+    text: Mar の値は 160
+  - id: f6
+    text: Apr の値は 140
+  - id: f7
+    text: 最大値は Mar の 160
+  - id: f8
+    text: 縦棒グラフ（bar chart）
+  - id: f9
+    text: Mar の棒だけ色が異なる（オレンジ系）
+  descriptions:
+    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n*   **タイトル（上部中央）:**\n    *   Monthly Revenue\
+      \ (million JPY)\n*   **棒の上の数値（左から右へ）:**\n    *   120\n    *   85\n    *   160\n    *   140\n*   **X軸下のラベル（左から右へ）:**\n\
+      \    *   Jan\n    *   Feb\n    *   Mar\n    *   Apr\n\n### 2. 図表・ダイアグラムの構造\nこの画像は縦棒グラフ（Bar chart）です。\n\n*   **軸の構造:**\n\
+      \    *   **Y軸:** 左端に垂直な直線が引かれていますが、目盛りや数値ラベルは存在しません。\n    *   **X軸:** 下端に水平な直線が引かれており、4つのカテゴリが設定されています。\n*   **データポイント（棒）の構造:**\n\
+      \    X軸上に4本の長方形（棒）が等間隔で配置されており、それぞれの高さは上部に記載された数値の大きさに視覚的に比例しています。\n    *   **第1項:** 位置「Jan」、値「120」\n    *   **第2項:**\
+      \ 位置「Feb」、値「85」\n    *   **第3項:** 位置「Mar」、値「160」\n    *   **第4項:** 位置「Apr」、値「140」\n\n### 3. 色とレイアウト\n*   **背景色:** 白\n\
+      *   **テキスト色:** 黒\n*   **線の色（軸線、棒の輪郭）:** 黒の細い実線\n*   **棒の塗りつぶし色:**\n    *   Janの棒: 青色\n    *   Febの棒: 青色\n    *   Marの棒:\
+      \ オレンジ色\n    *   Aprの棒: 青色\n*   **レイアウト（配置）:**\n    *   タイトルは画像の上部に配置されています。\n    *   Y軸の直線とX軸の直線が左下で交差するL字型の枠組み内にグラフが描画されています。\n\
+      \    *   各棒はX軸の直線を底辺として垂直に立っています。\n    *   各棒の幅はすべて均一です。\n    *   数値は各棒の上端のすぐ上に、カテゴリラベルは各棒の真下（X軸の下）に、それぞれ中央揃えで配置されています。\n\
+      \n### 4. 主要な視覚要素\n*   1つのタイトル文字列\n*   L字型を構成する2本の直線（Y軸、X軸）\n*   4つの長方形（データを示す棒）\n*   4つの数値文字列（棒の上）\n*   4つの文字列（X軸の下）"
+    specialized: '## グラフ種別
+
+      棒グラフ
+
+
+      ## データテーブル
+
+      | ラベル | 値 | 単位 | 色 |
+
+      |---|---|---|---|
+
+      | Jan | 120 | million JPY | 青（#4a90e2 系） |
+
+      | Feb | 85 | million JPY | 青（#4a90e2 系） |
+
+      | Mar | 160 | million JPY | オレンジ（#d97a50 系） |
+
+      | Apr | 140 | million JPY | 青（#4a90e2 系） |
+
+
+      ## 軸とタイトル
+
+      - タイトル: Monthly Revenue (million JPY)
+
+      - X 軸ラベル: 明記なし（月を示す Jan, Feb, Mar, Apr が項目ラベルとして配置）
+
+      - Y 軸ラベル / 単位: 目盛やラベルは明記なし / million JPY（タイトルより）
+
+      - 凡例があれば: なし
+
+
+      ## 補足
+
+      収益は2月に最小値の85 million JPYに落ち込んだ後、3月に急増して最大値の160 million JPYを記録しています。3月の棒グラフのみ色がオレンジ色に変更されており、特に強調したい月であることがうかがえます。'
+  description_scores:
+    generic: {}
+    specialized: {}
+  case1:
+    copilot_answer: ''
+    fact_scores: {}
+  case2:
+    copilot_answer: ''
+    fact_scores: {}
+- id: tc03
+  title: 売上テーブル
+  image: tests/text_vs_image/images/03_table.png
+  image_type: table
+  specialized_prompt: prompts/table_markdown.md
+  question: 'この表のタイトル、列名、各行のデータを教えてください。Tokyo の Mar の値と、Fukuoka の Total の値も教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f1
+    text: タイトルは 'Q1 2026 Regional Sales (million JPY)'
+  - id: f2
+    text: 5 列ある (Region, Jan, Feb, Mar, Total)
+  - id: f3
+    text: 4 行ある (Tokyo, Osaka, Nagoya, Fukuoka)
+  - id: f4
+    text: Tokyo の Mar は 160
+  - id: f5
+    text: Tokyo の Total は 365
+  - id: f6
+    text: Osaka の Total は 270
+  - id: f7
+    text: Nagoya の Total は 190
+  - id: f8
+    text: Fukuoka の Total は 150
+  - id: f9
+    text: ヘッダー行は青背景・白文字
+  - id: f10
+    text: 行は交互にグレーと白の縞模様
+  descriptions:
+    generic: "画像から読み取れる構造的な情報を詳細に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n**タイトル:**\n* Q1 2026 Regional Sales (million\
+      \ JPY)\n\n**テーブル内のテキスト (行ごと):**\n* **ヘッダー行:** Region, Jan, Feb, Mar, Total\n* **第1データ行:** Tokyo, 120, 85, 160, 365\n\
+      * **第2データ行:** Osaka, 90, 70, 110, 270\n* **第3データ行:** Nagoya, 60, 55, 75, 190\n* **第4データ行:** Fukuoka, 45, 40, 65, 150\n\
+      \n---\n\n### 2. 図表・ダイアグラムの構造\nこの画像は、行と列で構成される単一の**表（データテーブル）**です。\n\n* **全体構造:** 5列 × 5行（ヘッダー行を1行、データ行を4行含む）のグリッド構造。\n\
+      * **列の構造（左から右へ）:**\n    * **第1列 (Region):** 地域の名称を示すカテゴリ列。\n    * **第2列 (Jan):** 1月の数値を格納するデータ列。\n    * **第3列 (Feb):**\
+      \ 2月の数値を格納するデータ列。\n    * **第4列 (Mar):** 3月の数値を格納するデータ列。\n    * **第5列 (Total):** 各行の合計数値を格納するデータ列。\n* **行の階層構造:**\n \
+      \   * **第1行:** 各列の項目名を示すヘッダー行。\n    * **第2〜5行:** 各地域（Tokyo, Osaka, Nagoya, Fukuoka）に紐づく個別のデータ行。\n\n---\n\n### 3. 色とレイアウト\n\
+      * **全体背景:** 白色。\n* **タイトル:** \n    * 文字色: 黒色。\n    * 配置: 表の左上に左揃えで配置。\n* **表の外枠:** \n    * 罫線: 黒色で、内部の罫線よりもやや太い実線。\n\
+      * **表のヘッダー行 (Region, Jan...):**\n    * 背景色: 明るい青色。\n    * 文字色: 白色。\n    * 文字配置: 全て中央揃え。\n    * セル間の縦線: 白色。\n* **表のデータ行\
+      \ (Tokyo, Osaka...):**\n    * 背景色: 薄いグレーと白色が交互に繰り返されるストライプパターン（Tokyo行=薄いグレー、Osaka行=白、Nagoya行=薄いグレー、Fukuoka行=白）。\n  \
+      \  * 文字色: 黒色。\n    * 文字配置: 第1列（Region）は左揃え。第2〜5列（数値）は中央揃え。\n    * セル間の罫線（内側の縦線・横線）: 薄いグレーの細線。\n\n---\n\n### 4. 主要な視覚要素\n\
+      画像は大きく分けて2つの視覚要素で構成されています。\n1. **テキスト見出し:** 画像上部にある単一のテキスト行。表の内容（時期、内容、単位）を説明しています。\n2. **データテーブル本体:** 中央に配置された矩形の表。青いヘッダーとグレー/白の縞模様の行背景によって、視覚的に情報が区分けされ、読み取りやすさが強調されています。"
+    specialized: 'ご指示の通り、画像内の表を読み取って指定の形式で出力します。
+
+
+      ## 表のメタ情報
+
+      - タイトル / キャプション（あれば）: Q1 2026 Regional Sales (million JPY)
+
+      - 行数: 5
+
+      - 列数: 5
+
+
+      ## Markdown テーブル
+
+      | Region | Jan | Feb | Mar | Total |
+
+      |---|---|---|---|---|
+
+      | Tokyo | 120 | 85 | 160 | 365 |
+
+      | Osaka | 90 | 70 | 110 | 270 |
+
+      | Nagoya | 60 | 55 | 75 | 190 |
+
+      | Fukuoka | 45 | 40 | 65 | 150 |
+
+
+      ## 補足
+
+      - ヘッダー行（Region, Jan, Feb, Mar, Total）の背景が青色に設定され、文字が白色になっています。
+
+      - データ行の背景色が1行おき（TokyoとNagoyaの行）に薄いグレーでハイライトされています。
+
+      - 表外の注釈・脚注はありません。'
+  description_scores:
+    generic: {}
+    specialized: {}
+  case1:
+    copilot_answer: ''
+    fact_scores: {}
+  case2:
+    copilot_answer: ''
+    fact_scores: {}
+- id: tc04
+  title: コードスクリーンショット
+  image: tests/text_vs_image/images/04_code.png
+  image_type: code
+  specialized_prompt: prompts/code_transcription.md
+  question: 'この画像のコードを正確に転写してください。ファイル名、言語、関数名、引数、戻り値も教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f1
+    text: ファイル名は 'fibonacci.py'
+  - id: f2
+    text: 言語は Python
+  - id: f3
+    text: 関数名は 'fibonacci'
+  - id: f4
+    text: '引数は ''n: int'''
+  - id: f5
+    text: 戻り値型注釈は '-> int'
+  - id: f6
+    text: docstring は '"""Return the n-th Fibonacci number."""'
+  - id: f7
+    text: 'ベースケースは ''if n < 2: return n'''
+  - id: f8
+    text: ループは 'for _ in range(n - 1):'
+  - id: f9
+    text: swap 文は 'a, b = b, a + b'
+  - id: f10
+    text: 呼び出しは 'result = fibonacci(10)'
+  - id: f11
+    text: print 文は "print(f'F(10) = {result}')"
+  - id: f12
+    text: ダーク (黒) 背景のエディタテーマ
+  descriptions:
+    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内のすべてのテキストを、画面上のレイアウト（インデントや改行）に沿って以下に書き出します。\n\n**上部タイトルバー:**\n\
+      ```\nfibonacci.py — Python\n```\n\n**コードエリア:**\n```python\ndef fibonacci(n: int) -> int:\n    \"\"\"Return the n-th\
+      \ Fibonacci number.\"\"\"\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(n - 1):\n        a,\
+      \ b = b, a + b\n    return b\n\nresult = fibonacci(10)\nprint(f'F(10) = {result}')\n```\n\n### 2. 図表・ダイアグラムの構造\n画像内にはフローチャートやグラフなどの図表・ダイアグラムは**含まれていません**。\n\
+      すべてテキストベースのソースコードです。ただし、テキストの配置として、Pythonコード特有のスペースによるインデント（字下げ）を用いた階層構造（ブロック構造）が存在します。\n\n### 3. 色とレイアウト\n*   **レイアウト:**\n\
+      \    *   画面全体は大きく上下の2つの領域に分かれています。上部に細い帯状のタイトルバーがあり、その下に広いコード表示エリアが広がっています。\n    *   コードエリアのテキストはすべて左揃えで配置されており、特定の行には行頭に空白（インデント）が設けられています。\n\
+      *   **色 (テーマとシンタックスハイライト):**\n    *   **背景色:** 全体的にダークテーマが適用されています。タイトルバーは暗いグレー、コードエリアの背景はさらに暗いダークグレー（ほぼ黒に近い色）です。\n\
+      \    *   **テキストカラー:**\n        *   **タイトルバーのテキスト:** ライトグレー（または白）。\n        *   **キーワード（`def`, `if`, `return`, `for`,\
+      \ `in`）:** 明るい青色。\n        *   **関数定義の構成要素（`fibonacci`, `n`, `int`, `range`）:** 水色（キーワードの青よりやや淡い青）。\n        *   **ドキュメンテーション文字列（`\"\
+      \"\"Return the n-th Fibonacci number.\"\"\"`）:** 緑色。\n        *   **一般の変数、数値、記号（`a`, `b`, `_`, `0`, `1`, `2`, `10`,\
+      \ `result`, `:`, `<`, `=`, `,`, `-`, `+`, `()` など）:** 白色。関数呼び出し時の `fibonacci` も白色です。\n        *   **組み込み関数（`print`）:**\
+      \ 淡い黄色（クリーム色）。\n        *   **f文字列（`f'F(10) = {result}'`）:** 黄土色（オリーブ色に近い黄色）。\n\n### 4. 主要な視覚要素\n*   **ファイル名/環境表示:**\
+      \ 上部のバーにファイル名「fibonacci.py」と、実行環境または言語を示す「Python」の文字が配置されています。\n*   **プログラミングフォント:** コードエリアのテキストには、文字幅が均等な等幅フォント（プログラミング向けフォント）が使用されています。\n\
+      *   **シンタックスハイライト:** コードの構文（予約語、文字列、変数、関数など）を視覚的に区別するための色分け機能が働いていることがわかります。"
+    specialized: "## 言語\nPython\n\n## コード\n```python\ndef fibonacci(n: int) -> int:\n    \"\"\"Return the n-th Fibonacci number.\"\
+      \"\"\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return\
+      \ b\n\nresult = fibonacci(10)\nprint(f'F(10) = {result}')\n```\n\n## 補足\n- タイトルバー/ファイル名: `fibonacci.py — Python`\n-\
+      \ エディタ UI 要素（カーソルや選択範囲など）は特に見当たりません。"
+  description_scores:
+    generic: {}
+    specialized: {}
+  case1:
+    copilot_answer: ''
+    fact_scores: {}
+  case2:
+    copilot_answer: ''
+    fact_scores: {}
+- id: tc05
+  title: アーキテクチャ図
+  image: tests/text_vs_image/images/05_architecture.png
+  image_type: architecture
+  specialized_prompt: prompts/architecture_mermaid.md
+  question: 'このアーキテクチャ図のコンポーネント、各コンポーネント間の接続、プロトコル、タイトルを教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f1
+    text: タイトルは 'Web Application Architecture'
+  - id: f2
+    text: コンポーネントは 4 つ
+  - id: f3
+    text: Web Client (Browser) コンポーネントがある
+  - id: f4
+    text: API Server (FastAPI) コンポーネントがある
+  - id: f5
+    text: Database (PostgreSQL) コンポーネントがある
+  - id: f6
+    text: Cache (Redis) コンポーネントがある
+  - id: f7
+    text: Web Client → API Server の接続は 'HTTPS'
+  - id: f8
+    text: API Server → Database の接続は 'SQL'
+  - id: f9
+    text: API Server → Cache の接続は 'GET/SET'
+  - id: f10
+    text: Database はシリンダー形（円柱）で描かれている
+  - id: f11
+    text: '凡例: blue=client, yellow=api, green=db, red=cache'
+  descriptions:
+    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n*   **タイトル（左上）**:\n    *   `Web Application\
+      \ Architecture`\n*   **ノード内のテキスト（各ノード内で2行に分かれている）**:\n    *   `Web Client` / `(Browser)`\n    *   `API Server` / `(FastAPI)`\n\
+      \    *   `Database` / `(PostgreSQL)`\n    *   `Cache` / `(Redis)`\n*   **矢印（エッジ）に付随するラベル**:\n    *   `HTTPS`\n    *\
+      \   `SQL`\n    *   `GET/SET`\n*   **凡例（左下）**:\n    *   `Legend: blue=client, yellow=api, green=db, red=cache`\n\n###\
+      \ 2. 図表・ダイアグラムの構造\nこの図は、4つのノード（構成要素）とそれらを繋ぐ3つの有向エッジ（矢印）で構成されるフロー図またはアーキテクチャ図です。\n\n*   **階層とフロー**: 全体として左から右への流れ（依存関係またはデータフロー）を示しています。中央の「API\
+      \ Server」をハブとして、右側で2つに分岐する構造です。\n*   **ノードと接続関係**:\n    1.  **始点**: `Web Client (Browser)` ノードから `API Server (FastAPI)`\
+      \ ノードへ、右向きの矢印が接続されています。この矢印の上部には `HTTPS` というラベルがあります。\n    2.  **分岐1（右上）**: `API Server (FastAPI)` ノードから `Database (PostgreSQL)`\
+      \ ノードへ、右上に向かう斜めの矢印が接続されています。この矢印の近くには `SQL` というラベルがあります。\n    3.  **分岐2（右下）**: `API Server (FastAPI)` ノードから `Cache (Redis)`\
+      \ ノードへ、右下に向かう斜めの矢印が接続されています。この矢印の近くには `GET/SET` というラベルがあります。\n\n### 3. 色とレイアウト\n*   **背景色**: 白。\n*   **テキストの色**: タイトルとノード内のテキストは黒。矢印のラベル（HTTPS,\
+      \ SQL, GET/SET）と左下の凡例はグレー。\n*   **ノードの色と凡例との対応**: 各ノードは黒い実線の枠線で囲まれ、異なる色で塗りつぶされています。これらは左下の凡例と対応しています。\n    *   `Web\
+      \ Client`: 薄い青色（blue）\n    *   `API Server`: 薄い黄色（yellow）\n    *   `Database`: 薄い緑色（green）\n    *   `Cache`: 薄い赤色/ピンク色（red）\n\
+      *   **レイアウト（配置）**:\n    *   左側にクライアント要素、中央にAPIサーバー、右側の上下にデータストア要素が配置されています。\n    *   タイトルは左上に左揃えで配置。\n    *   凡例は左下に左揃えで配置（フォントサイズは他より小さい）。\n\
+      \    *   ノード内のテキストはすべて中央揃え（センタリング）されています。\n\n### 4. 主要な視覚要素\n*   **図形の形状**:\n    *   **長方形**: `Web Client`、`API Server`、`Cache`\
+      \ の3つのノードは単純な長方形です。\n    *   **円柱形**: `Database` ノードのみ、データストレージを一般的に表す円柱（立体的なドラム缶）の形状をしています。上部に楕円形が描かれ、立体感を表現しています。\n\
+      *   **矢印**:\n    *   すべて黒い実線の直線です。\n    *   先端には塗りつぶされた黒い三角形の矢尻がついています。\n    *   矢印は各図形の枠線から出発し、目的の図形の枠線に到達しています。"
+    specialized: "画像の内容に基づき、システム構成図を構造化して出力します。\n\n## Mermaid 表記\n\n```mermaid\nflowchart LR\n    A[\"Web Client\\n(Browser)\"\
+      ]\n    B[\"API Server\\n(FastAPI)\"]\n    C[(\"Database\\n(PostgreSQL)\")]\n    D[\"Cache\\n(Redis)\"]\n\n    A -- \"\
+      HTTPS\" --> B\n    B -- \"SQL\" --> C\n    B -- \"GET/SET\" --> D\n\n    %% スタイリング（画像の凡例に基づく色分け）\n    style A fill:#dae8fc,stroke:#000000\n\
+      \    style B fill:#fff2cc,stroke:#000000\n    style C fill:#d5e8d4,stroke:#000000\n    style D fill:#f8cecc,stroke:#000000\n\
+      ```\n\n## ノード一覧\n\n| ID | ラベル | 種別（service/db/queue/external/...） |\n|---|---|---|\n| A | Web Client (Browser) | client\
+      \ |\n| B | API Server (FastAPI) | service / api |\n| C | Database (PostgreSQL) | db |\n| D | Cache (Redis) | cache |\n\
+      \n## 接続一覧\n\n| From | To | ラベル（プロトコル等） |\n|---|---|---|\n| A (Web Client) | B (API Server) | HTTPS |\n| B (API Server)\
+      \ | C (Database) | SQL |\n| B (API Server) | D (Cache) | GET/SET |\n\n## 補足\n\n- **タイトル**: Web Application Architecture\n\
+      - **凡例（Legend）**: \n  - `blue` = client (Web Client)\n  - `yellow` = api (API Server)\n  - `green` = db (Database)\n\
+      \  - `red` = cache (Cache)\n- **グルーピングの名前**: 特になし\n- **その他注釈**: なし"
+  description_scores:
+    generic: {}
+    specialized: {}
+  case1:
+    copilot_answer: ''
+    fact_scores: {}
+  case2:
+    copilot_answer: ''
+    fact_scores: {}
