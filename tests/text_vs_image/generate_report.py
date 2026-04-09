@@ -25,10 +25,14 @@ WORKSPACE = ROOT.parent.parent
 
 EVAL_COLUMNS = [
     # (key, label, kind, source, badge_label)
-    ("generic", "Generic 記述", "description", "llm", "LLM 自動生成"),
-    ("specialized", "Specialized 記述", "description", "llm", "LLM 自動生成"),
-    ("case1", "Case 1: text → Copilot", "case", "manual", "手動入力"),
-    ("case2", "Case 2: image → Copilot", "case", "manual", "手動入力"),
+    # The "source" field now distinguishes:
+    #   - "describe": the LLM's raw description of the image
+    #   - "answer":   the LLM's answer to the user question (using either
+    #                 the specialized description or the image directly)
+    ("generic", "① Generic 記述", "description", "describe", "記述 (generic)"),
+    ("specialized", "② Specialized 記述", "description", "describe", "記述 (specialized)"),
+    ("case1", "③ Case 1: text→LLM 回答", "case", "answer", "回答 (text 経由)"),
+    ("case2", "④ Case 2: image→LLM 回答", "case", "answer", "回答 (image 直接)"),
 ]
 
 SCORE_VALUES = ("present", "partial", "missing")
@@ -132,14 +136,17 @@ def _render_html(data: dict) -> str:
             "columns": {},
             "scores_per_column": {},
         }
+        score_reasons = case.get("score_reasons") or {}
         for key, _label, kind, source, _badge in EVAL_COLUMNS:
             content = _content_for(case, key, kind)
+            reasons_key = f"descriptions.{key}" if kind == "description" else f"{key}.copilot_answer"
             case_payload["columns"][key] = {
                 "kind": kind,
                 "source": source,
                 "content": content,
                 "char_count": len(content),
                 "scores": _scores_for(case, key, kind),
+                "reasons": score_reasons.get(reasons_key, {}),
             }
             w, t, s = _per_case_score(case, key, kind)
             case_payload["scores_per_column"][key] = {
@@ -210,13 +217,13 @@ h3 { font-size: 16px; }
   text-align: center;
   position: relative;
 }
-.summary-card.source-llm {
+.summary-card.source-describe {
   background: #eff6ff;
   border-color: #93c5fd;
 }
-.summary-card.source-manual {
-  background: #f5f5f5;
-  border-color: #d1d5db;
+.summary-card.source-answer {
+  background: #f0fdf4;
+  border-color: #86efac;
 }
 .badge-mini {
   position: absolute;
@@ -233,8 +240,8 @@ h3 { font-size: 16px; }
   background: white;
   white-space: nowrap;
 }
-.badge-mini.source-llm { color: #1d4ed8; }
-.badge-mini.source-manual { color: #525252; }
+.badge-mini.source-describe { color: #1d4ed8; }
+.badge-mini.source-answer { color: #15803d; }
 .summary-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .summary-card .pct { font-size: 32px; font-weight: 700; margin: 8px 0; color: var(--accent); }
 .summary-card .detail { font-size: 12px; color: var(--muted); }
@@ -341,13 +348,13 @@ h3 { font-size: 16px; }
   flex-direction: column;
   position: relative;
 }
-.eval-col.source-llm {
+.eval-col.source-describe {
   background: #eff6ff;
   border-color: #93c5fd;
 }
-.eval-col.source-manual {
-  background: #f5f5f5;
-  border-color: #d1d5db;
+.eval-col.source-answer {
+  background: #f0fdf4;
+  border-color: #86efac;
 }
 .eval-col-badge {
   position: absolute;
@@ -362,11 +369,11 @@ h3 { font-size: 16px; }
   border: 1px solid currentColor;
   background: white;
 }
-.eval-col.source-llm .eval-col-badge {
+.eval-col.source-describe .eval-col-badge {
   color: #1d4ed8;
 }
-.eval-col.source-manual .eval-col-badge {
-  color: #525252;
+.eval-col.source-answer .eval-col-badge {
+  color: #15803d;
 }
 .eval-col-header {
   display: flex;
@@ -503,8 +510,8 @@ h3 { font-size: 16px; }
 </head>
 <body>
 
-<h1>Text vs Image — Copilot Chat Fidelity Report</h1>
-<p class="muted">画像を Copilot Chat に渡す方法（テキスト記述経由 vs 画像直接）でどの程度の情報損失が起きるか、またプロンプト工夫で記述の質をどれだけ改善できるかを評価。</p>
+<h1>Text vs Image Fidelity Report (全自動 LLM 評価版)</h1>
+<p class="muted">画像を LLM に渡す 2 通りの経路（specialized 記述を経由 vs 画像を直接渡す）でどの程度の情報損失が起きるか、またプロンプト工夫で記述の質をどれだけ改善できるかを LLM (Gemini) を使って完全自動で評価。Copilot Chat の代替として同じ Gemini モデルを使用しているため、同一モデル内の自己参照バイアスがあり得ることに留意。</p>
 
 <div class="summary">
   <h2>集計サマリー</h2>
@@ -606,9 +613,11 @@ function renderFactTable(c) {
     html += `<tr><td>${i + 1}</td><td>${escapeHtml(f.text)}</td>`;
     for (const col of DATA.columns) {
       const score = (c.columns[col.key].scores || {})[f.id] || null;
+      const reason = (c.columns[col.key].reasons || {})[f.id] || '';
       const cls = score ? `score-${score}` : 'score-na';
       const icon = score === 'present' ? '✓' : score === 'partial' ? '△' : score === 'missing' ? '✗' : '—';
-      html += `<td class="score ${cls}">${icon}</td>`;
+      const tip = reason ? ` title="${escapeHtml(reason)}"` : '';
+      html += `<td class="score ${cls}"${tip}>${icon}</td>`;
     }
     html += '</tr>';
   }
@@ -664,7 +673,7 @@ function renderCase(c) {
     </div>
     <div class="eval-section-title">
       <h3>各評価対象の出力</h3>
-      <span class="hint">← <strong style="color:#1d4ed8;">青枠 = LLM 自動生成</strong> ／ <strong style="color:#525252;">グレー枠 = Copilot Chat 手動入力</strong> →</span>
+      <span class="hint">← <strong style="color:#1d4ed8;">青枠 ①② = 画像 → LLM 記述 (describe)</strong> ／ <strong style="color:#15803d;">緑枠 ③④ = LLM 記述/画像 → LLM 回答 (answer)</strong> →</span>
     </div>
     <div class="eval-grid">${evalCols}</div>
   `;

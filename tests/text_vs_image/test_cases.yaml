@@ -1,345 +1,1716 @@
 test_cases:
 - id: tc01
-  title: フローチャート
-  image: tests/text_vs_image/images/01_flowchart.png
-  image_type: flowchart
-  specialized_prompt: prompts/flowchart_mermaid.md
-  question: 'この画像のフローチャートについて、ステップ数、各ステップの名前、矢印の向き、タイトル、注釈テキストを教えてください。
+  title: 混合スライド (Flow + Chart + Table + Code)
+  image: tests/text_vs_image/images/01_mixed_slide.png
+  image_type: mixed_slide
+  specialized_prompt: prompts/mixed_slide.md
+  question: 'このスライドに含まれる情報をすべて教えてください。フローチャートの各ステップ、棒グラフの月別値、地域別売上テーブルの Tokyo の Mar と Total、コード中の関数シグネチャ、フッター注釈を具体的に挙げてください。
 
     '
   ground_truth_facts:
-  - id: f1
-    text: ステップは 3 つ
-  - id: f2
-    text: 1 番目のステップは 'Receive Order'
-  - id: f3
-    text: 2 番目のステップは 'Validate Payment'
-  - id: f4
-    text: 3 番目のステップは 'Ship Product'
-  - id: f5
-    text: 矢印は左から右への単方向
-  - id: f6
-    text: タイトルは 'Order Processing Flow'
-  - id: f7
-    text: '注釈に ''Success rate: 97.3% (Q1 2026)'' と記載'
-  - id: f8
-    text: Receive Order ボックスの背景色は薄い青
-  descriptions:
-    generic: "提供された画像について、ご指定の項目に沿って構造的に記述します。\n\n### 1. テキスト内容（OCR）\n画像内に含まれるテキストは以下の通りです。\n\n*   **左上部（タイトル）:**\n    * \
-      \  `Order Processing Flow`\n*   **左のボックス内:**\n    *   `Receive`\n    *   `Order`\n*   **中央のボックス内:**\n    *   `Validate`\n\
-      \    *   `Payment`\n*   **右のボックス内:**\n    *   `Ship`\n    *   `Product`\n*   **左下部（注釈）:**\n    *   `Success rate: 97.3%\
-      \ (Q1 2026)`\n\n### 2. 図表・ダイアグラムの構造\n左から右へと一直線に進む、3つのステップからなるフローチャートです。\n\n*   **ノード（ボックス）:**\n    *   **ノード1（左）:**\
-      \ テキスト「Receive Order」を含む。\n    *   **ノード2（中央）:** テキスト「Validate Payment」を含む。\n    *   **ノード3（右）:** テキスト「Ship Product」を含む。\n\
-      *   **接続（矢印）:**\n    *   ノード1の右辺中央から、ノード2の左辺中央へ向かう右向きの矢印。\n    *   ノード2の右辺中央から、ノード3の左辺中央へ向かう右向きの矢印。\n*   **階層:** 分岐や並列処理のない、フラットな単一階層の順次構造です。\n\
-      \n### 3. 色とレイアウト\n*   **背景色:** 全体の背景は白色です。\n*   **レイアウト:**\n    *   タイトルテキストは左上に配置されています。\n    *   3つのノード（ボックス）は、画像の中央部分に水平に等間隔で配置されています。\n\
-      \    *   注釈テキストは左下に配置されています。\n*   **要素の色:**\n    *   **ノード1（Receive Order）:** 背景色は薄い青色。\n    *   **ノード2（Validate Payment）:**\
-      \ 背景色は薄い黄色。\n    *   **ノード3（Ship Product）:** 背景色は薄い緑色。\n    *   **ボックスの枠線:** 全てのボックスは太い黒色の実線で縁取られています。\n    *   **矢印:**\
-      \ 線の部分、鏃（やじり）の部分ともに黒色です。\n    *   **テキスト:** タイトルとボックス内のテキストは黒色。左下の注釈テキストは濃いグレー色です。\n\n### 4. 主要な視覚要素\n*   **長方形のボックス:**\
-      \ 同一サイズ・同一形状の長方形が3つ使用されています。\n*   **矢印:** 直線と三角形の鏃（やじり）で構成された、太くシンプルな右向きの矢印が2本使用されています。\n*   フォントは全てサンセリフ体（ゴシック体）で統一されています。"
-    specialized: "## Mermaid 表記\n\n```mermaid\nflowchart LR\n    A[\"Receive<br>Order\"] --> B[\"Validate<br>Payment\"]\n\
-      \    B --> C[\"Ship<br>Product\"]\n```\n\n## 補足情報\n\n*   **タイトル**: Order Processing Flow (左上に配置)\n*   **注釈・補足テキスト**:\
-      \ Success rate: 97.3% (Q1 2026) (左下にグレーの文字で配置)\n*   **色分けの意味**: 画像内に凡例はありませんが、各プロセスで背景色が異なります。\n    *   Receive Order:\
-      \ 薄い水色\n    *   Validate Payment: 薄い黄色\n    *   Ship Product: 薄い緑色\n*   **手書き or 印字の区別**: すべて印字（デジタルで作成された図）\n*   **その他特筆すべき視覚要素**:\
-      \ 各プロセスのノードは長方形で、太い黒の枠線が描画されています。"
-  description_scores:
-    generic: {}
-    specialized: {}
-  case1:
-    copilot_answer: ''
-    fact_scores: {}
-  case2:
-    copilot_answer: ''
-    fact_scores: {}
-- id: tc02
-  title: 棒グラフ
-  image: tests/text_vs_image/images/02_barchart.png
-  image_type: chart
-  specialized_prompt: prompts/chart_table.md
-  question: 'この棒グラフのタイトル、各棒のラベルと値、最大値、グラフの種別を教えてください。
-
-    '
-  ground_truth_facts:
-  - id: f1
-    text: タイトルは 'Monthly Revenue (million JPY)'
-  - id: f2
-    text: 棒は 4 本
-  - id: f3
+  - id: f01
+    text: タイトルは '2026 Q1 Operations Overview'
+  - id: f02
+    text: サブタイトルは 'Revenue, Fulfillment, and Metrics'
+  - id: f03
+    text: フローチャートのセクション見出しは 'Order Flow'
+  - id: f04
+    text: フローは 3 ステップ (Receive Order → Validate Payment → Ship Product)
+  - id: f05
+    text: フローの矢印は左→右の単方向
+  - id: f06
+    text: 棒グラフのセクション見出しは 'Monthly Revenue (MJPY)'
+  - id: f07
     text: Jan の値は 120
-  - id: f4
+  - id: f08
     text: Feb の値は 85
-  - id: f5
+  - id: f09
     text: Mar の値は 160
-  - id: f6
+  - id: f10
     text: Apr の値は 140
-  - id: f7
-    text: 最大値は Mar の 160
-  - id: f8
-    text: 縦棒グラフ（bar chart）
-  - id: f9
-    text: Mar の棒だけ色が異なる（オレンジ系）
+  - id: f11
+    text: Mar の棒だけ色が異なる (オレンジ系)
+  - id: f12
+    text: テーブルのセクション見出しは 'Regional Sales (MJPY)'
+  - id: f13
+    text: テーブルは 5 列 (Region, Jan, Feb, Mar, Total)
+  - id: f14
+    text: テーブルは 4 行 (Tokyo, Osaka, Nagoya, Fukuoka)
+  - id: f15
+    text: Tokyo の Mar の値は 160
+  - id: f16
+    text: Tokyo の Total の値は 365
+  - id: f17
+    text: Fukuoka の Total の値は 150
+  - id: f18
+    text: コードのファイル名は 'quarterly_total.py'
+  - id: f19
+    text: 関数名は 'quarterly_total'
+  - id: f20
+    text: '引数は ''region: str'''
+  - id: f21
+    text: 戻り値型注釈は '-> int'
+  - id: f22
+    text: コードは 'data = SALES[region]' を含む
+  - id: f23
+    text: 'フッター注釈に ''Q1 total revenue: 975 million JPY'' と記載'
+  - id: f24
+    text: フッター注釈に 'Mar was the strongest month' と記載
   descriptions:
-    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n*   **タイトル（上部中央）:**\n    *   Monthly Revenue\
-      \ (million JPY)\n*   **棒の上の数値（左から右へ）:**\n    *   120\n    *   85\n    *   160\n    *   140\n*   **X軸下のラベル（左から右へ）:**\n\
-      \    *   Jan\n    *   Feb\n    *   Mar\n    *   Apr\n\n### 2. 図表・ダイアグラムの構造\nこの画像は縦棒グラフ（Bar chart）です。\n\n*   **軸の構造:**\n\
-      \    *   **Y軸:** 左端に垂直な直線が引かれていますが、目盛りや数値ラベルは存在しません。\n    *   **X軸:** 下端に水平な直線が引かれており、4つのカテゴリが設定されています。\n*   **データポイント（棒）の構造:**\n\
-      \    X軸上に4本の長方形（棒）が等間隔で配置されており、それぞれの高さは上部に記載された数値の大きさに視覚的に比例しています。\n    *   **第1項:** 位置「Jan」、値「120」\n    *   **第2項:**\
-      \ 位置「Feb」、値「85」\n    *   **第3項:** 位置「Mar」、値「160」\n    *   **第4項:** 位置「Apr」、値「140」\n\n### 3. 色とレイアウト\n*   **背景色:** 白\n\
-      *   **テキスト色:** 黒\n*   **線の色（軸線、棒の輪郭）:** 黒の細い実線\n*   **棒の塗りつぶし色:**\n    *   Janの棒: 青色\n    *   Febの棒: 青色\n    *   Marの棒:\
-      \ オレンジ色\n    *   Aprの棒: 青色\n*   **レイアウト（配置）:**\n    *   タイトルは画像の上部に配置されています。\n    *   Y軸の直線とX軸の直線が左下で交差するL字型の枠組み内にグラフが描画されています。\n\
-      \    *   各棒はX軸の直線を底辺として垂直に立っています。\n    *   各棒の幅はすべて均一です。\n    *   数値は各棒の上端のすぐ上に、カテゴリラベルは各棒の真下（X軸の下）に、それぞれ中央揃えで配置されています。\n\
-      \n### 4. 主要な視覚要素\n*   1つのタイトル文字列\n*   L字型を構成する2本の直線（Y軸、X軸）\n*   4つの長方形（データを示す棒）\n*   4つの数値文字列（棒の上）\n*   4つの文字列（X軸の下）"
-    specialized: '## グラフ種別
+    generic: "画像の内容について、ご指定の4つの観点から構造的に詳細に記述します。\n\n### 1. テキスト内容（OCR）\n画像内に含まれるすべてのテキストをセクションごとに記述します。\n\n**ヘッダー部分:**\n*\
+      \   2026 Q1 Operations Overview\n*   Revenue, Fulfillment, and Metrics\n\n**左上パネル:**\n*   Order Flow\n*   Receive Order\n\
+      *   Validate Payment\n*   Ship Product\n\n**右上パネル:**\n*   Monthly Revenue (MJPY)\n*   120\n*   85\n*   160\n*   140\n\
+      *   Jan\n*   Feb\n*   Mar\n*   Apr\n\n**左下パネル:**\n*   Regional Sales (MJPY)\n*   Region, Jan, Feb, Mar, Total\n*   Tokyo,\
+      \ 120, 85, 160, 365\n*   Osaka, 90, 70, 110, 270\n*   Nagoya, 60, 55, 75, 190\n*   Fukuoka, 45, 40, 65, 150\n\n**右下パネル:**\n\
+      *   quarterly_total.py\n*   `def quarterly_total(region: str) -> int:`\n*   `    \"\"\"Sum Jan+Feb+Mar for one region.\"\
+      \"\"`\n*   `    data = SALES[region]`\n*   `    return data['Jan'] + data['Feb'] + data['Mar']`\n*   `total = quarterly_total('Tokyo')`\n\
+      \n**フッター部分:**\n*   Q1 total revenue: 975 million JPY. Mar was the strongest month across all regions.\n\n---\n\n###\
+      \ 2. 図表・ダイアグラムの構造\n\n**フローチャート (Order Flow):**\n*   **構造:** 3つの矩形ノードが左から右へ水平に配置され、直線的な階層を持つ。\n*   **ノード1:** 「Receive\
+      \ Order」（改行あり）。黒い枠線を持つ長方形。\n*   **接続:** ノード1の右端からノード2の左端へ向かう右向きの矢印。\n*   **ノード2:** 「Validate Payment」（改行あり）。黒い枠線を持つ長方形。\n\
+      *   **接続:** ノード2の右端からノード3の左端へ向かう右向きの矢印。\n*   **ノード3:** 「Ship Product」（改行あり）。黒い枠線を持つ長方形。\n\n**棒グラフ (Monthly Revenue (MJPY)):**\n\
+      *   **軸:** 黒い実線で描かれたL字型の軸（Y軸とX軸）。Y軸に目盛りやラベルは無い。X軸の下にラベルがある。\n*   **データ要素:** 4本の垂直な棒グラフ。各棒は黒い枠線を持つ。\n*   **要素の配置と値:**\n\
+      \    *   第1の棒: ラベル「Jan」、上部に値「120」\n    *   第2の棒: ラベル「Feb」、上部に値「85」\n    *   第3の棒: ラベル「Mar」、上部に値「160」（4本の中で最も高い）\n  \
+      \  *   第4の棒: ラベル「Apr」、上部に値「140」\n\n**表 (Regional Sales (MJPY)):**\n*   **構造:** 5列×5行のグリッド構造。外枠は黒い実線。\n*   **ヘッダー行:**\
+      \ 1行目。「Region」「Jan」「Feb」「Mar」「Total」の5項目。\n*   **データ行:** 2行目から5行目まで。各行の左端（Region列）に都市名があり、右側4列に数値データが格納されている。\n*   **罫線:**\
+      \ ヘッダー行とデータ行の間、および各データ行の間に細いグレーの水平線がある。列を区切る垂直線は、ヘッダー行のみ白線で、データ行には明示的な縦線はない（背景の塗り分けのみ）。\n\n---\n\n### 3. 色とレイアウト\n\n\
+      **全体レイアウト:**\n*   画面は上部のヘッダー帯、中央のメインコンテンツエリア（2行×2列の4パネル構成）、下部のフッター帯の3層構造になっている。\n*   背景色は、メインエリアが白色。\n\n**ヘッダー:**\n\
+      *   背景色: 鮮やかな青色。\n*   テキスト: 白色、左寄せ。上の行は太字で大きく、下の行は標準の太さで小さい。\n\n**各パネルの見出し:**\n*   パネル上部に配置されたタイトルテキストはすべて黒色、太字、左寄せ。\n\
+      \n**フローチャート (左上):**\n*   「Receive Order」ノード: 薄い青色の背景。\n*   「Validate Payment」ノード: 薄い黄色の背景。\n*   「Ship Product」ノード: 薄い緑色の背景。\n\
+      *   テキストと枠線、矢印は黒色。\n\n**棒グラフ (右上):**\n*   「Jan」「Feb」「Apr」の棒: 青色。\n*   「Mar」の棒: オレンジ色。\n*   枠線、軸線、テキストは黒色。\n\n**表 (左下):**\n\
+      *   ヘッダー行の背景: 水色（青）。\n*   ヘッダー行のテキストと縦の区切り線: 白色。\n*   データ行の背景: 白色。\n*   データ行のテキスト: 黒色。行を区切る水平線は薄いグレー。\n\n**コードスニペット\
+      \ (右下):**\n*   背景色: 濃いダークグレー（ほぼ黒）。\n*   テキストのシンタックスハイライト:\n    *   キーワード(`def`, `return`など)や型ヒント: 水色・青色系。\n    *   文字列・ドックストリング(`\"\
+      \"\"...\"\"\"`, `'Jan'`など): 緑色系。\n    *   変数名、関数名、記号(`=`, `+`など): 白色・薄いグレー。\n\n**フッター:**\n*   背景色: 非常に薄いグレー（またはわずかに青みがかった白）。\n\
+      *   テキスト: 黒色、太字、左寄せ。\n\n---\n\n### 4. 主要な視覚要素\n\n*   **トップバナー:** ページ全体のコンテキスト（時期とトピック）を示す青い横長の領域。\n*   **4つの情報ブロック:**\
+      \ 中央の白い領域に均等に配置された4つの独立した視覚コンポーネント。\n    1.  **業務プロセスの可視化（左上）:** 横方向のフローチャート図。\n    2.  **月別売上の推移（右上）:** 棒グラフ。特定の月（Mar）が色分けで強調されている。\n\
+      \    3.  **地域別売上データ（左下）:** マトリクス状のデータテーブル。\n    4.  **計算ロジック（右下）:** ダークモード風の背景を持つプログラミングコードのブロック。\n*   **ボトムバナー:** ページ下部を横断し、全体の要約や結論を示す薄いグレーの領域。"
+    specialized: "ご指示に従い、画像内のすべての要素を漏れなく抽出・構造化して出力します。\n\n## Step 1: レイアウトの全体像\nスライド全体は大きく以下の6つのセクション（領域）に分かれています。\n\n*  \
+      \ **ヘッダー（上部）**: タイトルとサブタイトル（本文テキスト）\n*   **左上セクション**: Order Flow（フローチャート）\n*   **右上セクション**: Monthly Revenue (MJPY)（グラフ\
+      \ / チャート）\n*   **左下セクション**: Regional Sales (MJPY)（表）\n*   **右下セクション**: quarterly_total.py（コード）\n*   **フッター（下部）**: まとめ・注釈（本文テキスト）\n\
+      \n---\n\n## Step 2: 各セクションを専用形式で出力\n\n### ヘッダー（上部）\n**タイトル:**\n> 2026 Q1 Operations Overview\n\n**サブタイトル:**\n> Revenue,\
+      \ Fulfillment, and Metrics\n\n### 左上セクション：フローチャート / プロセス図\n**タイトル:** Order Flow\n\n```mermaid\nflowchart LR\n    A[\"\
+      Receive\\nOrder\"] --> B[\"Validate\\nPayment\"] --> C[\"Ship\\nProduct\"]\n```\n\n### 右上セクション：グラフ / チャート\n**タイトル:**\
+      \ Monthly Revenue (MJPY)\n※X軸ラベル：月、Y軸：売上（MJPY）\n\n| ラベル | 値 | 単位 | 色・強調 |\n|---|---|---|---|\n| Jan | 120 | MJPY | 青色\
+      \ |\n| Feb | 85 | MJPY | 青色 |\n| Mar | 160 | MJPY | オレンジ色（強調） |\n| Apr | 140 | MJPY | 青色 |\n\n### 左下セクション：表 (table)\n\
+      **タイトル:** Regional Sales (MJPY)\n\n| Region | Jan | Feb | Mar | Total |\n|---|---|---|---|---|\n| Tokyo | 120 | 85 |\
+      \ 160 | 365 |\n| Osaka | 90 | 70 | 110 | 270 |\n| Nagoya | 60 | 55 | 75 | 190 |\n| Fukuoka | 45 | 40 | 65 | 150 |\n\n\
+      ### 右下セクション：コード\n**ファイル名:** quarterly_total.py\n\n```python\ndef quarterly_total(region: str) -> int:\n    \"\"\"Sum\
+      \ Jan+Feb+Mar for one region.\"\"\"\n    data = SALES[region]\n    return data['Jan'] + data['Feb'] + data['Mar']\n\n\
+      total = quarterly_total('Tokyo')\n```\n\n### フッター（下部）：本文テキスト / 注釈\n**テキスト:**\n> Q1 total revenue: 975 million JPY. Mar\
+      \ was the strongest month across all regions.\n\n---\n\n## Step 3: 全体の主張\nこのスライドは2026年第1四半期（Q1）の業務概要（受注フロー、月次・地域別の収益状況など）を報告するものです。データから、Q1の総収益が9億7500万円（975\
+      \ million JPY）であり、すべての地域において3月（Mar）の売上が最も好調であったことを結論付けています。"
+  description_scores:
+    generic:
+      f01: present
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+    specialized:
+      f01: present
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+  case1:
+    copilot_answer: '提供された記述に基づき、ご指定の情報を抽出します。
 
-      棒グラフ
+
+      **1. フローチャートの各ステップ**
+
+      *   Receive Order
+
+      *   Validate Payment
+
+      *   Ship Product
 
 
-      ## データテーブル
+      **2. 棒グラフ（Monthly Revenue）の月別値**
 
-      | ラベル | 値 | 単位 | 色 |
+      *   Jan: 120 (MJPY)
+
+      *   Feb: 85 (MJPY)
+
+      *   Mar: 160 (MJPY)
+
+      *   Apr: 140 (MJPY)
+
+
+      **3. 地域別売上テーブルの Tokyo の Mar と Total**
+
+      *   Mar: 160
+
+      *   Total: 365
+
+
+      **4. コード中の関数シグネチャ**
+
+      `def quarterly_total(region: str) -> int:`
+
+
+      **5. フッター注釈**
+
+      「Q1 total revenue: 975 million JPY. Mar was the strongest month across all regions.」'
+    fact_scores:
+      f01: missing
+      f02: missing
+      f03: missing
+      f04: present
+      f05: missing
+      f06: partial
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: missing
+      f12: missing
+      f13: missing
+      f14: missing
+      f15: present
+      f16: present
+      f17: missing
+      f18: missing
+      f19: present
+      f20: present
+      f21: present
+      f22: missing
+      f23: present
+      f24: present
+  case2:
+    copilot_answer: '画像（スライド）に含まれる情報をセクションごとに整理してお答えします。
+
+
+      **1. タイトル・サブタイトル**
+
+      *   **タイトル:** 2026 Q1 Operations Overview
+
+      *   **サブタイトル:** Revenue, Fulfillment, and Metrics
+
+
+      **2. フローチャート (Order Flow)**
+
+      注文の処理手順が以下の3つのステップで示されています。
+
+      *   **ステップ1:** Receive Order （水色のボックス）
+
+      *   **ステップ2:** Validate Payment （黄色のボックス）
+
+      *   **ステップ3:** Ship Product （緑色のボックス）
+
+
+      **3. 棒グラフ (Monthly Revenue (MJPY))**
+
+      月別の収益（単位：百万日本円）が示されています。各月の値は以下の通りです。
+
+      *   **Jan (1月):** 120
+
+      *   **Feb (2月):** 85
+
+      *   **Mar (3月):** 160 （この月だけ棒がオレンジ色になっています）
+
+      *   **Apr (4月):** 140
+
+
+      **4. 地域別売上テーブル (Regional Sales (MJPY))**
+
+      4つの地域（Tokyo, Osaka, Nagoya, Fukuoka）の1月〜3月の売上と合計が記載されています。
+
+      ご指定の **Tokyo** のデータは以下の通りです。
+
+      *   **Mar (3月) の値:** 160
+
+      *   **Total (合計) の値:** 365
+
+
+      **5. コード (quarterly_total.py)**
+
+      特定の地域の第1四半期（1〜3月）の合計を計算するPythonスクリプトが記載されています。
+
+      ご指定の **関数シグネチャ** は以下の通りです。
+
+      *   `def quarterly_total(region: str) -> int:`
+
+
+      **6. フッター注釈**
+
+      スライドの一番下に以下のテキストが記載されています。
+
+      *   "Q1 total revenue: 975 million JPY. Mar was the strongest month across all regions."'
+    fact_scores:
+      f01: present
+      f02: present
+      f03: present
+      f04: present
+      f05: missing
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: partial
+      f14: present
+      f15: present
+      f16: present
+      f17: missing
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: missing
+      f23: present
+      f24: present
+  score_reasons:
+    descriptions.generic:
+      f01: ヘッダー部分に完全に一致する記載があるため。
+      f02: ヘッダー部分に該当文字列が明確に記載されているため。
+      f03: フローチャートの見出しとして明記されているため
+      f04: 3ステップの名称と矢印による順序が明記されている
+      f05: フロー図の接続が全て右向きの矢印であると明記されているため。
+      f06: 「棒グラフ」の項目名として同文字列が明記されている。
+      f07: 棒グラフの説明でJanの値が120と明記されているため
+      f08: Febの値が85であると明記されているため
+      f09: 棒グラフや表の説明でMarの値が160と明記されているため
+      f10: 棒グラフの説明にAprの値が140と明記されているため。
+      f11: Marの棒がオレンジ色で他と異なることが明記されている
+      f12: 表の見出しとして完全に一致する記載があるため
+      f13: 表が5列で各列名も完全に記載されているため
+      f14: データ行として4都市の4行分が明確に記載されている
+      f15: 左下パネルの表に明確な記載があるため
+      f16: 表データにTokyoのTotalが365と明記されている
+      f17: 表のデータ行に明確な記載があるため
+      f18: 右下パネルにファイル名が正確に記載されているため。
+      f19: 右下パネルのOCR部分に関数名が明記されているため。
+      f20: '引数 ''region: str'' が明記されている'
+      f21: 「-> int」が明記されているため。
+      f22: 右下パネルのコード部分に完全一致で含まれているため
+      f23: フッター部分に完全に一致する記載があるため
+      f24: フッター部分に該当の記載が明確にあるため
+    descriptions.specialized:
+      f01: テキスト内に同一のタイトルが明記されている
+      f02: サブタイトルが完全に一致して記載
+      f03: フローチャートの見出しがOrder Flowと明記されているため
+      f04: 3つのステップと順序がフロー図として正確に記載されている。
+      f05: Mermaid記法でLR指定と単方向矢印が明記されているため。
+      f06: グラフのタイトルとして明確に記載されている。
+      f07: グラフと表のJanの値として120が記載されている。
+      f08: グラフや表にFebの値が85と明記されているため
+      f09: テキスト内のグラフデータにMarの値が160と明記されている
+      f10: グラフの表にAprの値が140と記載があるため
+      f11: グラフでMarのみオレンジ色と明記されているため
+      f12: 表のタイトルとして明記されているため
+      f13: 表が5列で指定の列名と完全に一致する
+      f14: 表に指定された4都市のデータ行が全て存在するため
+      f15: 表のTokyo行Mar列の値が160であるため。
+      f16: 表内でTokyoのTotalが365と明記されている
+      f17: 表内でFukuokaのTotal値が150と記載。
+      f18: ファイル名が正確に記載されているため。
+      f19: コード内に関数名が明確に記載されているため
+      f20: コード内で引数として明確に記述されているため
+      f21: コードに戻り値型注釈-> intが存在する。
+      f22: コード内に該当の記述が完全に含まれているため。
+      f23: フッターに指定の文言が完全に記載されているため。
+      f24: フッターの注釈に該当する文が明確に記載されているため
+    case1.copilot_answer:
+      f01: テキストにタイトルの言及が一切ないため。
+      f02: サブタイトルへの言及がないため
+      f03: 「Order Flow」という記載がないため
+      f04: 3つのステップが全て正確に記載されているため。
+      f05: 矢印の方向への言及が一切ないため
+      f06: 見出しに(MJPY)が含まれていないため
+      f07: Janが120であると明記されているため。
+      f08: Febの値が85と明記されているため
+      f09: Marの値が160と明記されているため
+      f10: テキストにAprが140と明記されている。
+      f11: グラフの色に関する言及がないため
+      f12: 指定の見出し文字列の記載なし
+      f13: テーブルの列数や全列名の言及がないため。
+      f14: Tokyo以外の都市名や行数の記載がないため。
+      f15: TokyoのMarが160と明記されているため
+      f16: TokyoのTotalが365と明記されているため。
+      f17: テキストにFukuokaの言及がないため
+      f18: ファイル名への言及が一切ないため
+      f19: 関数シグネチャに明記されている。
+      f20: 関数シグネチャに完全に一致する記述があるため
+      f21: 関数シグネチャに-> intの記載あり
+      f22: 指定されたコードがテキストに存在しないため
+      f23: フッター注釈に正確な記載があるため
+      f24: 該当の文言がフッター注釈に完全に含まれているため
+    case2.copilot_answer:
+      f01: テキストに正確なタイトルが記載されているため。
+      f02: テキストに明確に記載されているため。
+      f03: 見出しにOrder Flowと明記されているため
+      f04: 3ステップと各処理名が正確に記載されているため
+      f05: 矢印や左から右への方向についての言及がない。
+      f06: セクション見出しが完全一致で含まれているため
+      f07: テキストにJanの値が120と明記されているため。
+      f08: Febの値が85と明記されているため。
+      f09: Marの値が160であると明記されているため
+      f10: テキストにAprが140と明記されているため
+      f11: Marの棒だけオレンジ色であると明記されているため。
+      f12: 見出しの完全な記載があるため
+      f13: 5列という明記や正確な英語の列名が不足しているため。
+      f14: 4つの地域名が全て明記されているため
+      f15: TokyoのMarの値が160と明記されているため。
+      f16: TokyoのTotalの値が365と明記されているため。
+      f17: Fukuokaの合計値に関する言及が一切ないため。
+      f18: テキストにファイル名が明記されているため。
+      f19: 関数名がquarterly_totalと明記されているため
+      f20: '引数region: strが明確に記載されているため'
+      f21: 関数シグネチャに「-> int」と記載があるため
+      f22: 指定されたコードの記述は含まれていないため
+      f23: フッター注釈に正確な記載があるため
+      f24: フッター注釈に完全一致する記載があるため
+- id: tc02
+  title: UI 変更要求 (RFP)
+  image: tests/text_vs_image/images/02_ui_change.png
+  image_type: ui_change_request
+  specialized_prompt: prompts/ui_change.md
+  question: 'この画像は既存の UI モックアップに変更要求の吹き出しが書き込まれたものです。現在の画面要素と、各変更要求が「何を」「どう変えようとしているか」を対応づけて教えてください。
+
+    '
+  ground_truth_facts:
+  - id: f01
+    text: ドキュメントタイトルは 'UI Change Request — ShopApp Product Search'
+  - id: f02
+    text: アプリ名は 'ShopApp'
+  - id: f03
+    text: 画面の右上に 'Login' ボタンがある
+  - id: f04
+    text: 検索バー (text input) が存在する
+  - id: f05
+    text: '''Search'' ボタンがあり、現在は青色'
+  - id: f06
+    text: サイドバーにフィルター (Filters) セクションがある
+  - id: f07
+    text: カテゴリチェックボックスは 3 つ (Electronics, Books, Clothing)
+  - id: f08
+    text: 価格レンジスライダーがある (¥0 - ¥50,000)
+  - id: f09
+    text: 結果テーブルの列は Product, Price, Stock の 3 列
+  - id: f10
+    text: 結果テーブルには少なくとも 3 行のデータがある
+  - id: f11
+    text: ページネーション (< 1 2 3 >) がある
+  - id: f12
+    text: '変更要求 1: ''Remember last search'' チェックボックスを検索バー近くに追加'
+  - id: f13
+    text: '変更要求 2: Search ボタンの色を青から緑に変更'
+  - id: f14
+    text: '変更要求 3: 結果テーブルの右上に CSV エクスポートボタンを追加'
+  - id: f15
+    text: '変更要求 4: 1 ページあたり 20 件表示に変更'
+  - id: f16
+    text: 変更要求 1 の吹き出しは検索バー領域を指している
+  - id: f17
+    text: 変更要求 2 の吹き出しは Search ボタンを指している
+  - id: f18
+    text: 変更要求 3 の吹き出しは結果テーブルを指している
+  - id: f19
+    text: 変更要求 4 の吹き出しはページネーション領域を指している
+  - id: f20
+    text: 凡例に 'Red = change request, Gray = existing UI' と記載
+  descriptions:
+    generic: "画像から直接読み取れる構造的な情報を以下に詳細に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストを上から下、左から右の順に記載します。\n\n**ヘッダー・メタ情報**\n*   UI Change\
+      \ Request — ShopApp Product Search\n*   Reviewer: PM / Design — 2026-04-10\n\n**UIモックアップ部 (左側)**\n*   **トップバー:** ShopApp,\
+      \ Login\n*   **検索エリア:** Search products..., Search\n*   **サイドバー (Filters):**\n    *   Filters\n    *   Electronics\n\
+      \    *   Books\n    *   Clothing\n    *   Price range\n    *   ¥0 - ¥50,000\n*   **メインテーブル:**\n    *   Product, Price,\
+      \ Stock (列ヘッダー)\n    *   Wireless Headphones, ¥12,800, 42\n    *   USB-C Hub (7-in-1), ¥4,500, 118\n    *   Mech. Keyboard,\
+      \ ¥15,200, 7\n*   **ページネーション:** <, 1, 2, 3, >\n\n**注釈ボックス部 (右側・赤枠内)**\n*   1. Add a \"Remember last search\" checkbox\
+      \ below the search bar.\n*   2. Change the Search button color from blue to green.\n*   3. Add a CSV export button on\
+      \ the results table top-right corner.\n*   4. Show 20 items per page instead of the current 10.\n\n**凡例部 (右下・黄背景枠内)**\n\
+      *   Legend\n*   Red = change request\n*   Gray = existing UI\n\n---\n\n### 2. 図表・ダイアグラムの構造\nこの画像は、左側の「UIモックアップ」に対して、右側の「変更要求（注釈ボックス）」が赤い矢印で紐付けられている構造（ダイアグラム）になっています。\n\
+      \n**ノード（要素）と接続（矢印）の対応関係:**\n*   **接続1:** 注釈ボックス「1. Add a...」の左端付近から、UIモックアップ内の**「Search products...」入力枠の左下の余白**へ向かって赤い矢印が伸びています。\n\
+      *   **接続2:** 注釈ボックス「2. Change the...」の左端付近から、UIモックアップ内の**青い「Search」ボタン**へ向かって赤い矢印が伸びています。\n*   **接続3:** 注釈ボックス「3. Add\
+      \ a...」の左端付近から、UIモックアップ内の**データテーブルの右上（「Stock」列の右側の余白）**へ向かって赤い矢印が伸びています。\n*   **接続4:** 注釈ボックス「4. Show 20...」の左端付近から、UIモックアップ内の**ページネーションの「2」と「3」のボタンの間の余白**へ向かって赤い矢印が伸びています。\n\
+      \n**UI要素の階層構造:**\n全体を囲む大きなグレーの枠の中に、以下の階層で要素が配置されています。\n*   上部：ダークブルーのナビゲーションバー\n*   中部上：検索バーと検索ボタン\n*   中部下：左右に分割\n\
+      \    *   左ペイン：フィルター項目（チェックボックス群、スライダー）を含むボックス\n    *   右ペイン：データテーブル\n*   下部：ページネーションコントロール\n\n---\n\n### 3. 色とレイアウト\n\
+      **レイアウト:**\n*   画面の最上部にタイトルとメタ情報があり、細い水平線で区切られています。\n*   画面は大きく左右に分割されており、左側の約65%の領域にUIモックアップ（グレーの枠で囲まれている）が配置されています。\n\
+      *   右側の約35%の領域に、4つの赤い注釈ボックスが縦に等間隔に配置されています。\n*   画面の右下隅に凡例ボックスが配置されています。\n\n**色:**\n*   **背景:** 全体的に白（無地）。\n*   **UI枠線・区切り線:**\
+      \ 薄いグレー。\n*   **トップバー:** 背景はダークブルー。テキストは白。\n*   **「Search」ボタン:** 背景は青。テキストは白。\n*   **サイドバー (Filters):** 背景は非常に薄いグレー。\n\
+      *   **テーブルヘッダー行:** 背景は薄いグレー。\n*   **スライダーのつまみと選択範囲:** 青。\n*   **ページネーションの「1」:** 背景は青。テキストは白。それ以外のボタンは白背景にグレー枠。\n*  \
+      \ **注釈ボックス・テキスト・矢印:** 全て濃い赤色。\n*   **凡例ボックス:** 背景は薄い黄色。枠線は茶色。\n\n---\n\n### 4. 主要な視覚要素\n画像内で視覚的に識別できる主要な要素（コンポーネント・グラフィック）は以下の通りです。\n\
+      \n*   **入力フィールド:** プレースホルダーテキストを含む長方形の検索枠。\n*   **ボタン:**\n    *   枠線のみのボタン（「Login」）\n    *   塗りつぶしボタン（「Search」）\n  \
+      \  *   小さな四角いボタン群（ページネーションの「<」「1」「2」「3」「>」）\n*   **チェックボックス:** 「Electronics」「Books」「Clothing」の横にある3つの四角いアイコン。\n*   **スライダーコントロール:**\
+      \ 横線の上に2つの青い円形のつまみがあるUIパーツ。\n*   **データテーブル:** 列名（太字）と3行のデータセルを持つ表組み。薄いグレーの横線で区切られている。\n*   **注釈ボックス (Callout):** 赤い枠線で囲まれた4つの四角形。\n\
+      *   **指示矢印:** 赤い実線で描かれた4本の矢印（先端が三角形）。\n*   **凡例 (Legend):** 黄色い背景の四角形内に、赤い短い水平線と、グレーの枠線の正方形が描画されている。"
+    specialized: 'ご指示いただいた3つのステップに従って、画像から情報を抽出・整理しました。
+
+
+      ## Step 1: 現在の UI 画面要素の列挙
+
+
+      - **Header**: ロゴ名「ShopApp」、ボタン種類「Login」ボタン
+
+      - **Search**: 入力欄（"Search products..."のプレースホルダー）、ボタン「Search」（現在は青色）
+
+      - **Filters**: 見出し「Filters」、チェックボックス（Electronics, Books, Clothing）、スライダー「Price range」（¥0 - ¥50,000）
+
+      - **Results**: テーブルの列名「Product, Price, Stock」、行数は現在3行（Wireless Headphones, USB-C Hub (7-in-1), Mech. Keyboard）
+
+      - **Pagination**: 「<」「1」「2」「3」「>」のボタン（「1」が現在青色でアクティブ状態）
+
+
+      ## Step 2: 変更要求の抽出
+
+
+      | # | 吹き出し内のテキスト | 対象 UI 要素 | 変更内容 |
 
       |---|---|---|---|
 
-      | Jan | 120 | million JPY | 青（#4a90e2 系） |
+      | 1 | 1. Add a "Remember last search" checkbox below the search bar. | Search 入力欄の下の余白 | 「Remember last search」というチェックボックスを追加
+      |
 
-      | Feb | 85 | million JPY | 青（#4a90e2 系） |
+      | 2 | 2. Change the Search button color from blue to green. | Search ボタン | ボタンの色を青色から緑色に変更 |
 
-      | Mar | 160 | million JPY | オレンジ（#d97a50 系） |
+      | 3 | 3. Add a CSV export button on the results table top-right corner. | 結果テーブルの右上角 | CSV エクスポートボタンを追加 |
 
-      | Apr | 140 | million JPY | 青（#4a90e2 系） |
-
-
-      ## 軸とタイトル
-
-      - タイトル: Monthly Revenue (million JPY)
-
-      - X 軸ラベル: 明記なし（月を示す Jan, Feb, Mar, Apr が項目ラベルとして配置）
-
-      - Y 軸ラベル / 単位: 目盛やラベルは明記なし / million JPY（タイトルより）
-
-      - 凡例があれば: なし
+      | 4 | 4. Show 20 items per page instead of the current 10. | ページネーション（「2」のボタン付近） | 1ページあたりの表示件数を現在の10件から20件に変更 |
 
 
-      ## 補足
+      ## Step 3: 変更が適用された後の画面の姿
 
-      収益は2月に最小値の85 million JPYに落ち込んだ後、3月に急増して最大値の160 million JPYを記録しています。3月の棒グラフのみ色がオレンジ色に変更されており、特に強調したい月であることがうかがえます。'
+
+      検索エリアでは「Search」ボタンが緑色になり、検索バーのすぐ下に「Remember last search」のチェックボックスが新たに配置されます。また、検索結果のテーブル右上にはCSV出力用のボタンが追加され、1ページあたりの商品表示件数が20件に増えることで、一度に一覧できる情報量が多くなる画面へと変化します。'
   description_scores:
-    generic: {}
-    specialized: {}
+    generic:
+      f01: present
+      f02: present
+      f03: partial
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+    specialized:
+      f01: missing
+      f02: present
+      f03: partial
+      f04: present
+      f05: present
+      f06: partial
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: missing
   case1:
-    copilot_answer: ''
-    fact_scores: {}
+    copilot_answer: "提供された記述に基づき、現在の画面要素と各変更要求（「何を」「どう変えようとしているか」）を対応づけると以下のようになります。\n\n**1. Search（検索エリア）**\n*   **現在の画面要素:**\
+      \ \n    *   入力欄（\"Search products...\"のプレースホルダー）\n    *   「Search」ボタン（現在は青色）\n*   **対応する変更要求:**\n    *   **何を:** Search\
+      \ 入力欄の下の余白\n    *   **どう変える:** 「Remember last search」というチェックボックスを追加する。\n    *   **何を:** Search ボタン\n    *   **どう変える:**\
+      \ ボタンの色を青色から緑色に変更する。\n\n**2. Results（検索結果テーブル）**\n*   **現在の画面要素:** \n    *   テーブル（列名「Product, Price, Stock」、現在は「Wireless\
+      \ Headphones」「USB-C Hub (7-in-1)」「Mech. Keyboard」の3行が表示されている）\n*   **対応する変更要求:**\n    *   **何を:** 結果テーブルの右上角\n    *\
+      \   **どう変える:** CSV エクスポートボタンを追加する。\n\n**3. Pagination（ページネーション）**\n*   **現在の画面要素:** \n    *   「<」「1」「2」「3」「>」のボタン（「1」が現在青色でアクティブ状態）\n\
+      *   **対応する変更要求:**\n    *   **何を:** ページネーション（「2」のボタン付近）／1ページあたりの表示件数\n    *   **どう変える:** 1ページあたりの表示件数を、現在の10件から20件に変更する。\n\
+      \n**4. 変更を伴わない現在の画面要素（※変更要求なし）**\n*   **Header:** ロゴ名「ShopApp」、「Login」ボタン\n*   **Filters:** 見出し「Filters」、チェックボックス（Electronics,\
+      \ Books, Clothing）、スライダー「Price range」（¥0 - ¥50,000）"
+    fact_scores:
+      f01: missing
+      f02: present
+      f03: partial
+      f04: present
+      f05: present
+      f06: partial
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: partial
+      f17: missing
+      f18: missing
+      f19: missing
+      f20: missing
   case2:
-    copilot_answer: ''
-    fact_scores: {}
+    copilot_answer: '画像に記載されている4つの変更要求について、現在の画面要素と「何を」「どう変えるか」の対応は以下の通りです。
+
+
+      **1. 検索バー下のチェックボックス追加**
+
+      *   **現在の画面要素（対象）:** 検索バー（「Search products...」と入力するテキストボックス）
+
+      *   **何をどう変えるか:** 検索バーのすぐ下のスペースに、**「Remember last search（前回の検索を記憶する）」というチェックボックスを新たに追加**する。
+
+
+      **2. 検索ボタンの色の変更**
+
+      *   **現在の画面要素（対象）:** 検索バーの右にある青色の「Search」ボタン
+
+      *   **何をどう変えるか:** ボタンの背景色を、**青色から緑色に変更**する。
+
+
+      **3. CSVエクスポートボタンの追加**
+
+      *   **現在の画面要素（対象）:** 検索結果が表示されている一覧テーブル（表）
+
+      *   **何をどう変えるか:** テーブルの右上隅のスペースに、**「CSV export（CSV出力）」のためのボタンを新たに追加**する。
+
+
+      **4. 1ページあたりの表示件数の変更**
+
+      *   **現在の画面要素（対象）:** 検索結果のリストおよびページネーション（表の下にある「< 1 2 3 >」のページ送りボタン）
+
+      *   **何をどう変えるか:** 1ページあたりのアイテム表示件数を、**現在の「10件」から「20件」に変更**する。'
+    fact_scores:
+      f01: missing
+      f02: missing
+      f03: missing
+      f04: present
+      f05: present
+      f06: missing
+      f07: missing
+      f08: missing
+      f09: missing
+      f10: missing
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: partial
+      f17: partial
+      f18: present
+      f19: partial
+      f20: missing
+  score_reasons:
+    descriptions.generic:
+      f01: ヘッダー情報に正確なタイトルが記載されているため
+      f02: トップバーの項目に「ShopApp」と明記されているため。
+      f03: Loginボタンはあるが、右上という位置情報の記載がない。
+      f04: 検索バーや入力フィールドの存在が明記されているため。
+      f05: 青い「Search」ボタンの存在が明記されているため
+      f06: サイドバー (Filters) セクションの記載があるため。
+      f07: 3つのカテゴリ名とチェックボックスの明記がある
+      f08: Price range、該当金額、スライダーの記載があるため
+      f09: メインテーブルの列ヘッダーとして明記されているため
+      f10: データテーブルに3行のデータがあると明記されているため。
+      f11: ページネーション（<, 1, 2, 3, >）の記載があるため
+      f12: 検索バーの下に追加する変更要求1が明記されているため
+      f13: 英語の注釈テキストとして完全に記載されている
+      f14: 注釈部と接続構造の箇所に正確に記載されているため
+      f15: 変更要求4として20件表示への変更が明記されているため。
+      f16: 注釈ボックス1の矢印が検索入力枠の余白を指すとあるため。
+      f17: 注釈2からSearchボタンへ矢印が伸びているため
+      f18: 注釈ボックス3の矢印がデータテーブルを指すため
+      f19: 注釈ボックス4からページネーションへの矢印が明記されているため
+      f20: 凡例部に当該テキストが正確に記載されているため。
+    descriptions.specialized:
+      f01: ドキュメントタイトルの言及がないため
+      f02: ロゴ名としてShopAppの記載があるため
+      f03: Loginボタンの言及はあるが、右上という位置情報がない。
+      f04: テキストに入力欄や検索バーの記載があるため
+      f05: Searchボタンがあり現在青色と明記されているため。
+      f06: Filtersはあるが、サイドバーという位置情報がないため。
+      f07: チェックボックスの3つの項目名が全て明記されているため。
+      f08: スライダーと価格範囲が正確に記載されているため
+      f09: 結果テーブルの列名が指定の3つと記載されているため
+      f10: 結果テーブルの行数は3行と明記されているため。
+      f11: Pagination項目に要素が全て明記されているため
+      f12: 検索バーの下に追加と明記されているため
+      f13: 変更要求2として全て正確に記載されているため
+      f14: Step2の表に完全な内容で明記されているため
+      f15: 変更要求4に1ページ20件表示への変更が明記されているため。
+      f16: Search入力欄の下の余白を対象要素としているため。
+      f17: 表内で対象UI要素がSearchボタンと明記されているため
+      f18: 対象UI要素が結果テーブルの右上角と記載
+      f19: 表の対象UI要素としてページネーションと明記されているため
+      f20: テキスト内に凡例に関する記載が一切ないため
+    case1.copilot_answer:
+      f01: ドキュメントタイトルへの言及がないため
+      f02: ロゴ名ShopAppと明記されているため
+      f03: Loginボタンの記載はあるが配置場所の言及がないため。
+      f04: 検索エリアに入力欄の記載があるため
+      f05: Searchボタンが現在青色であると明記されているため。
+      f06: Filtersの記載はあるがサイドバーという位置情報が欠如
+      f07: 3つのカテゴリ名が全て正確に記載されているため。
+      f08: 価格スライダーと範囲の記載があるため
+      f09: 列名がProduct, Price, Stockと明記されているため
+      f10: 3行が表示されていると明記されているため
+      f11: ページネーションの各ボタンの記載があるため。
+      f12: Search入力欄の下に該当のチェックボックスを追加すると記載。
+      f13: Searchボタンを青から緑に変更すると明記。
+      f14: 結果テーブル右上にCSVエクスポートボタンを追加する記載あり
+      f15: 1ページ20件に変更する旨が明記されているため。
+      f16: 変更要求1の対象は検索領域だが吹き出しの言及がないため
+      f17: 変更要求2や吹き出しの言及がないため
+      f18: 3番目の変更対象はページネーションであるため。
+      f19: 変更要求4に関する記述は存在しないため
+      f20: 凡例や色に関する記述が全くないため。
+    case2.copilot_answer:
+      f01: ドキュメントタイトルへの言及が一切ないため。
+      f02: アプリ名に関する言及がないため
+      f03: Loginボタンに関する言及が一切ないため。
+      f04: テキストボックスとして検索バーの存在が明記されているため。
+      f05: 青色の「Search」ボタンと明記されているため。
+      f06: サイドバーやフィルターに関する言及がないため
+      f07: カテゴリチェックボックスへの言及なし
+      f08: 価格やスライダーの言及が一切ないため
+      f09: テーブルの列に関する言及がないため。
+      f10: 結果テーブルの行数に関する記述がないため
+      f11: ページネーションの記述が明確にあるため
+      f12: 検索バーの下に該当チェックボックスを追加すると記載がある。
+      f13: Searchボタンを青から緑に変更と明記
+      f14: 要求3としてテーブル右上へのCSV出力ボタン追加が明記。
+      f15: 変更要求4に20件表示への変更が明記されているため。
+      f16: 対象は検索バーとあるが吹き出しの言及がない
+      f17: 「吹き出し」という要素の言及がなく対象のみ記載されているため
+      f18: 変更要求3の対象が結果テーブルと明記されているため
+      f19: 吹き出しへの言及はないが対象にページネーションを含む
+      f20: テキスト内に凡例に関する記載はない。
+- id: tc02_judge
+  title: '[JUDGMENT] UI 変更要求の工数見積 (tc02 と同じ画像)'
+  image: tests/text_vs_image/images/02_ui_change.png
+  image_type: ui_change_request
+  specialized_prompt: prompts/ui_change.md
+  question: 'この UI 変更要求について、プロダクトマネージャーの立場で判断してください。既存画面と 4 つの赤い吹き出しの変更要求を読み、以下 4 点に具体的に答えてください。
+
+
+    (1) 4 つの変更要求それぞれの実装工数見積もり (Small / Medium / Large) と理由。
+
+    (2) 各変更がバックエンド (API) の変更を必要とするか否か。
+
+    (3) 最も技術的リスクが高い変更はどれで、その理由は何か。
+
+    (4) これら 4 つの変更を並列で実装できますか? 依存関係があれば指摘してください。'
+  ground_truth_facts:
+  - id: j01
+    text: '変更 1 (Remember last search チェックボックス追加): 工数は Small または Medium'
+  - id: j02
+    text: '変更 1 の根拠: クライアント側の localStorage / cookie 保存、最小限のロジック追加'
+  - id: j03
+    text: '変更 2 (Search ボタン青→緑): 工数は Small'
+  - id: j04
+    text: '変更 2 の根拠: CSS の色変更のみ、ロジック不要'
+  - id: j05
+    text: '変更 3 (CSV エクスポートボタン追加): 工数は Medium または Large'
+  - id: j06
+    text: '変更 3 の根拠: 新規エンドポイント、データ整形、エンコーディング、ダウンロード処理が必要'
+  - id: j07
+    text: '変更 4 (1 ページ 20 件表示に変更): 工数は Small'
+  - id: j08
+    text: '変更 4 の根拠: 既存の pagination の page_size パラメータ変更'
+  - id: j09
+    text: 変更 1 はバックエンド変更が基本不要 (クライアント側完結)
+  - id: j10
+    text: 変更 2 はバックエンド変更が不要 (フロントの CSS のみ)
+  - id: j11
+    text: 変更 3 はバックエンド変更が必要 (CSV 生成用の新エンドポイント or 既存 API の拡張)
+  - id: j12
+    text: 変更 4 は既存 API の page_size パラメータを使う場合バックエンド変更なし、ハードコードされている場合は変更必要
+  - id: j13
+    text: 技術的リスクが最も高いのは変更 3 (CSV エクスポート)
+  - id: j14
+    text: '変更 3 のリスク: 大量データのメモリ消費、文字エンコーディング (特に日本語)、権限制御、タイムアウト'
+  - id: j15
+    text: 4 つの変更は基本的に並列実装可能 (異なる画面領域・機能に分かれているため)
+  - id: j16
+    text: 変更間の強い依存関係はない
+  descriptions:
+    generic: "画像から読み取れる情報を構造的かつ詳細に記述します。\n\n### 1. テキスト内容（OCR）\n\n**ヘッダー部分:**\n*   UI Change Request — ShopApp Product Search\n\
+      *   Reviewer: PM / Design — 2026-04-10\n\n**UIモックアップ部分（左側）:**\n*   ShopApp\n*   Login\n*   Search products...\n*   Search\n\
+      *   Filters\n*   Electronics\n*   Books\n*   Clothing\n*   Price range\n*   ¥0 - ¥50,000\n*   Product\n*   Price\n*\
+      \   Stock\n*   Wireless Headphones\n*   ¥12,800\n*   42\n*   USB-C Hub (7-in-1)\n*   ¥4,500\n*   118\n*   Mech. Keyboard\n\
+      *   ¥15,200\n*   7\n*   <\n*   1\n*   2\n*   3\n*   >\n\n**注釈部分（右側の赤い枠内、上から順）:**\n*   1. Add a \"Remember last search\"\
+      \ checkbox below the search bar.\n*   2. Change the Search button color from blue to green.\n*   3. Add a CSV export\
+      \ button on the results table top-right corner.\n*   4. Show 20 items per page instead of the current 10.\n\n**凡例部分（右下）:**\n\
+      *   Legend\n*   Red = change request\n*   Gray = existing UI\n\n---\n\n### 2. 図表・ダイアグラムの構造（ノード・接続・階層）\n\n画像は大きく「既存のUIモックアップ（左側の大きなグレーの枠内）」と「変更要求の注釈（右側の赤い枠）」の2つの階層で構成されており、赤い矢印（接続）で結びつけられています。\n\
+      \n*   **ノード1（注釈1）と接続:**\n    *   **起点:** 右上段の赤枠「1. Add a...」内のテキスト下部。\n    *   **終点:** UI内の「Search products...」入力フィールドのすぐ下の余白部分。赤い矢印で接続されている。\n\
+      *   **ノード2（注釈2）と接続:**\n    *   **起点:** 右から2番目の赤枠「2. Change the...」内のテキスト下部。\n    *   **終点:** UI内の青い「Search」ボタン。赤い矢印で接続されており、ボタン内の「Search」という文字の上には赤い横線（取り消し線）が引かれている。\n\
+      *   **ノード3（注釈3）と接続:**\n    *   **起点:** 右から3番目の赤枠「3. Add a...」内のテキスト下部。\n    *   **終点:** UI内の表のヘッダー行、右端（「Stock」の右側）の余白部分。赤い矢印で接続されている。\n\
+      *   **ノード4（注釈4）と接続:**\n    *   **起点:** 右下段の赤枠「4. Show 20...」内のテキスト下部。\n    *   **終点:** UI内のページネーション部分。赤い矢印で接続されており、ページ番号の「2」の上には赤い横線（取り消し線）が引かれている。\n\
+      \n---\n\n### 3. 色とレイアウト\n\n*   **全体レイアウト:** 白い背景。上部にタイトルヘッダーがあり、その下に横線が引かれている。画面の左約3/4をUIモックアップが占め、右約1/4に注釈と凡例が縦に配置されている。\n\
+      *   **UIモックアップの色使い:**\n    *   **全体枠:** グレーの細い実線。\n    *   **トップナビゲーション:** 濃いネイビーブルーの背景に白抜き文字（ShopApp）。「Login」ボタンは透明背景に白い枠線と文字。\n\
+      \    *   **検索エリア:** 白い入力フィールド（グレーの枠線とプレースホルダーテキスト）と、青い背景に白文字の「Search」ボタン。\n    *   **サイドバー（Filters）:** 薄いグレーの背景にグレーの枠線。チェックボックスは白背景にグレーの枠。スライダーバーはグレーの線の上に青い丸（ハンドル）と青い線。\n\
+      \    *   **表（Table）:** ヘッダー行は薄いグレーの背景に黒文字（太字）。データ行は白背景に黒文字。各セルは細いグレーの線で区切られている。\n    *   **ページネーション:** 白背景にグレーの枠と黒文字。現在選択されている「1」のみ、青背景に白文字。\n\
+      *   **注釈と凡例の色使い:**\n    *   **注釈:** 文字、枠線、矢印、取り消し線のすべてが赤色（Red）。\n    *   **凡例（Legend）:** 薄い黄色の背景に茶色の枠線。「Legend」の文字は茶色/濃い赤。「Red\
+      \ = ...」の隣には赤い短い横線、「Gray = ...」の隣にはグレーの枠線を持つ白い四角形が配置されている。\n\n---\n\n### 4. 主要な視覚要素\n\n*   **テキスト入力フィールド:** 検索ワードを入力するための長方形のエリア。\n\
+      *   **ボタン要素:** 「Login」「Search」およびページネーションの各数字・記号。\n*   **チェックボックス:** 複数選択可能な四角い入力要素（Electronics, Books, Clothing）。\n\
+      *   **レンジスライダー:** 価格帯（Price range）を指定するための、2つの青いハンドルを持つ水平バー。\n*   **データテーブル:** 「Product」「Price」「Stock」の3列で構成されるグリッド状の表。3行のデータが含まれる。\n\
+      *   **ページネーション:** ページを切り替えるための「<」「1」「2」「3」「>」のブロック。\n*   **アノテーション（注釈）マークアップ:** UI上に上書きされた手書き風の赤い線（矢印と取り消し線）およびテキストボックス。変更の指示を視覚的に強調している。\n\
+      *   **凡例ボックス:** 画面内の色の意味（赤＝変更要求、グレー＝既存UI）を定義する独立したパネル。"
+    specialized: "指示に従い、画像を解析して3つのステップで出力します。\n\n## Step 1: 現在の UI 画面要素の列挙\n\n- **Header**:\n  - ロゴ名: ShopApp\n  - ボタン種類:\
+      \ Loginボタン\n- **Search**:\n  - 入力欄: プレースホルダー「Search products...」付きのテキストボックス\n  - ボタン: 「Search」ボタン（現在の色は青色）\n- **Filters**:\
+      \ \n  - チェックボックス: Electronics, Books, Clothing\n  - スライダー: Price range（¥0 - ¥50,000）\n- **Results**: \n  - テーブルの列名:\
+      \ Product, Price, Stock\n  - 行数: 3行（データ行）\n- **Pagination**: \n  - ページャの現在の状態: 「<」「1」「2」「3」「>」のボタンがあり、「1」が青背景でアクティブになっている\n\
+      \n## Step 2: 変更要求の抽出（最重要）\n\n| # | 吹き出し内のテキスト | 対象 UI 要素 | 変更内容 |\n|---|---|---|---|\n| 1 | 1. Add a \"Remember last\
+      \ search\" checkbox below the search bar. | Search入力欄の下のスペース | 「Remember last search」チェックボックスを追加 |\n| 2 | 2. Change\
+      \ the Search button color from blue to green. | Searchボタン | ボタンの色を青色から緑色に変更 |\n| 3 | 3. Add a CSV export button on the\
+      \ results table top-right corner. | 結果テーブルの右上角（ヘッダー行の右端） | CSVエクスポートボタンを追加 |\n| 4 | 4. Show 20 items per page instead\
+      \ of the current 10. | ページネーション | 1ページあたりの表示件数を現在の10件から20件に変更 |\n\n## Step 3: 変更が適用された後の画面の姿\n\n検索エリアでは、緑色になった検索ボタンと、その下に前回の検索を記憶するためのチェックボックスが配置され、利便性が向上します。検索結果エリアでは、テーブルの右上にCSVエクスポートボタンが追加され、さらに1ページあたりのデータ表示件数が10件から20件に拡張されて、より多くの情報が一度に閲覧できるようになります。"
+  description_scores:
+    generic:
+      j01: partial
+      j02: missing
+      j03: partial
+      j04: missing
+      j05: partial
+      j06: missing
+      j07: partial
+      j08: missing
+      j09: missing
+      j10: missing
+      j11: missing
+      j12: missing
+      j13: missing
+      j14: missing
+      j15: missing
+      j16: missing
+    specialized:
+      j01: missing
+      j02: missing
+      j03: missing
+      j04: missing
+      j05: missing
+      j06: missing
+      j07: missing
+      j08: missing
+      j09: missing
+      j10: missing
+      j11: missing
+      j12: missing
+      j13: missing
+      j14: missing
+      j15: missing
+      j16: missing
+  case1:
+    copilot_answer: "プロダクトマネージャー（PM）の視点から、提示された4つのUI変更要求について回答します。開発現場における一般的なWebアプリケーションのアーキテクチャ（フロントエンドとバックエンドの分離）を前提として評価しています。\n\
+      \n---\n\n### (1) 4つの変更要求それぞれの実装工数見積もりと理由\n\n*   **変更1（Remember last search 追加）: Small**\n    *   **理由:** UI上にチェックボックスを追加し、前回の検索条件をブラウザの\
+      \ `LocalStorage` や `SessionStorage` に保存・復元するだけであれば、フロントエンドの軽微な実装のみで完結するためです。\n*   **変更2（Searchボタンの色を緑へ変更）: Small**\n\
+      \    *   **理由:** CSSのスタイル定義（カラーコード等）や該当コンポーネントのクラス設定を変更するだけで済む、極めて単純な作業だからです。\n*   **変更3（CSVエクスポートボタン追加）: Medium**\n\
+      \    *   **理由:** 単なるUI追加ではなく、「データをCSV形式に変換し、ファイルとしてダウンロードさせる」という新しい機能ロジックを実装する必要があります。全件エクスポートなどの要件次第ではバックエンドの開発・検証も絡むため、一定の工数がかかります。\n\
+      *   **変更4（1ページあたりの表示件数を10件から20件に変更）: Small**\n    *   **理由:** 一般的に、フロントエンドからバックエンドへデータをリクエストする際のパラメータ（`limit` や `per_page`\
+      \ など）の定数を「10」から「20」に書き換えるだけで済むケースが大半であるためです。\n\n### (2) 各変更がバックエンド (API) の変更を必要とするか否か\n\n*   **変更1:** 基本的に **不要** です。ブラウザ側への保存で要件を満たせます（※ただし「別端末にログインした際も前回の検索条件を同期・復元したい」という要件にする場合はAPIの変更・追加が必要です）。\n\
+      *   **変更2:** **不要** です。フロントエンド（CSS/HTML）のみの改修です。\n*   **変更3:** **必要になる可能性が高い** です。「現在画面に表示されている1ページ分のデータのみ」をCSVにする簡易的な仕様ならフロントエンドだけで完結しますが、ビジネス用途では「検索条件に合致する全件」をエクスポートする要件が一般的です。その場合、バックエンド側にCSV出力用の新規API、またはデータ一括取得の処理を追加する必要があります。\n\
+      *   **変更4:** 基本的に **不要** です。フロントエンド側のリクエストパラメータの変更で対応可能です（※ただし、バックエンドのAPI側で「最大取得件数は10件まで」といったハードコードされた制限やバリデーションが存在する場合は、その解除・修正が必要です）。\n\
+      \n### (3) 最も技術的リスクが高い変更はどれか、その理由\n\n最も技術的リスクが高いのは **変更3（CSVエクスポートボタン追加）** です。\n\n*   **理由（パフォーマンス面）:** 検索結果が数万〜数十万件と膨大になった場合、全件CSV出力の処理によってバックエンドのメモリ逼迫、処理のタイムアウト、またはデータベースへの過度な負荷によるシステム全体のパフォーマンス低下を引き起こす恐れがあります。非同期処理化（バッチ処理化）を検討する必要が出てくるかもしれません。\n\
+      *   **理由（セキュリティ面）:** データのエクスポートは情報漏洩に直結しやすいため、ユーザーの権限に応じた出力制御や、個人情報・機密情報のマスキングなど、非機能要件についての慎重な設計・テストが求められるためです。\n\n\
+      ### (4) これら4つの変更を並列で実装できるか、依存関係の有無\n\n4つの変更は **並列で実装可能** です。「Aが終わらなければBの開発に着手できない」といった致命的な論理的依存関係はありません。ただし、並列で進める場合は以下の点に留意・調整する必要があります。\n\
+      \n*   **コードの競合（コンフリクト）に対する注意:**\n    *   変更1と変更2は、どちらも「Searchエリアのコンポーネント」に対する改修です。別々の担当者が同時に開発すると、バージョン管理（Gitなど）でのマージコンフリクトが発生しやすいため、フロントエンドエンジニア間での声掛けが必要です。\n\
+      *   **テスト（QA）時の依存関係:**\n    *   変更3（CSV）と変更4（表示件数）は「結果テーブル」に紐づく改修です。もし変更3をフロントエンドだけで処理する仕様（画面に表示されているものをそのままCSV化する）にした場合、変更4がマージされる前は「10件」出力され、マージされた後は「20件」出力されることになります。並行して進める場合、結合テスト時にそれぞれの仕様変更が正しく噛み合っているか確認する必要があります。"
+    fact_scores:
+      j01: present
+      j02: partial
+      j03: partial
+      j04: partial
+      j05: present
+      j06: partial
+      j07: present
+      j08: partial
+      j09: present
+      j10: present
+      j11: present
+      j12: partial
+      j13: present
+      j14: partial
+      j15: partial
+      j16: present
+  case2:
+    copilot_answer: "プロダクトマネージャー（PM）の視点から、ご提示いただいた4つのUI変更要求について評価・回答いたします。\n\n---\n\n### (1) 4つの変更要求それぞれの実装工数見積もり (Small /\
+      \ Medium / Large) と理由\n\n*   **1. 「前回の検索を記憶する」チェックボックスの追加 (Add a \"Remember last search\" checkbox...)**\n    *   **見積もり:**\
+      \ **Small**\n    *   **理由:** UIへのチェックボックス追加自体は軽微です。ロジックとしても、フロントエンド側でブラウザのローカルストレージ（LocalStorage）やCookieに検索キーワード（および必要ならフィルタ状態）を保存し、次回ページロード時にそれを読み込んで初期表示するだけで完結するため、実装は比較的シンプルです。\n\
+      *   **2. 検索ボタンの色を青から緑に変更 (Change the Search button color...)**\n    *   **見積もり:** **Small** (実質的にはMicroレベル)\n    * \
+      \  **理由:** 純粋なCSS（スタイルシート）の変更、またはUIコンポーネントのプロパティ変更のみで完了するためです。\n*   **3. 検索結果テーブルの右上にCSVエクスポートボタンを追加 (Add a CSV export\
+      \ button...)**\n    *   **見積もり:** **Medium** (データ量や仕様によっては Large になる可能性あり)\n    *   **理由:** UIのボタン追加自体は簡単ですが、「現在表示されている1ページ分だけを出力するのか」「現在の検索・絞り込み条件に合致する『全件』を出力するのか」によって工数が変わります。ユーザーの期待値としては通常「全件出力」であるため、バックエンド側でのCSV生成・ダウンロード処理の実装、およびフロントエンドでのファイル受け取り処理が必要になります。\n\
+      *   **4. 1ページあたりの表示件数を現在の10件から20件に変更 (Show 20 items per page...)**\n    *   **見積もり:** **Small**\n    *   **理由:** すでにページネーションの仕組みが存在しているため、フロントエンドからAPIにリクエストを送る際のパラメータ（例:\
+      \ `limit=10` を `limit=20` にする）を変更するだけで済む可能性が非常に高いためです。\n\n---\n\n### (2) 各変更がバックエンド (API) の変更を必要とするか否か\n\n*   **変更1\
+      \ (検索の記憶):** **不要**。アカウントをまたいで（別端末でも）記憶させる仕様でない限り、フロントエンドのローカルストレージのみで実装可能です。\n*   **変更2 (ボタンの色):** **不要**。完全にフロントエンドのみの変更です。\n\
+      *   **変更3 (CSVエクスポート):** **必要**。画面上のデータのみ（最大10〜20件）をCSV化するならフロントエンドだけでも可能ですが、実用上は「検索条件に一致する全データ」をエクスポートする機能が求められます。そのため、検索条件を受け取り、データベースから該当データを全件取得してCSV形式で返す専用のAPIエンドポイントを新規作成する必要があります。\n\
+      *   **変更4 (20件表示):** **原則不要**。APIがすでにページネーション対応（`page` や `limit` / `size` などのパラメータを受け付ける設計）になっていれば、フロントエンドからのリクエスト値を変更するだけでよく、API自体の改修は不要です（バックエンド側で上限値がハードコーディングされていない限り）。\n\
+      \n---\n\n### (3) 最も技術的リスクが高い変更はどれで、その理由は何か\n\n*   **最もリスクが高い変更:** **変更3 (CSVエクスポートの追加)**\n*   **理由:**\n    1.  **パフォーマンスと負荷のリスク:**\
+      \ 検索条件に合致するデータが数万件、数十万件とある場合、それを一度にデータベースから取得してCSVを生成すると、バックエンドのメモリを圧迫し、サーバーのレスポンス低下やタイムアウト（ダウン）を引き起こす可能性があります。\n  \
+      \  2.  **仕様の曖昧さ:** 同期処理でダウンロードさせるか、非同期処理（「準備ができたらメールで通知する」など）にするかの判断が必要です。データ量が大きい場合は非同期処理にする必要があり、その場合バックエンドの実装アーキテクチャ（キューイングシステムの実装など）が大幅に複雑化し、工数が一気にLargeに跳ね上がるリスクを含んでいます。\n\
+      \n---\n\n### (4) これら4つの変更を並列で実装できますか? 依存関係があれば指摘してください。\n\n*   **結論:** **はい、基本的には4つすべてを並行して実装（パラレル開発）することが可能です。** それぞれが触れるコードの領域が異なるため、複数の開発者で分担しやすいタスクです。\n\
+      *   **依存関係・留意点:**\n    *   **変更4 (20件表示)** と **変更1 (検索の記憶)**: 「ページネーションの状態（何ページ目を見ていたか、1ページ何件表示か）」も記憶させる仕様にする場合、変更4の表示件数ロジックが確定してから変更1の保存ロジックをテストした方が二度手間を防げます。\n\
+      \    *   **変更3 (CSVエクスポート)** はバックエンドの開発が先行または並行して必要になるため、フロントエンド開発者はAPI（またはモックAPI）が提供されるのを待つか、API仕様（コントラクト）を先に合意しておく必要があります。\n\
+      \    *   変更2（色変更）は完全に独立しており、いつでも誰でも対応可能です。"
+    fact_scores:
+      j01: present
+      j02: present
+      j03: present
+      j04: present
+      j05: present
+      j06: partial
+      j07: present
+      j08: partial
+      j09: present
+      j10: present
+      j11: present
+      j12: present
+      j13: present
+      j14: partial
+      j15: present
+      j16: partial
+  score_reasons:
+    descriptions.generic:
+      j01: 変更内容の記載はあるが工数はない
+      j02: 実装の根拠に関する記載は一切ない
+      j03: 変更内容の記載はあるが工数はない
+      j04: 実装の根拠に関する記載は一切ない
+      j05: 変更内容の記載はあるが工数はない
+      j06: 実装の根拠に関する記載は一切ない
+      j07: 変更内容の記載はあるが工数はない
+      j08: 実装の根拠に関する記載は一切ない
+      j09: バックエンドに関する記載は一切ない
+      j10: バックエンドに関する記載は一切ない
+      j11: バックエンド変更に関する言及なし
+      j12: APIやバックエンドに関する言及なし
+      j13: 技術的リスクに関する言及なし
+      j14: リスクの詳細に関する言及なし
+      j15: 実装の並列性に関する言及なし
+      j16: 変更間の依存関係に関する言及なし
+    descriptions.specialized:
+      j01: 工数に関する言及が一切ないため
+      j02: 実装方法や根拠の言及がないため
+      j03: 工数に関する言及が一切ないため
+      j04: 実装方法や根拠の言及がないため
+      j05: 工数に関する言及が一切ないため
+      j06: 実装方法や根拠の言及がないため
+      j07: 工数に関する言及が一切ないため
+      j08: 実装方法や根拠の言及がないため
+      j09: バックエンドに関する言及がないため
+      j10: バックエンドに関する言及がないため
+      j11: バックエンド変更に関する言及なし
+      j12: APIやバックエンドの言及なし
+      j13: 技術的リスクに関する言及なし
+      j14: 変更3のリスクに関する言及なし
+      j15: 並列実装に関する言及なし
+      j16: 依存関係に関する言及なし
+    case1.copilot_answer:
+      j01: 工数はSmallと明記されているため。
+      j02: localStorageの記載はあるがcookieの言及がないため。
+      j03: 緑への変更とSmallは一致するが変更前の色(青)の記載なし。
+      j04: CSS変更のみとあるがロジック不要の明言はないため。
+      j05: 工数はMediumと明記されているため。
+      j06: 新規APIや変換の記載はあるがエンコードの言及なし。
+      j07: 工数はSmallと明記されているため。
+      j08: page_sizeではなくlimit等のパラメータと言及。
+      j09: バックエンド変更は基本的に不要と明記されているため。
+      j10: バックエンド変更不要でフロントのみと明記されているため。
+      j11: 新規APIや一括取得処理の追加として言及
+      j12: page_sizeではなくlimit等で言及
+      j13: 最も技術的リスクが高いのは変更3と明記
+      j14: 文字エンコーディングに関する言及が欠如
+      j15: 並列可能だが一部は同一画面領域と説明
+      j16: 致命的な論理的依存関係はないと明記
+    case2.copilot_answer:
+      j01: 工数はSmallと明記されている。
+      j02: ローカルストレージ等の保存で完結すると記載。
+      j03: 工数はSmallと明記されている。
+      j04: CSSの変更等のみで完了すると記載。
+      j05: MediumやLargeの可能性が記載されている。
+      j06: 新規API等の記載はあるがエンコード等の言及なし。
+      j07: 工数はSmallと明記されている。
+      j08: パラメータ名がpage_sizeではなくlimitやsize。
+      j09: バックエンド変更は不要と明記されている。
+      j10: バックエンド不要でフロントのみと明記されている。
+      j11: CSV出力用の専用APIエンドポイント新規作成が必要と記載。
+      j12: size等のパラメータ変更で不要、ハードコード時は必要と記載。
+      j13: 最もリスクが高い変更は変更3であると明確に記載されているため。
+      j14: メモリ圧迫やタイムアウトは言及あるが文字コード等の記載なし。
+      j15: 触れる領域が異なるため並行して実装が可能と明記されている。
+      j16: 並列実装可能だが一部の変更間に留意すべき依存関係の記載あり。
 - id: tc03
-  title: 売上テーブル
-  image: tests/text_vs_image/images/03_table.png
-  image_type: table
-  specialized_prompt: prompts/table_markdown.md
-  question: 'この表のタイトル、列名、各行のデータを教えてください。Tokyo の Mar の値と、Fukuoka の Total の値も教えてください。
-
-    '
-  ground_truth_facts:
-  - id: f1
-    text: タイトルは 'Q1 2026 Regional Sales (million JPY)'
-  - id: f2
-    text: 5 列ある (Region, Jan, Feb, Mar, Total)
-  - id: f3
-    text: 4 行ある (Tokyo, Osaka, Nagoya, Fukuoka)
-  - id: f4
-    text: Tokyo の Mar は 160
-  - id: f5
-    text: Tokyo の Total は 365
-  - id: f6
-    text: Osaka の Total は 270
-  - id: f7
-    text: Nagoya の Total は 190
-  - id: f8
-    text: Fukuoka の Total は 150
-  - id: f9
-    text: ヘッダー行は青背景・白文字
-  - id: f10
-    text: 行は交互にグレーと白の縞模様
-  descriptions:
-    generic: "画像から読み取れる構造的な情報を詳細に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n**タイトル:**\n* Q1 2026 Regional Sales (million\
-      \ JPY)\n\n**テーブル内のテキスト (行ごと):**\n* **ヘッダー行:** Region, Jan, Feb, Mar, Total\n* **第1データ行:** Tokyo, 120, 85, 160, 365\n\
-      * **第2データ行:** Osaka, 90, 70, 110, 270\n* **第3データ行:** Nagoya, 60, 55, 75, 190\n* **第4データ行:** Fukuoka, 45, 40, 65, 150\n\
-      \n---\n\n### 2. 図表・ダイアグラムの構造\nこの画像は、行と列で構成される単一の**表（データテーブル）**です。\n\n* **全体構造:** 5列 × 5行（ヘッダー行を1行、データ行を4行含む）のグリッド構造。\n\
-      * **列の構造（左から右へ）:**\n    * **第1列 (Region):** 地域の名称を示すカテゴリ列。\n    * **第2列 (Jan):** 1月の数値を格納するデータ列。\n    * **第3列 (Feb):**\
-      \ 2月の数値を格納するデータ列。\n    * **第4列 (Mar):** 3月の数値を格納するデータ列。\n    * **第5列 (Total):** 各行の合計数値を格納するデータ列。\n* **行の階層構造:**\n \
-      \   * **第1行:** 各列の項目名を示すヘッダー行。\n    * **第2〜5行:** 各地域（Tokyo, Osaka, Nagoya, Fukuoka）に紐づく個別のデータ行。\n\n---\n\n### 3. 色とレイアウト\n\
-      * **全体背景:** 白色。\n* **タイトル:** \n    * 文字色: 黒色。\n    * 配置: 表の左上に左揃えで配置。\n* **表の外枠:** \n    * 罫線: 黒色で、内部の罫線よりもやや太い実線。\n\
-      * **表のヘッダー行 (Region, Jan...):**\n    * 背景色: 明るい青色。\n    * 文字色: 白色。\n    * 文字配置: 全て中央揃え。\n    * セル間の縦線: 白色。\n* **表のデータ行\
-      \ (Tokyo, Osaka...):**\n    * 背景色: 薄いグレーと白色が交互に繰り返されるストライプパターン（Tokyo行=薄いグレー、Osaka行=白、Nagoya行=薄いグレー、Fukuoka行=白）。\n  \
-      \  * 文字色: 黒色。\n    * 文字配置: 第1列（Region）は左揃え。第2〜5列（数値）は中央揃え。\n    * セル間の罫線（内側の縦線・横線）: 薄いグレーの細線。\n\n---\n\n### 4. 主要な視覚要素\n\
-      画像は大きく分けて2つの視覚要素で構成されています。\n1. **テキスト見出し:** 画像上部にある単一のテキスト行。表の内容（時期、内容、単位）を説明しています。\n2. **データテーブル本体:** 中央に配置された矩形の表。青いヘッダーとグレー/白の縞模様の行背景によって、視覚的に情報が区分けされ、読み取りやすさが強調されています。"
-    specialized: 'ご指示の通り、画像内の表を読み取って指定の形式で出力します。
-
-
-      ## 表のメタ情報
-
-      - タイトル / キャプション（あれば）: Q1 2026 Regional Sales (million JPY)
-
-      - 行数: 5
-
-      - 列数: 5
-
-
-      ## Markdown テーブル
-
-      | Region | Jan | Feb | Mar | Total |
-
-      |---|---|---|---|---|
-
-      | Tokyo | 120 | 85 | 160 | 365 |
-
-      | Osaka | 90 | 70 | 110 | 270 |
-
-      | Nagoya | 60 | 55 | 75 | 190 |
-
-      | Fukuoka | 45 | 40 | 65 | 150 |
-
-
-      ## 補足
-
-      - ヘッダー行（Region, Jan, Feb, Mar, Total）の背景が青色に設定され、文字が白色になっています。
-
-      - データ行の背景色が1行おき（TokyoとNagoyaの行）に薄いグレーでハイライトされています。
-
-      - 表外の注釈・脚注はありません。'
-  description_scores:
-    generic: {}
-    specialized: {}
-  case1:
-    copilot_answer: ''
-    fact_scores: {}
-  case2:
-    copilot_answer: ''
-    fact_scores: {}
-- id: tc04
-  title: コードスクリーンショット
-  image: tests/text_vs_image/images/04_code.png
-  image_type: code
-  specialized_prompt: prompts/code_transcription.md
-  question: 'この画像のコードを正確に転写してください。ファイル名、言語、関数名、引数、戻り値も教えてください。
-
-    '
-  ground_truth_facts:
-  - id: f1
-    text: ファイル名は 'fibonacci.py'
-  - id: f2
-    text: 言語は Python
-  - id: f3
-    text: 関数名は 'fibonacci'
-  - id: f4
-    text: '引数は ''n: int'''
-  - id: f5
-    text: 戻り値型注釈は '-> int'
-  - id: f6
-    text: docstring は '"""Return the n-th Fibonacci number."""'
-  - id: f7
-    text: 'ベースケースは ''if n < 2: return n'''
-  - id: f8
-    text: ループは 'for _ in range(n - 1):'
-  - id: f9
-    text: swap 文は 'a, b = b, a + b'
-  - id: f10
-    text: 呼び出しは 'result = fibonacci(10)'
-  - id: f11
-    text: print 文は "print(f'F(10) = {result}')"
-  - id: f12
-    text: ダーク (黒) 背景のエディタテーマ
-  descriptions:
-    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内のすべてのテキストを、画面上のレイアウト（インデントや改行）に沿って以下に書き出します。\n\n**上部タイトルバー:**\n\
-      ```\nfibonacci.py — Python\n```\n\n**コードエリア:**\n```python\ndef fibonacci(n: int) -> int:\n    \"\"\"Return the n-th\
-      \ Fibonacci number.\"\"\"\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(n - 1):\n        a,\
-      \ b = b, a + b\n    return b\n\nresult = fibonacci(10)\nprint(f'F(10) = {result}')\n```\n\n### 2. 図表・ダイアグラムの構造\n画像内にはフローチャートやグラフなどの図表・ダイアグラムは**含まれていません**。\n\
-      すべてテキストベースのソースコードです。ただし、テキストの配置として、Pythonコード特有のスペースによるインデント（字下げ）を用いた階層構造（ブロック構造）が存在します。\n\n### 3. 色とレイアウト\n*   **レイアウト:**\n\
-      \    *   画面全体は大きく上下の2つの領域に分かれています。上部に細い帯状のタイトルバーがあり、その下に広いコード表示エリアが広がっています。\n    *   コードエリアのテキストはすべて左揃えで配置されており、特定の行には行頭に空白（インデント）が設けられています。\n\
-      *   **色 (テーマとシンタックスハイライト):**\n    *   **背景色:** 全体的にダークテーマが適用されています。タイトルバーは暗いグレー、コードエリアの背景はさらに暗いダークグレー（ほぼ黒に近い色）です。\n\
-      \    *   **テキストカラー:**\n        *   **タイトルバーのテキスト:** ライトグレー（または白）。\n        *   **キーワード（`def`, `if`, `return`, `for`,\
-      \ `in`）:** 明るい青色。\n        *   **関数定義の構成要素（`fibonacci`, `n`, `int`, `range`）:** 水色（キーワードの青よりやや淡い青）。\n        *   **ドキュメンテーション文字列（`\"\
-      \"\"Return the n-th Fibonacci number.\"\"\"`）:** 緑色。\n        *   **一般の変数、数値、記号（`a`, `b`, `_`, `0`, `1`, `2`, `10`,\
-      \ `result`, `:`, `<`, `=`, `,`, `-`, `+`, `()` など）:** 白色。関数呼び出し時の `fibonacci` も白色です。\n        *   **組み込み関数（`print`）:**\
-      \ 淡い黄色（クリーム色）。\n        *   **f文字列（`f'F(10) = {result}'`）:** 黄土色（オリーブ色に近い黄色）。\n\n### 4. 主要な視覚要素\n*   **ファイル名/環境表示:**\
-      \ 上部のバーにファイル名「fibonacci.py」と、実行環境または言語を示す「Python」の文字が配置されています。\n*   **プログラミングフォント:** コードエリアのテキストには、文字幅が均等な等幅フォント（プログラミング向けフォント）が使用されています。\n\
-      *   **シンタックスハイライト:** コードの構文（予約語、文字列、変数、関数など）を視覚的に区別するための色分け機能が働いていることがわかります。"
-    specialized: "## 言語\nPython\n\n## コード\n```python\ndef fibonacci(n: int) -> int:\n    \"\"\"Return the n-th Fibonacci number.\"\
-      \"\"\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return\
-      \ b\n\nresult = fibonacci(10)\nprint(f'F(10) = {result}')\n```\n\n## 補足\n- タイトルバー/ファイル名: `fibonacci.py — Python`\n-\
-      \ エディタ UI 要素（カーソルや選択範囲など）は特に見当たりません。"
-  description_scores:
-    generic: {}
-    specialized: {}
-  case1:
-    copilot_answer: ''
-    fact_scores: {}
-  case2:
-    copilot_answer: ''
-    fact_scores: {}
-- id: tc05
-  title: アーキテクチャ図
-  image: tests/text_vs_image/images/05_architecture.png
-  image_type: architecture
+  title: 複雑クラウドアーキテクチャ (AWS Multi-AZ)
+  image: tests/text_vs_image/images/03_complex_arch.png
+  image_type: cloud_architecture
   specialized_prompt: prompts/architecture_mermaid.md
-  question: 'このアーキテクチャ図のコンポーネント、各コンポーネント間の接続、プロトコル、タイトルを教えてください。
+  question: 'このアーキテクチャ図の全コンポーネント、VPC/AZ/サブネットの階層、主要な接続（プロトコル含む）、Multi-AZ による冗長化の構造を教えてください。
 
     '
   ground_truth_facts:
-  - id: f1
-    text: タイトルは 'Web Application Architecture'
-  - id: f2
-    text: コンポーネントは 4 つ
-  - id: f3
-    text: Web Client (Browser) コンポーネントがある
-  - id: f4
-    text: API Server (FastAPI) コンポーネントがある
-  - id: f5
-    text: Database (PostgreSQL) コンポーネントがある
-  - id: f6
-    text: Cache (Redis) コンポーネントがある
-  - id: f7
-    text: Web Client → API Server の接続は 'HTTPS'
-  - id: f8
-    text: API Server → Database の接続は 'SQL'
-  - id: f9
-    text: API Server → Cache の接続は 'GET/SET'
+  - id: f01
+    text: タイトルは 'Production Architecture — AWS Multi-AZ'
+  - id: f02
+    text: リージョンは 'ap-northeast-1'
+  - id: f03
+    text: 環境は 'prod'
+  - id: f04
+    text: VPC (CIDR 10.0.0.0/16) が存在する
+  - id: f05
+    text: 2 つの AZ (AZ-a / ap-northeast-1a, AZ-b / ap-northeast-1c) がある
+  - id: f06
+    text: 各 AZ に Public Subnet がある
+  - id: f07
+    text: 各 AZ に Private Subnet (App) がある
+  - id: f08
+    text: 各 AZ に DB Subnet がある
+  - id: f09
+    text: Route 53 が最上流 (DNS) にある
   - id: f10
-    text: Database はシリンダー形（円柱）で描かれている
+    text: CloudFront (CDN) が Route 53 の下流にある
   - id: f11
-    text: '凡例: blue=client, yellow=api, green=db, red=cache'
+    text: S3 が CloudFront の origin として静的アセットを配信
+  - id: f12
+    text: IAM が外部として存在
+  - id: f13
+    text: CloudWatch が外部にあり、ログ/メトリクス用
+  - id: f14
+    text: ALB (Application Load Balancer) が両 AZ の Public Subnet に配置
+  - id: f15
+    text: NAT Gateway が両 AZ の Public Subnet に配置
+  - id: f16
+    text: ECS Fargate の App Service が両 AZ の Private Subnet に配置
+  - id: f17
+    text: ElastiCache Redis が両 AZ の Private Subnet に存在
+  - id: f18
+    text: RDS PostgreSQL Primary は AZ-a の DB Subnet に配置
+  - id: f19
+    text: RDS PostgreSQL Read Replica は AZ-b の DB Subnet に配置
+  - id: f20
+    text: CloudFront → ALB の接続は HTTPS
+  - id: f21
+    text: ECS → RDS Primary は書き込み (write) 接続
+  - id: f22
+    text: ECS → RDS Replica は読み込み専用 (read-only) 接続
+  - id: f23
+    text: ECS → ElastiCache の接続は GET/SET
+  - id: f24
+    text: NAT GW 経由で外部に Outbound 通信
+  - id: f25
+    text: Multi-AZ による冗長化構成 (ALB, ECS, Cache, RDS すべて両 AZ に配置)
+  - id: f26
+    text: 凡例にサブネット色分け (Public=青, Private App=黄, DB=緑) が記載
   descriptions:
-    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容\n画像内に含まれるテキストは以下の通りです。\n\n*   **タイトル（左上）**:\n    *   `Web Application\
-      \ Architecture`\n*   **ノード内のテキスト（各ノード内で2行に分かれている）**:\n    *   `Web Client` / `(Browser)`\n    *   `API Server` / `(FastAPI)`\n\
-      \    *   `Database` / `(PostgreSQL)`\n    *   `Cache` / `(Redis)`\n*   **矢印（エッジ）に付随するラベル**:\n    *   `HTTPS`\n    *\
-      \   `SQL`\n    *   `GET/SET`\n*   **凡例（左下）**:\n    *   `Legend: blue=client, yellow=api, green=db, red=cache`\n\n###\
-      \ 2. 図表・ダイアグラムの構造\nこの図は、4つのノード（構成要素）とそれらを繋ぐ3つの有向エッジ（矢印）で構成されるフロー図またはアーキテクチャ図です。\n\n*   **階層とフロー**: 全体として左から右への流れ（依存関係またはデータフロー）を示しています。中央の「API\
-      \ Server」をハブとして、右側で2つに分岐する構造です。\n*   **ノードと接続関係**:\n    1.  **始点**: `Web Client (Browser)` ノードから `API Server (FastAPI)`\
-      \ ノードへ、右向きの矢印が接続されています。この矢印の上部には `HTTPS` というラベルがあります。\n    2.  **分岐1（右上）**: `API Server (FastAPI)` ノードから `Database (PostgreSQL)`\
-      \ ノードへ、右上に向かう斜めの矢印が接続されています。この矢印の近くには `SQL` というラベルがあります。\n    3.  **分岐2（右下）**: `API Server (FastAPI)` ノードから `Cache (Redis)`\
-      \ ノードへ、右下に向かう斜めの矢印が接続されています。この矢印の近くには `GET/SET` というラベルがあります。\n\n### 3. 色とレイアウト\n*   **背景色**: 白。\n*   **テキストの色**: タイトルとノード内のテキストは黒。矢印のラベル（HTTPS,\
-      \ SQL, GET/SET）と左下の凡例はグレー。\n*   **ノードの色と凡例との対応**: 各ノードは黒い実線の枠線で囲まれ、異なる色で塗りつぶされています。これらは左下の凡例と対応しています。\n    *   `Web\
-      \ Client`: 薄い青色（blue）\n    *   `API Server`: 薄い黄色（yellow）\n    *   `Database`: 薄い緑色（green）\n    *   `Cache`: 薄い赤色/ピンク色（red）\n\
-      *   **レイアウト（配置）**:\n    *   左側にクライアント要素、中央にAPIサーバー、右側の上下にデータストア要素が配置されています。\n    *   タイトルは左上に左揃えで配置。\n    *   凡例は左下に左揃えで配置（フォントサイズは他より小さい）。\n\
-      \    *   ノード内のテキストはすべて中央揃え（センタリング）されています。\n\n### 4. 主要な視覚要素\n*   **図形の形状**:\n    *   **長方形**: `Web Client`、`API Server`、`Cache`\
-      \ の3つのノードは単純な長方形です。\n    *   **円柱形**: `Database` ノードのみ、データストレージを一般的に表す円柱（立体的なドラム缶）の形状をしています。上部に楕円形が描かれ、立体感を表現しています。\n\
-      *   **矢印**:\n    *   すべて黒い実線の直線です。\n    *   先端には塗りつぶされた黒い三角形の矢尻がついています。\n    *   矢印は各図形の枠線から出発し、目的の図形の枠線に到達しています。"
-    specialized: "画像の内容に基づき、システム構成図を構造化して出力します。\n\n## Mermaid 表記\n\n```mermaid\nflowchart LR\n    A[\"Web Client\\n(Browser)\"\
-      ]\n    B[\"API Server\\n(FastAPI)\"]\n    C[(\"Database\\n(PostgreSQL)\")]\n    D[\"Cache\\n(Redis)\"]\n\n    A -- \"\
-      HTTPS\" --> B\n    B -- \"SQL\" --> C\n    B -- \"GET/SET\" --> D\n\n    %% スタイリング（画像の凡例に基づく色分け）\n    style A fill:#dae8fc,stroke:#000000\n\
-      \    style B fill:#fff2cc,stroke:#000000\n    style C fill:#d5e8d4,stroke:#000000\n    style D fill:#f8cecc,stroke:#000000\n\
-      ```\n\n## ノード一覧\n\n| ID | ラベル | 種別（service/db/queue/external/...） |\n|---|---|---|\n| A | Web Client (Browser) | client\
-      \ |\n| B | API Server (FastAPI) | service / api |\n| C | Database (PostgreSQL) | db |\n| D | Cache (Redis) | cache |\n\
-      \n## 接続一覧\n\n| From | To | ラベル（プロトコル等） |\n|---|---|---|\n| A (Web Client) | B (API Server) | HTTPS |\n| B (API Server)\
-      \ | C (Database) | SQL |\n| B (API Server) | D (Cache) | GET/SET |\n\n## 補足\n\n- **タイトル**: Web Application Architecture\n\
-      - **凡例（Legend）**: \n  - `blue` = client (Web Client)\n  - `yellow` = api (API Server)\n  - `green` = db (Database)\n\
-      \  - `red` = cache (Cache)\n- **グルーピングの名前**: 特になし\n- **その他注釈**: なし"
+    generic: "画像から読み取れる情報を構造的に記述します。\n\n### 1. テキスト内容（OCR）\n\n**タイトル・ヘッダー部分:**\n*   Production Architecture — AWS Multi-AZ\n\
+      *   Environment: prod • Region: ap-northeast-1\n\n**外部/グローバルリソース（上部・右部）:**\n*   Route 53 DNS\n*   CloudFront CDN\n*\
+      \   S3 Static Assets\n*   IAM Roles\n*   CloudWatch Logs/Metrics\n\n**接続ラベル（上部）:**\n*   origin (CloudFrontからS3の間)\n\
+      *   HTTPS (CloudFrontの下)\n\n**階層枠のラベル:**\n*   VPC: 10.0.0.0/16\n*   AZ-a (ap-northeast-1a)\n*   AZ-b (ap-northeast-1c)\n\
+      *   Public Subnet (AZ-a, AZ-bの両方に存在)\n*   Private Subnet (App) (AZ-a, AZ-bの両方に存在)\n*   DB Subnet (AZ-a, AZ-bの両方に存在)\n\
+      \n**AZ-a内のノードとラベル:**\n*   ALB (AZ-a)\n*   NAT GW (AZ-a)\n*   Outbound (NAT GWの上)\n*   ECS Fargate App Service (AZ-a)\n\
+      *   GET/SET (ECSからRedisの間)\n*   write (ECSからRDS Primaryの間)\n*   ElastiCache Redis\n*   RDS PostgreSQL Primary\n\n**AZ-b内のノードとラベル:**\n\
+      *   ALB (AZ-b)\n*   NAT GW (AZ-b)\n*   ECS Fargate App Service (AZ-b)\n*   read-only (ECSからRDS Read Replicaの間)\n*  \
+      \ ElastiCache Redis\n*   RDS PostgreSQL Read Replica\n\n**凡例 (Legend - 下部):**\n*   Public Subnet\n*   Private Subnet\
+      \ (App)\n*   DB Subnet\n*   External / DNS\n*   Cache\n\n---\n\n### 2. 図表・ダイアグラムの構造（ノード・接続・階層）\n\n**階層構造:**\n図は大きく分けて「VPC外（外部リソース）」と「VPC内」に分かれており、VPC内はさらにアベイラビリティゾーン（AZ）とサブネットによって階層化されています。\n\
+      1.  **最上位**: VPC外部。左上に通信の入り口となるリソース、右上に管理・監視系リソースが配置されています。\n2.  **VPC階層**: 「VPC: 10.0.0.0/16」という大きな枠で囲まれています。\n3. \
+      \ **AZ階層**: VPCの中に「AZ-a」と「AZ-b」という2つの独立した枠が左右に並んでいます。\n4.  **サブネット階層**: 各AZの中に、上から「Public Subnet」「Private Subnet (App)」「DB\
+      \ Subnet」の3つの水平な枠が配置されています。\n\n**ノードの配置:**\n*   **VPC外**: 「Route 53 DNS」「CloudFront CDN」「S3 Static Assets」が左上から水平に並び、「IAM\
+      \ Roles」「CloudWatch Logs/Metrics」が右端に縦に並んでいます。\n*   **Public Subnet内**: 各AZに「ALB」と「NAT GW」が配置されています。\n*   **Private\
+      \ Subnet (App)内**: 各AZに「ECS Fargate App Service」と「ElastiCache Redis」が配置されています。\n*   **DB Subnet内**: AZ-aに「RDS PostgreSQL\
+      \ Primary」、AZ-bに「RDS PostgreSQL Read Replica」が配置されています。\n\n**接続（矢印の向きとフロー）:**\n*   `Route 53 DNS` → `CloudFront CDN`\n\
+      *   `CloudFront CDN` → `S3 Static Assets` (ラベル: origin)\n*   `CloudFront CDN` → AZ-aの`ALB` (ラベル: HTTPS) および AZ-bの`ALB`\n\
+      *   AZ-aの`NAT GW` → 上方向（枠外）へ (ラベル: Outbound)\n*   AZ-bの`NAT GW` → 上方向（枠外）へ\n*   各AZの `ALB` → 同じAZ内の `ECS Fargate App\
+      \ Service`\n*   AZ-aの `ECS Fargate App Service` → AZ-aの `ElastiCache Redis` (ラベル: GET/SET)\n*   AZ-bの `ECS Fargate App\
+      \ Service` → AZ-bの `ElastiCache Redis`\n*   AZ-aの `ECS Fargate App Service` → `RDS PostgreSQL Primary` (緑色の矢印、ラベル: write)\n\
+      *   AZ-aの `ECS Fargate App Service` → `RDS PostgreSQL Read Replica` (緑色の矢印)\n*   AZ-bの `ECS Fargate App Service` → `RDS\
+      \ PostgreSQL Read Replica` (青緑色の矢印、ラベル: read-only)\n*   VPC内の複数のコンポーネント（両AZの`ALB`, `NAT GW`, `ECS`）から、右上の `CloudWatch\
+      \ Logs/Metrics` に向かって、非常に薄い破線の矢印が伸びています。\n\n---\n\n### 3. 色とレイアウト\n\n**レイアウト:**\n*   上部にタイトル群、その下に外部からのリクエストの入り口となるコンポーネントが配置されています。\n\
+      *   メインの構造は中央の大きなVPC枠であり、その中でAZ-a（左）とAZ-b（右）が左右対称に近い形で並んでいます（データベース層のみPrimaryとRead Replicaで非対称）。\n*   各AZ内のサブネットは、上からパブリック、プライベート（アプリケーション）、データベースという順序で水平に積み重なっています。\n\
+      *   画面下部に凡例（レジェンド）が1行で配置されています。\n\n**色使い:**\n*   **テキスト**: 基本は黒ですが、VPCのラベルは紫、AZとPublic Subnetのラベルは青色、DB Subnetのラベルは緑色、矢印のラベル（write,\
+      \ read-only等）も矢印の色に合わせて緑や青緑が使われています。\n*   **枠線**:\n    *   VPC: 太い紫色の破線\n    *   AZ: 青緑色（ティール）の破線\n    *   Public Subnet:\
+      \ 薄い青色の実線（背景も非常に薄い青）\n    *   Private Subnet: 薄いオレンジ/黄色の実線（背景も非常に薄い黄色）\n    *   DB Subnet: 薄い緑色の実線（背景も非常に薄い緑）\n*   **ノードの塗りつぶし色**:\n\
+      \    *   薄紫色: Route 53\n    *   黄色/オレンジ系: CloudFront, ALB, NAT GW\n    *   薄緑色: S3, RDS PostgreSQL\n    *   ピンク色: IAM\
+      \ Roles, CloudWatch Logs/Metrics, ElastiCache Redis\n    *   肌色/ピーチ色: ECS Fargate App Service\n*   **凡例の色指定**:\n   \
+      \ *   Public Subnet: 薄青色の四角\n    *   Private Subnet (App): 薄黄色の四角\n    *   DB Subnet: 薄緑色の四角\n    *   External / DNS:\
+      \ 薄紫色の四角\n    *   Cache: ピンク色の四角\n\n---\n\n### 4. 主要な視覚要素\n\n*   **図形の形状**:\n    *   **角丸四角形**: Route 53, CloudFront,\
+      \ IAM Roles, CloudWatch Logs/Metrics, ALB, ECS Fargate, ElastiCache Redisに使用されています。多くの主要サービスを示しています。\n    *   **直角の四角形**:\
+      \ S3, NAT GWに使用されています。\n    *   **円柱形（立体的なドラム缶状）**: データベースであることを示す一般的な記号として、RDS PostgreSQL（PrimaryおよびRead Replica）に使用されています。\n\
+      *   **線種**:\n    *   **実線の矢印**: 明確なデータの流れやリクエストの経路（黒色）、またはデータベースへのアクセス（緑色、青緑色）を示しています。\n    *   **破線の矢印**: メトリクスやログの送信など、バックグラウンドでの情報の流れ（CloudWatch宛ての薄い線）を示しています。\n\
+      \    *   **破線の枠**: 論理的な境界であるVPCやAZを囲むために使用されています。\n    *   **実線の枠**: より具体的なネットワークの区切りであるサブネットを囲むために使用されています。"
+    specialized: "ご提示いただいたシステム構成図に基づいて、Mermaid表記、ノード一覧、接続一覧、補足情報を出力します。\n\n## Mermaid 表記\n\n```mermaid\nflowchart TB\n   \
+      \ route53([\"Route 53\\nDNS\"])\n    cloudfront([\"CloudFront\\nCDN\"])\n    s3[\"S3\\nStatic Assets\"]\n    iam([\"\
+      IAM\\nRoles\"])\n    cloudwatch([\"CloudWatch\\nLogs/Metrics\"])\n    \n    route53 --> cloudfront\n    cloudfront --\
+      \ origin --> s3\n    \n    subgraph vpc [\"VPC: 10.0.0.0/16\"]\n        subgraph az_a [\"AZ-a (ap-northeast-1a)\"]\n\
+      \            subgraph pub_a [\"Public Subnet\"]\n                alb_a([\"ALB\\n(AZ-a)\"])\n                nat_a([\"\
+      NAT GW\\n(AZ-a)\"])\n                outbound_a[\"Outbound\"]\n                nat_a --> outbound_a\n            end\n\
+      \            subgraph priv_a [\"Private Subnet (App)\"]\n                ecs_a([\"ECS Fargate\\nApp Service\\n(AZ-a)\"\
+      ])\n                redis_a([\"ElastiCache\\nRedis\"])\n            end\n            subgraph db_a [\"DB Subnet\"]\n\
+      \                rds_primary[(\"RDS PostgreSQL\\nPrimary\")]\n            end\n            alb_a --> ecs_a\n       \
+      \     ecs_a -- GET/SET --> redis_a\n            ecs_a --> nat_a\n        end\n\n        subgraph az_b [\"AZ-b (ap-northeast-1c)\"\
+      ]\n            subgraph pub_b [\"Public Subnet\"]\n                alb_b([\"ALB\\n(AZ-b)\"])\n                nat_b([\"\
+      NAT GW\\n(AZ-b)\"])\n                outbound_b[\"Outbound\"]\n                nat_b --> outbound_b\n            end\n\
+      \            subgraph priv_b [\"Private Subnet (App)\"]\n                ecs_b([\"ECS Fargate\\nApp Service\\n(AZ-b)\"\
+      ])\n                redis_b([\"ElastiCache\\nRedis\"])\n            end\n            subgraph db_b [\"DB Subnet\"]\n\
+      \                rds_replica[(\"RDS PostgreSQL\\nRead Replica\")]\n            end\n            alb_b --> ecs_b\n  \
+      \          ecs_b --> redis_b\n            ecs_b --> nat_b\n        end\n        \n        ecs_a -- write --> rds_primary\n\
+      \        ecs_b -- write --> rds_primary\n        ecs_a -- read-only --> rds_replica\n        ecs_b -- read-only -->\
+      \ rds_replica\n    end\n\n    cloudfront -- HTTPS --> alb_a\n    cloudfront --> alb_b\n    \n    ecs_a -.-> cloudwatch\n\
+      \    ecs_b -.-> cloudwatch\n```\n\n## ノード一覧\n\n| ID | ラベル | 種別 |\n|---|---|---|\n| route53 | Route 53 DNS | external/dns\
+      \ |\n| cloudfront | CloudFront CDN | cdn |\n| s3 | S3 Static Assets | storage |\n| iam | IAM Roles | security |\n| cloudwatch\
+      \ | CloudWatch Logs/Metrics | monitoring |\n| alb_a | ALB (AZ-a) | load balancer |\n| nat_a | NAT GW (AZ-a) | network\
+      \ |\n| outbound_a | Outbound | external (仮想ノード) |\n| ecs_a | ECS Fargate App Service (AZ-a) | compute/service |\n| redis_a\
+      \ | ElastiCache Redis | cache/db |\n| rds_primary | RDS PostgreSQL Primary | db |\n| alb_b | ALB (AZ-b) | load balancer\
+      \ |\n| nat_b | NAT GW (AZ-b) | network |\n| outbound_b | Outbound | external (仮想ノード) |\n| ecs_b | ECS Fargate App Service\
+      \ (AZ-b) | compute/service |\n| redis_b | ElastiCache Redis | cache/db |\n| rds_replica | RDS PostgreSQL Read Replica\
+      \ | db |\n\n## 接続一覧\n\n| From | To | ラベル（プロトコル等） |\n|---|---|---|\n| route53 | cloudfront | |\n| cloudfront | s3 | origin\
+      \ |\n| cloudfront | alb_a | HTTPS |\n| cloudfront | alb_b | |\n| alb_a | ecs_a | |\n| alb_b | ecs_b | |\n| ecs_a | redis_a\
+      \ | GET/SET |\n| ecs_b | redis_b | |\n| ecs_a | nat_a | |\n| ecs_b | nat_b | |\n| nat_a | outbound_a | |\n| nat_b |\
+      \ outbound_b | |\n| ecs_a | rds_primary | write (画像では緑色の線) |\n| ecs_b | rds_primary | write (画像では緑色の線) |\n| ecs_a |\
+      \ rds_replica | read-only (画像では青色の線) |\n| ecs_b | rds_replica | read-only (画像では青色の線) |\n| ecs_a | cloudwatch | (点線での接続)\
+      \ |\n| ecs_b | cloudwatch | (点線での接続) |\n\n## 補足\n\n- **タイトル:** Production Architecture — AWS Multi-AZ\n- **環境情報:** Environment:\
+      \ prod • Region: ap-northeast-1\n- **グルーピング階層:**\n  - `VPC: 10.0.0.0/16`\n    - `AZ-a (ap-northeast-1a)` / `AZ-b (ap-northeast-1c)`\n\
+      \      - `Public Subnet`\n      - `Private Subnet (App)`\n      - `DB Subnet`\n- **凡例（色分け）:**\n  - 水色の背景枠: Public Subnet\n\
+      \  - 薄黄色の背景枠: Private Subnet (App)\n  - 薄緑色の背景枠: DB Subnet\n  - 薄紫色のコンポーネント: External / DNS (Route53)\n  - ピンク色のコンポーネント:\
+      \ Cache (ElastiCache)\n- **注釈:**\n  - `IAM Roles` は他のリソース（特にECS等）から利用される前提ですが、図面上は直接の矢印が引かれていないため独立したノードとして配置しています。\n\
+      \  - NAT GWから外部へ向かう「Outbound」通信は、Mermaid上では図示のために `Outbound` という仮想ノードを作成して表現しています。\n  - ECS から DB への接続線は、Primaryへの書き込み（write）が緑色、Read\
+      \ Replicaへの読み取り（read-only）が青色で色分けされています。"
   description_scores:
-    generic: {}
-    specialized: {}
+    generic:
+      f01: present
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+      f25: present
+      f26: present
+    specialized:
+      f01: present
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+      f25: present
+      f26: partial
   case1:
-    copilot_answer: ''
-    fact_scores: {}
+    copilot_answer: "ご提示いただいた記述に基づき、アーキテクチャ図の構成を以下の4項目に整理して回答します。\n\n### 1. 全コンポーネント\nアーキテクチャ図に存在する全コンポーネント（ノード）は以下の通りです。\n\
+      \n**【外部・VPC外のコンポーネント】**\n*   Route 53 DNS\n*   CloudFront CDN\n*   S3 Static Assets\n*   IAM Roles（図面上は独立したノードとして配置）\n\
+      *   CloudWatch Logs/Metrics\n\n**【AZ-a 内のコンポーネント】**\n*   ALB (AZ-a)\n*   NAT GW (AZ-a)\n*   Outbound（外部へ向かう通信を表す仮想ノード）\n\
+      *   ECS Fargate App Service (AZ-a)\n*   ElastiCache Redis\n*   RDS PostgreSQL Primary\n\n**【AZ-b 内のコンポーネント】**\n*   ALB\
+      \ (AZ-b)\n*   NAT GW (AZ-b)\n*   Outbound（外部へ向かう通信を表す仮想ノード）\n*   ECS Fargate App Service (AZ-b)\n*   ElastiCache Redis\n\
+      *   RDS PostgreSQL Read Replica\n\n### 2. VPC/AZ/サブネットの階層\n本環境は「Region: ap-northeast-1 (prod)」にデプロイされており、以下の階層構造を持っています。\n\
+      \n*   **VPC: 10.0.0.0/16**\n    *   **AZ-a (ap-northeast-1a)**\n        *   Public Subnet（水色の背景枠）\n        *   Private\
+      \ Subnet (App)（薄黄色の背景枠）\n        *   DB Subnet（薄緑色の背景枠）\n    *   **AZ-b (ap-northeast-1c)**\n        *   Public Subnet（水色の背景枠）\n\
+      \        *   Private Subnet (App)（薄黄色の背景枠）\n        *   DB Subnet（薄緑色の背景枠）\n\n### 3. 主要な接続（プロトコル含む）\n各コンポーネント間の主な接続関係と、付与されているラベル（プロトコル・用途等）は以下の通りです。\n\
+      \n*   **フロントエンド・CDNの接続:**\n    *   Route 53 から CloudFront へ接続\n    *   CloudFront から S3 へ接続（ラベル: `origin`）\n    *  \
+      \ CloudFront から ALB (AZ-a) へ接続（ラベル: `HTTPS`）\n    *   CloudFront から ALB (AZ-b) へ接続\n*   **アプリケーション・ネットワークの接続:**\n  \
+      \  *   各ALB から 同AZ内の ECS Fargate へ接続\n    *   各ECS Fargate から 同AZ内の NAT GW へ接続し、そこから Outbound（外部）へ接続\n    *   ECS Fargate\
+      \ (AZ-a) から AZ-aの ElastiCache Redis へ接続（ラベル: `GET/SET`）\n    *   ECS Fargate (AZ-b) から AZ-bの ElastiCache Redis へ接続\n\
+      \    *   各ECS Fargate から CloudWatch へ接続（点線）\n*   **データベースへの接続:**\n    *   両AZの ECS Fargate から RDS PostgreSQL Primary\
+      \ へ接続（ラベル: `write` / 緑色の線）\n    *   両AZの ECS Fargate から RDS PostgreSQL Read Replica へ接続（ラベル: `read-only` / 青色の線）\n\n\
+      ### 4. Multi-AZ による冗長化の構造\nこのアーキテクチャでは、VPC内に「AZ-a」と「AZ-b」の2つのアベイラビリティゾーンを設け、各サブネット階層でリソースを分散して冗長化を図っています。\n\n*   **Public\
+      \ Subnet:** AZ-aとAZ-bのそれぞれにロードバランサー（ALB）と NAT GW が配置され、CloudFrontからの通信が両AZのALBに向けられています。\n*   **Private Subnet (App):**\
+      \ AZ-aとAZ-bのそれぞれにコンピューティングリソース（ECS Fargate App Service）とキャッシュ層（ElastiCache Redis）が配置されています。\n*   **DB Subnet:** データベース層は、AZ-a\
+      \ に「RDS PostgreSQL Primary」を置き、AZ-b に「RDS PostgreSQL Read Replica」を配置する構造です。両AZのECSから Primary には書き込み（write）、Read Replica\
+      \ には読み取り（read-only）が行われる構成になっています。"
+    fact_scores:
+      f01: missing
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+      f25: present
+      f26: partial
   case2:
-    copilot_answer: ''
-    fact_scores: {}
+    copilot_answer: "ご提示いただいたAWSのアーキテクチャ図に基づいて、詳細を解説します。\n\nこの図は、東京リージョン（ap-northeast-1）に構築された、本番環境（prod）向けのMulti-AZ（マルチアベイラビリティーゾーン）アーキテクチャを示しています。\n\
+      \n### 1. 全コンポーネント\n\n図に配置されているすべてのコンポーネントは以下の通りです。\n\n**VPC外（グローバル/リージョンサービス）**\n*   **Route 53 DNS**: ドメイン名解決を行います。\n\
+      *   **CloudFront CDN**: コンテンツ配信ネットワーク。エンドユーザーに近いエッジからコンテンツを配信します。\n*   **S3 (Static Assets)**: 静的コンテンツ（画像、CSS、JSなど）を保存するオブジェクトストレージです。CloudFrontのオリジンとして機能します。\n\
+      *   **IAM Roles**: AWSリソース間のアクセス権限を管理します。\n*   **CloudWatch Logs/Metrics**: アプリケーションやインフラのログ・メトリクスを収集・監視します。\n\n**VPC内リソース**\n\
+      *   **ALB (Application Load Balancer)**: HTTP/HTTPSトラフィックを受け取り、バックエンドのコンテナに負荷分散します。\n*   **NAT GW (NAT Gateway)**: プライベートサブネット内のリソースがインターネットへアクセスするためのゲートウェイです。\n\
+      *   **ECS Fargate App Service**: アプリケーションコンテナを実行するサーバーレスコンピューティングエンジンです。\n*   **ElastiCache Redis**: アプリケーションのパフォーマンスを向上させるためのインメモリキャッシュデータストアです。\n\
+      *   **RDS PostgreSQL Primary**: メインのリレーショナルデータベースです。データの書き込みと読み込みを担当します。\n*   **RDS PostgreSQL Read Replica**: Primaryのデータを複製した読み取り専用データベースです。\n\
+      \n---\n\n### 2. VPC / AZ / サブネットの階層\n\nネットワークは以下のように階層化され、セキュアに分離されています。\n\n*   **VPC**: `10.0.0.0/16` のCIDRブロックを持つ全体を囲む仮想ネットワーク。\n\
+      *   **AZ (アベイラビリティーゾーン)**: 東京リージョン内の2つの独立したデータセンター群を利用して冗長化されています。\n    *   **AZ-a**: ap-northeast-1a\n    *   **AZ-b**:\
+      \ ap-northeast-1c\n*   **サブネット**: 各AZ内に3つの階層（層）が設けられています。\n    1.  **Public Subnet** (青色): インターネットと直接通信できる層。ALBとNAT\
+      \ Gatewayが配置されています。\n    2.  **Private Subnet (App)** (黄色): インターネットから直接アクセスされないアプリケーション層。ECS FargateとElastiCache Redisが配置されています。\n\
+      \    3.  **DB Subnet** (緑色): 最もセキュアなデータ層。RDS PostgreSQLデータベースが配置されています。\n\n---\n\n### 3. 主要な接続（データの流れとプロトコル）\n\n矢印で示された主要な通信フローは以下の通りです。\n\
+      \n*   **外部からのリクエスト (Inbound)**\n    *   ユーザーは `Route 53` で名前解決し、`CloudFront` にアクセスします。\n    *   静的アセットへのリクエストは、CloudFrontから\
+      \ `S3` (origin) へルーティングされます。\n    *   動的アプリケーションへのリクエストは、CloudFrontからVPC内のパブリックサブネットにある `ALB` へ **HTTPS** プロトコルでルーティングされます。\n\
+      *   **アプリケーション層の通信**\n    *   ALBはトラフィックをプライベートサブネットの `ECS Fargate App Service` に分散させます。\n    *   ECS Fargateはキャッシュの取得や保存のために\
+      \ `ElastiCache Redis` と通信します（ラベル: **GET/SET**）。\n*   **データベースへのアクセス**\n    *   **書き込み (write)**: 両方のAZのECS Fargateから、AZ-aにある\
+      \ `RDS PostgreSQL Primary` へデータが書き込まれます（緑色の実線）。\n    *   **読み込み (read-only)**: AZ-bのECS Fargateは、同じAZ-bにある `RDS PostgreSQL\
+      \ Read Replica` からデータを読み込んでいます（青緑色の太い実線）。\n*   **外部への通信 (Outbound) と管理**\n    *   ECS Fargateなどのプライベートなリソースは、外部APIへのアクセスやパッケージダウンロードのために、パブリックサブネットの\
+      \ `NAT GW` を経由してインターネットへ抜けます（ラベル: Outbound）。\n    *   ECS Fargateは必要な権限を得るために `IAM Roles` と通信し、稼働状況を `CloudWatch` に送信しています（点線）。\n\
+      \n---\n\n### 4. Multi-AZ による冗長化の構造\n\nこのアーキテクチャは、単一障害点（SPOF）を排除し、可用性を高めるために「Multi-AZ（複数アベイラビリティーゾーン）」構成を採用しています。\n\n\
+      *   **インフラの分散配置**: ALB、NAT Gateway、ECS Fargate、ElastiCache Redisが **AZ-a と AZ-b の両方に均等に配置**されています。これにより、仮に一方のAZで大規模な障害が発生しても、もう一方のAZのリソースでシステムを継続して稼働させることができます。\n\
+      *   **トラフィックの負荷分散**: CloudFrontからのトラフィックは両方のAZのALBに振り分けられ、そこから各AZのアプリケーション（ECS Fargate）へロードバランシングされます。\n*   **データベースの冗長性と負荷分散**:\n\
+      \    *   DBはAZ-aにPrimary（書き込み/読み込み）、AZ-bにRead Replica（読み込み専用）を配置しています。\n    *   この構成は主に読み取りトラフィックの負荷分散（Read Replicaへのオフロード）を目的としていますが、Primaryに障害が発生した際にRead\
+      \ Replicaを昇格させることで、ダウンタイムを最小限に抑えるディザスタリカバリの基盤としても機能します。\n*   **アウトバウンド通信の可用性確保**: NAT Gatewayも各AZに配置されているため、一方のAZがダウンしても、もう一方のAZのプライベートリソースはインターネットへの接続を維持できます。"
+    fact_scores:
+      f01: partial
+      f02: present
+      f03: present
+      f04: present
+      f05: present
+      f06: present
+      f07: present
+      f08: present
+      f09: present
+      f10: present
+      f11: present
+      f12: present
+      f13: present
+      f14: present
+      f15: present
+      f16: present
+      f17: present
+      f18: present
+      f19: present
+      f20: present
+      f21: present
+      f22: present
+      f23: present
+      f24: present
+      f25: present
+      f26: present
+  score_reasons:
+    descriptions.generic:
+      f01: テキストのタイトル部分に完全一致で記載されているため。
+      f02: ヘッダー部分に明記されているため
+      f03: 'Environment: prodと明記されているため'
+      f04: 'VPC: 10.0.0.0/16の記載があるため'
+      f05: 階層枠のラベルに2つのAZと領域名が全て明記されているため
+      f06: 各AZの中にPublic Subnetが配置と明記されているため
+      f07: 各AZに存在すると明確に記載されているため
+      f08: DB Subnetが両AZに存在すると明記されているため。
+      f09: Route 53 DNSが最上位・左上にあり通信の起点と記載。
+      f10: Route 53からCloudFrontへの矢印があるため
+      f11: S3静的アセットがCloudFrontのoriginと記載
+      f12: 外部リソースとしてIAM Rolesの記載があるため。
+      f13: 外部リソースとしてCloudWatch Logs/Metricsの記載あり。
+      f14: 各AZのPublic Subnet内にALBがあると記載されている
+      f15: 各AZのPublic SubnetにNAT GWが配置と明記されているため
+      f16: 両AZのPrivate Subnet内に配置と明記されているため
+      f17: 両AZのPrivate Subnetに配置と明記されているため。
+      f18: DB Subnet内の説明に明記されている
+      f19: DB Subnet内の配置説明で明確に言及されているため。
+      f20: CloudFrontからALBへの接続にHTTPSの記載がある
+      f21: ECSからRDS Primaryへのwrite接続が明記されているため。
+      f22: ECSからRDS Replica間がread-onlyと記載
+      f23: ECSからRedis間の接続ラベルがGET/SETと明記されている。
+      f24: NAT GWから枠外へのOutbound通信が記載されているため
+      f25: 全指定リソースが両AZに配置されていると記載があるため。
+      f26: 凡例にサブネット色分け（青、黄、緑）が明確に記載されている。
+    descriptions.specialized:
+      f01: 補足にタイトルが明記されている
+      f02: 補足情報にリージョンが明記されているため
+      f03: 補足の環境情報にprodと明記されているため
+      f04: 図や補足情報にCIDR付きで明記されているため
+      f05: AZ-a(1a)とAZ-b(1c)の存在が明記されている。
+      f06: 両AZにPublic Subnetがあると明記されているため
+      f07: 各AZにPrivate Subnet(App)が明記されているため
+      f08: AZ-aとAZ-bの両方にDB Subnetの記載があるため
+      f09: Route 53がDNSとして最上流の起点に記載されているため
+      f10: Route53からCloudFrontへの接続があるため
+      f11: S3静的アセットがCloudFrontオリジンと記載。
+      f12: VPC外に独立したノードとして配置されているため
+      f13: VPC外部にあり、Logs/Metrics用と明記されているため。
+      f14: 両AZのPublic SubnetにALBが配置されていると明記
+      f15: 両AZのPublic SubnetにNAT GWが配置されている。
+      f16: 両AZのPrivate Subnetに配置と明記されている。
+      f17: 両AZのPrivate Subnet内にRedisが明記されている
+      f18: Mermaid図でAZ-aのDB Subnet内に配置と明記。
+      f19: AZ-bのDB Subnetに配置されると明示されているため
+      f20: CloudFrontからalb_aへのHTTPS接続が明記
+      f21: ECSからRDS Primaryへのwrite接続が明記されている
+      f22: 接続一覧表や補足に明確な記載があるため
+      f23: ECSからRedisへの接続がGET/SETと記載あり
+      f24: NAT GWから外部へのOutbound通信が明記されているため
+      f25: 各リソースがAZ-aとAZ-bの両方に配置されているため
+      f26: 色の表記が水色、薄黄色、薄緑色となっているため
+    case1.copilot_answer:
+      f01: タイトルへの言及がテキストに一切ないため。
+      f02: ap-northeast-1と明記されているため
+      f03: テキスト内に(prod)と明記されているため
+      f04: '「VPC: 10.0.0.0/16」と明記されているため。'
+      f05: 2つのAZの名前と識別子が正確に記載されているため。
+      f06: 両方のAZにPublic Subnetがあることが明記されている。
+      f07: AZ-aとAZ-bの両方に存在すると明記されているため。
+      f08: AZ-aとAZ-bの両方にDB Subnetの記載があるため
+      f09: Route 53 DNSから下流への接続が明記されているため
+      f10: Route 53からCloudFrontへの接続が記載されている
+      f11: CloudFrontからS3（静的アセット）へのorigin接続と記載
+      f12: 外部コンポーネントとしてIAM Rolesが記載されているため。
+      f13: 外部・VPC外にLogs/Metricsと記載があるため
+      f14: 両AZのPublic SubnetにALBが配置と明記されている。
+      f15: 両AZのPublic SubnetにNAT GWが配置と明記。
+      f16: 両AZのPrivate Subnetに配置と明記されているため
+      f17: 両AZのPrivate SubnetにRedisがあると明記。
+      f18: AZ-aのDB Subnetへの配置が明記されているため。
+      f19: AZ-bのDB Subnetに配置と明記されているため
+      f20: CloudFrontからALBへの接続にHTTPSと明記。
+      f21: ECSからRDS Primaryへの書き込み接続が明記されている。
+      f22: ECSからRead Replicaへのread-only接続が明記。
+      f23: ECSからRedisへの接続にGET/SETの記載があるため
+      f24: NAT GWからOutbound（外部）へ接続と明記されているため
+      f25: ALB、ECS、Cache、RDSの全てが両AZに配置されているため。
+      f26: 背景色として記載されているが、凡例としての明記がないため
+    case2.copilot_answer:
+      f01: 意味は記載されているが、正確な英語タイトルの表記がない
+      f02: 東京リージョン（ap-northeast-1）と明記されているため。
+      f03: テキスト内に「本番環境（prod）」と明記されているため。
+      f04: VPCとそのCIDR値の記載が明確に存在する
+      f05: テキストにAZ名とリージョンが明記されているため
+      f06: 各AZ内にPublic Subnetがあると明確に記載されている
+      f07: 各AZ内にPrivate Subnet(App)の記載があるため。
+      f08: 各AZ内にDB Subnetが設けられていると明記。
+      f09: ユーザーアクセスの起点としてRoute53での名前解決が明記。
+      f10: 「Route 53で名前解決し、CloudFrontにアクセス」と明記
+      f11: 静的アセット向けS3がCloudFrontのオリジンと明記。
+      f12: IAM RolesがVPC外に存在すると明記されているため。
+      f13: VPC外の項目でログ・メトリクス用と明確に記載されているため。
+      f14: 両AZのPublic SubnetにALBが配置と明記されているため
+      f15: NAT GWが両AZのパブリックサブネットにあると記載。
+      f16: 各AZのPrivate Subnetに配置と明記されているため
+      f17: 両AZのPrivate Subnetに配置と明記されている
+      f18: PrimaryはAZ-aにあり、DB Subnetに配置と明記。
+      f19: AZ-bへの配置とDB Subnetにあることが明記
+      f20: CloudFrontからALBへHTTPSでルーティングすると記載あり
+      f21: ECSからPrimaryへの書き込み接続が明記されているため。
+      f22: ECSからRDSレプリカへの読み取り専用接続が明記。
+      f23: ECSとRedisの通信ラベルがGET/SETと明記
+      f24: NAT GW経由で外部へOutbound通信する旨の記載あり
+      f25: 指定の全リソースが両AZに配置されていると明記されているため
+      f26: サブネットの項目で各層の色分けが明確に記載されているため
+- id: tc03_judge
+  title: '[JUDGMENT] AWS 構成図の視覚的特徴読解 (tc03 と同じ画像)'
+  image: tests/text_vs_image/images/03_complex_arch.png
+  image_type: cloud_architecture
+  specialized_prompt: prompts/architecture_mermaid.md
+  question: 'この AWS アーキテクチャ図を観察し、**視覚的な手がかり**を使って以下に答えてください。図から読み取れない情報を AWS の一般的な知識で補完することは禁止します。
+
+
+    (1) VPC 境界（紫色の点線矩形）の **内側** に配置されているコンポーネントと、**外側** に配置されているコンポーネントを列挙してください。
+
+    (2) 図の上から下への配置順序で、トラフィックが通る階層（最上流 → 最下流）を 4 層に分けて答えてください。
+
+    (3) 図に描かれている接続線（矢印）のうち、**緑色で太い線** と **青緑/シアンで太い線** がそれぞれ何を結んでいて、どのような意味の違いがあるかを答えてください。
+
+    (4) 図の凡例（下部のボックス）に列挙されているサブネット種別は何種類あり、それぞれ何色に対応していますか？'
+  ground_truth_facts:
+  - id: j01
+    text: 'VPC 外側: Route 53'
+  - id: j02
+    text: 'VPC 外側: CloudFront'
+  - id: j03
+    text: 'VPC 外側: S3'
+  - id: j04
+    text: 'VPC 外側: IAM'
+  - id: j05
+    text: 'VPC 外側: CloudWatch'
+  - id: j06
+    text: 'VPC 内側: ALB (両 AZ)'
+  - id: j07
+    text: 'VPC 内側: NAT Gateway (両 AZ)'
+  - id: j08
+    text: 'VPC 内側: ECS Fargate App Service (両 AZ)'
+  - id: j09
+    text: 'VPC 内側: ElastiCache Redis (両 AZ)'
+  - id: j10
+    text: 'VPC 内側: RDS PostgreSQL Primary および Read Replica'
+  - id: j11
+    text: '第 1 層 (最上流): Route 53 → CloudFront'
+  - id: j12
+    text: '第 2 層: ALB (Public Subnet)'
+  - id: j13
+    text: '第 3 層: ECS Fargate (Private Subnet)'
+  - id: j14
+    text: '第 4 層 (最下流): RDS PostgreSQL / ElastiCache Redis (DB Subnet)'
+  - id: j15
+    text: '緑色の太い線: ECS → RDS Primary の ''write'' 接続'
+  - id: j16
+    text: '青緑/シアンの太い線: ECS → RDS Read Replica の ''read-only'' 接続'
+  - id: j17
+    text: '両者の違い: 緑 = 書き込み、青緑 = 読み取り専用 (データベースアクセスの方向性)'
+  - id: j18
+    text: '凡例のサブネット種別は 3 種類: Public Subnet, Private Subnet (App), DB Subnet'
+  - id: j19
+    text: Public Subnet は青 (薄い青)
+  - id: j20
+    text: Private Subnet (App) は黄 (薄い黄)
+  - id: j21
+    text: DB Subnet は緑 (薄い緑)
+  descriptions:
+    generic: "提供された画像（システムアーキテクチャ図）について、ご指定の条件に従って構造的に詳細に記述します。\n\n---\n\n### 1. テキスト内容（OCR）\n\n画像内に含まれるすべてのテキストを領域ごとに書き出します。\n\
+      \n**ヘッダー部分**\n*   Production Architecture — AWS Multi-AZ\n*   Environment: prod • Region: ap-northeast-1\n\n**外部 / グローバルノード（上部および右側）**\n\
+      *   Route 53 DNS\n*   CloudFront CDN\n*   S3 Static Assets\n*   IAM Roles\n*   CloudWatch Logs/Metrics\n*   origin （CloudFrontからS3への矢印上）\n\
+      *   HTTPS （CloudFrontからVPC方向への矢印付近）\n\n**VPC・AZ境界のラベル**\n*   VPC: 10.0.0.0/16\n*   AZ-a (ap-northeast-1a)\n*   AZ-b\
+      \ (ap-northeast-1c)\n*   Outbound （NAT GW上部の矢印付近）\n\n**AZ-a 内部のテキスト**\n*   Public Subnet\n*   ALB (AZ-a)\n*   NAT GW\
+      \ (AZ-a)\n*   Private Subnet (App)\n*   ECS Fargate App Service (AZ-a)\n*   GET/SET （ECSからElastiCacheへの矢印上）\n*   ElastiCache\
+      \ Redis\n*   DB Subnet\n*   write （ECSからRDSへの矢印上）\n*   RDS PostgreSQL Primary\n\n**AZ-b 内部のテキスト**\n*   Public Subnet\n\
+      *   ALB (AZ-b)\n*   NAT GW (AZ-b)\n*   Private Subnet (App)\n*   ECS Fargate App Service (AZ-b)\n*   ElastiCache Redis\n\
+      *   DB Subnet\n*   read-only （ECSからRDSへの矢印上）\n*   RDS PostgreSQL Read Replica\n\n**凡例（下部）**\n*   Public Subnet\n*  \
+      \ Private Subnet (App)\n*   DB Subnet\n*   External / DNS\n*   Cache\n\n---\n\n### 2. 図表・ダイアグラムの構造（ノード・接続・階層）\n\n図は階層的な境界線（ボックス）を用いて、ネットワークの分離とコンポーネントの配置を示しています。\n\
+      \n#### 【階層構造】\n1.  **VPC外（外部リソース）:** Route 53, CloudFront, S3, IAM Roles, CloudWatch Logs/Metrics\n2.  **VPCレベル:** 紫色の破線で囲まれた最大の領域。この中に2つのAZが含まれる。\n\
+      3.  **AZレベル:** 「AZ-a」と「AZ-b」という2つの青緑色の破線で囲まれた領域が左右に並列に配置されている。\n4.  **サブネットレベル:** 各AZ内に、上から下へ3つのサブネット（Public, Private,\
+      \ DB）が配置されている。\n5.  **ノードレベル:** 各サブネット内に特定のリソースが配置されている。\n\n#### 【ノードの配置】\n*   **外部（上部）:** 左から「Route 53 DNS」、「CloudFront\
+      \ CDN」、「S3 Static Assets」。\n*   **外部（右側）:** 上から「IAM Roles」、「CloudWatch Logs/Metrics」。\n*   **AZ-a（左側）:**\n    *   Public\
+      \ Subnet内: 「ALB (AZ-a)」、「NAT GW (AZ-a)」\n    *   Private Subnet内: 「ECS Fargate App Service (AZ-a)」、「ElastiCache Redis」\n\
+      \    *   DB Subnet内: 「RDS PostgreSQL Primary」\n*   **AZ-b（右側）:**\n    *   Public Subnet内: 「ALB (AZ-b)」、「NAT GW (AZ-b)」\n\
+      \    *   Private Subnet内: 「ECS Fargate App Service (AZ-b)」、「ElastiCache Redis」\n    *   DB Subnet内: 「RDS PostgreSQL\
+      \ Read Replica」\n\n#### 【接続（矢印のフロー）】\n*   **外部から内部へのフロー:**\n    *   Route 53 → CloudFront （黒い実線矢印）\n    *   CloudFront\
+      \ → S3 （黒い実線矢印、「origin」ラベル）\n    *   CloudFront → ALB (AZ-a) （黒い実線矢印）\n    *   CloudFront → ALB (AZ-b) （黒い実線矢印）\n* \
+      \  **AZ内のフロー（AZ-a / AZ-b 共通）:**\n    *   ALB → ECS Fargate （黒い実線矢印）\n    *   ECS Fargate → NAT GW （細く薄いグレーの実線矢印）\n \
+      \   *   NAT GW → 上方向（VPC外）へ向かう矢印（AZ-a側には「Outbound」ラベルあり）\n    *   ECS Fargate → ElastiCache Redis （黒い実線矢印、AZ-a側には「GET/SET」ラベルあり）\n\
+      *   **DBへのフロー（クロスAZを含む）:**\n    *   ECS Fargate (AZ-a) → RDS Primary （緑色の実線矢印、「write」ラベル）\n    *   ECS Fargate (AZ-b)\
+      \ → RDS Primary （緑色の実線矢印）\n    *   ECS Fargate (AZ-b) → RDS Read Replica （太い青色の実線矢印、「read-only」ラベル）\n*   **管理/監視系へのフロー:**\n\
+      \    *   VPC内の各主要コンポーネント（ALB, NAT GW, ECS）から、右側の「IAM Roles」および「CloudWatch Logs/Metrics」へ向かって、非常に薄いグレーの線（実線および破線）が多数接続されている。\n\
+      \n---\n\n### 3. 色とレイアウト\n\n図は視覚的な区別のために一貫したカラーコードとレイアウトを採用しています。\n\n#### 【レイアウト】\n*   **全体配置:** 全体的に左右対称（シンメトリー）に近いレイアウト。左半分がAZ-a、右半分がAZ-bの構成。\n\
+      *   **データフローの方向:** 基本的に上から下（外部から内部ネットワークへ）へ向かってリクエストが流れるように描画されている。\n\n#### 【カラーリング（境界線と背景）】\n*   **VPC境界:** 紫色の太い破線。\n\
+      *   **AZ境界:** 青緑色の破線。\n*   **Public Subnet:** 薄い青色の背景、青色の実線枠。\n*   **Private Subnet (App):** 薄い黄色/オレンジの背景、黄色の実線枠。\n\
+      *   **DB Subnet:** 薄い緑色の背景、緑色の実線枠。\n\n#### 【カラーリング（ノード・凡例に基づく）】\n*   **Route 53 DNS (External/DNS):** 薄い紫色\n*   **CloudFront\
+      \ CDN:** 黄色（マスタードイエロー）\n*   **S3 Static Assets:** 薄い緑/青緑色\n*   **ALB / NAT GW:** 薄い黄色（クリーム色）\n*   **ECS Fargate:** 薄いオレンジ/ピーチ色\n\
+      *   **ElastiCache Redis (Cache):** 薄いピンク色\n*   **RDS PostgreSQL:** 鮮やかな薄緑色\n*   **IAM Roles / CloudWatch:** 薄いピンク紫色\n\
+      \n---\n\n### 4. 主要な視覚要素\n\n*   **図形の形状:**\n    *   RDS（データベース）ノードのみ、データストレージを示す一般的な**円柱形（シリンダー）**のアイコンが使用されている。\n  \
+      \  *   S3ノードのみ、角の尖った**長方形**が使用されている。\n    *   それ以外のすべてのノード（Route 53, CloudFront, ALB, NAT GW, ECS, ElastiCache, IAM,\
+      \ CloudWatch）は、**角丸長方形**で統一されている。\n*   **ドロップシャドウ効果:** すべてのノード（角丸長方形、長方形、円柱）には、右下に黒いドロップシャドウ（影）が適用されており、背景のサブネット境界線から浮き出して見える立体的な表現がなされている。\n\
+      *   **線の太さと色による強調:**\n    *   データの書き込み（write）は緑色の線、読み取り専用（read-only）は太い青色の線で視覚的に区別されている。\n    *   権限（IAM）やログ・メトリクス（CloudWatch）への接続線は、メインのデータフローの邪魔にならないように、意図的に非常に薄く細いグレーの線で描かれている。\n\
+      *   **凡例（Legend）:** 画像の最下部に、四角いカラーボックスとテキストのペアが並んでおり、サブネットの背景色や一部のノードの役割を説明している。横長の枠で囲まれている。"
+    specialized: "ご提示いただいたシステム構成図を分析し、指定されたフォーマットで構造化しました。\n\n## Mermaid 表記\n\n```mermaid\nflowchart TB\n    route53(\"Route\
+      \ 53<br>DNS\")\n    cloudfront(\"CloudFront<br>CDN\")\n    s3[\"S3<br>Static Assets\"]\n    \n    iam(\"IAM<br>Roles\"\
+      )\n    cloudwatch(\"CloudWatch<br>Logs/Metrics\")\n    outbound((\"Internet\"))\n\n    route53 --> cloudfront\n    cloudfront\
+      \ -- \"origin\" --> s3\n\n    subgraph VPC [\"VPC: 10.0.0.0/16\"]\n        subgraph AZ_A [\"AZ-a (ap-northeast-1a)\"\
+      ]\n            subgraph Pub_A [\"Public Subnet\"]\n                alb_a(\"ALB<br>(AZ-a)\")\n                nat_a(\"\
+      NAT GW<br>(AZ-a)\")\n            end\n            subgraph Priv_A [\"Private Subnet (App)\"]\n                ecs_a(\"\
+      ECS Fargate<br>App Service<br>(AZ-a)\")\n                redis_a(\"ElastiCache<br>Redis\")\n            end\n      \
+      \      subgraph DB_A [\"DB Subnet\"]\n                rds_primary[(\"RDS PostgreSQL<br>Primary\")]\n            end\n\
+      \        end\n\n        subgraph AZ_B [\"AZ-b (ap-northeast-1c)\"]\n            subgraph Pub_B [\"Public Subnet\"]\n\
+      \                alb_b(\"ALB<br>(AZ-b)\")\n                nat_b(\"NAT GW<br>(AZ-b)\")\n            end\n          \
+      \  subgraph Priv_B [\"Private Subnet (App)\"]\n                ecs_b(\"ECS Fargate<br>App Service<br>(AZ-b)\")\n   \
+      \             redis_b(\"ElastiCache<br>Redis\")\n            end\n            subgraph DB_B [\"DB Subnet\"]\n      \
+      \          rds_replica[(\"RDS PostgreSQL<br>Read Replica\")]\n            end\n        end\n    end\n\n    cloudfront\
+      \ -- \"HTTPS\" --> alb_a\n    cloudfront --> alb_b\n\n    alb_a --> ecs_a\n    alb_b --> ecs_b\n\n    ecs_a -- \"GET/SET\"\
+      \ --> redis_a\n    ecs_b --> redis_b\n\n    ecs_a -- \"write\" --> rds_primary\n    ecs_a --> rds_replica\n    ecs_b\
+      \ --> rds_primary\n    ecs_b -- \"read-only\" --> rds_replica\n\n    ecs_a -.-> nat_a\n    ecs_b -.-> nat_b\n\n    nat_a\
+      \ -- \"Outbound\" --> outbound\n    nat_b --> outbound\n\n    ecs_a -.-> cloudwatch\n    ecs_b -.-> cloudwatch\n```\n\
+      *(注: NAT GWやCloudWatchへの線は画像上で細いグレーの線で表現されているため、Mermaid上では点線 `-.->` を用いて主データフローと区別しています。また、NAT GWからの「Outbound」矢印の先として便宜上\
+      \ `Internet` ノードを設置しています)*\n\n---\n\n## ノード一覧\n\n| ID | ラベル | 種別（service/db/queue/external/...） |\n|---|---|---|\n|\
+      \ route53 | Route 53<br>DNS | external / dns |\n| cloudfront | CloudFront<br>CDN | external / cdn |\n| s3 | S3<br>Static\
+      \ Assets | storage / object |\n| alb_a | ALB<br>(AZ-a) | network / loadbalancer |\n| nat_a | NAT GW<br>(AZ-a) | network\
+      \ / gateway |\n| ecs_a | ECS Fargate<br>App Service<br>(AZ-a) | service / compute |\n| redis_a | ElastiCache<br>Redis\
+      \ | cache |\n| rds_primary | RDS PostgreSQL<br>Primary | db (primary) |\n| alb_b | ALB<br>(AZ-b) | network / loadbalancer\
+      \ |\n| nat_b | NAT GW<br>(AZ-b) | network / gateway |\n| ecs_b | ECS Fargate<br>App Service<br>(AZ-b) | service / compute\
+      \ |\n| redis_b | ElastiCache<br>Redis | cache |\n| rds_replica | RDS PostgreSQL<br>Read Replica | db (replica) |\n|\
+      \ iam | IAM<br>Roles | security / identity |\n| cloudwatch | CloudWatch<br>Logs/Metrics | monitoring |\n\n---\n\n##\
+      \ 接続一覧\n\n| From | To | ラベル（プロトコル等） |\n|---|---|---|\n| Route 53 DNS | CloudFront CDN | |\n| CloudFront CDN | S3 Static\
+      \ Assets | origin |\n| CloudFront CDN | ALB (AZ-a) | HTTPS |\n| CloudFront CDN | ALB (AZ-b) | |\n| ALB (AZ-a) | ECS\
+      \ Fargate App Service (AZ-a) | |\n| ALB (AZ-b) | ECS Fargate App Service (AZ-b) | |\n| ECS Fargate App Service (AZ-a)\
+      \ | ElastiCache Redis (AZ-a) | GET/SET |\n| ECS Fargate App Service (AZ-b) | ElastiCache Redis (AZ-b) | |\n| ECS Fargate\
+      \ App Service (AZ-a) | RDS PostgreSQL Primary | write |\n| ECS Fargate App Service (AZ-a) | RDS PostgreSQL Read Replica\
+      \ | |\n| ECS Fargate App Service (AZ-b) | RDS PostgreSQL Primary | |\n| ECS Fargate App Service (AZ-b) | RDS PostgreSQL\
+      \ Read Replica | read-only |\n| ECS Fargate App Service (AZ-a) | NAT GW (AZ-a) | |\n| ECS Fargate App Service (AZ-b)\
+      \ | NAT GW (AZ-b) | |\n| NAT GW (AZ-a) | (外部/Internet) | Outbound |\n| NAT GW (AZ-b) | (外部/Internet) | |\n| ECS Fargate\
+      \ App Service (AZ-a) | CloudWatch Logs/Metrics | |\n| ECS Fargate App Service (AZ-b) | CloudWatch Logs/Metrics | |\n\
+      \n---\n\n## 補足\n\n- **タイトル:** Production Architecture — AWS Multi-AZ\n- **サブタイトル (注釈):** Environment: prod • Region:\
+      \ ap-northeast-1\n- **凡例 (Legend):**\n  - 水色 (Light Blue): Public Subnet\n  - 薄黄色 (Light Yellow): Private Subnet (App)\n\
+      \  - 薄緑色 (Light Green): DB Subnet\n  - 薄紫色 (Light Purple): External / DNS\n  - 薄ピンク色 (Light Pink): Cache\n- **グルーピングの階層と名前:**\n\
+      \  - `VPC: 10.0.0.0/16` (一番外側の紫点線枠)\n    - `AZ-a (ap-northeast-1a)` (青緑点線枠・左)\n      - `Public Subnet`\n      - `Private\
+      \ Subnet (App)`\n      - `DB Subnet`\n    - `AZ-b (ap-northeast-1c)` (青緑点線枠・右)\n      - `Public Subnet`\n      - `Private\
+      \ Subnet (App)`\n      - `DB Subnet`\n- **その他構造化できない注釈:**\n  - `IAM Roles` ノードは他のコンポーネントと明示的な線で結ばれていませんが、AWS環境全体（特にECSタスク等）に対して権限を提供していることを示唆して配置されています。\n\
+      \  - RDSへのアクセスについて、AZ-aからはPrimaryへのWriteアクセスが強調（緑線）され、AZ-bからはRead ReplicaへのRead-Onlyアクセスが強調（青緑線）されていますが、クロスAZでの接続線も描画されています。"
+  description_scores:
+    generic:
+      j01: present
+      j02: present
+      j03: present
+      j04: present
+      j05: present
+      j06: present
+      j07: present
+      j08: present
+      j09: present
+      j10: present
+      j11: partial
+      j12: partial
+      j13: partial
+      j14: missing
+      j15: partial
+      j16: partial
+      j17: partial
+      j18: present
+      j19: present
+      j20: present
+      j21: present
+    specialized:
+      j01: present
+      j02: present
+      j03: present
+      j04: present
+      j05: present
+      j06: present
+      j07: present
+      j08: present
+      j09: present
+      j10: present
+      j11: partial
+      j12: partial
+      j13: partial
+      j14: missing
+      j15: partial
+      j16: partial
+      j17: present
+      j18: present
+      j19: present
+      j20: present
+      j21: present
+  case1:
+    copilot_answer: "ご提示いただいた画像記述（視覚的な手がかり）に基づき、回答いたします。\n\n**(1) VPC 境界（紫色の点線矩形）の内側と外側に配置されているコンポーネント**\n記述の「Mermaid 表記」におけるグループ分け（`subgraph\
+      \ VPC`）や「補足」の階層構造から、以下のように分類されます。\n\n*   **内側に配置されているコンポーネント：**\n    *   **AZ-a内：** ALB (AZ-a), NAT GW (AZ-a), ECS Fargate\
+      \ App Service (AZ-a), ElastiCache Redis (AZ-a), RDS PostgreSQL Primary\n    *   **AZ-b内：** ALB (AZ-b), NAT GW (AZ-b),\
+      \ ECS Fargate App Service (AZ-b), ElastiCache Redis (AZ-b), RDS PostgreSQL Read Replica\n*   **外側に配置されているコンポーネント：**\n\
+      \    *   Route 53 DNS, CloudFront CDN, S3 Static Assets, IAM Roles, CloudWatch Logs/Metrics, Internet（外部）\n\n**(2) 図の上から下への配置順序で、トラフィックが通る\
+      \ 4 つの階層（最上流 → 最下流）**\nMermaidの「Top to Bottom（TB）」のフローとサブネットのグルーピング順序から、トラフィックは以下の4つの階層を上から下へと通ります。\n\n*   **第1層（最上流）:**\
+      \ VPC外の外部コンポーネント群（Route 53 DNS, CloudFront CDN, S3 Static Assets）\n*   **第2層:** Public Subnet（ALB, NAT GW）\n*   **第3層:**\
+      \ Private Subnet (App)（ECS Fargate App Service, ElastiCache Redis）\n*   **第4層（最下流）:** DB Subnet（RDS PostgreSQL Primary,\
+      \ RDS PostgreSQL Read Replica）\n\n**(3) 緑色で太い線 と 青緑/シアンで太い線 が結んでいるものと意味の違い**\n補足の「その他構造化できない注釈」から、以下の通りの違いがあります。\n\n\
+      *   **緑色で太い線：** 「AZ-a（のECS Fargate App Service）」と「RDS PostgreSQL Primary」を結んでおり、**「Write（書き込み）」**アクセスを意味（強調）しています。\n\
+      *   **青緑/シアンで太い線：** 「AZ-b（のECS Fargate App Service）」と「RDS PostgreSQL Read Replica」を結んでおり、**「Read-Only（読み取り専用）」**アクセスを意味（強調）しています。\n\
+      \n**(4) 凡例（下部のボックス）に列挙されているサブネット種別の数と色**\n補足の「凡例 (Legend)」によると、名前に「Subnet」が含まれるものは以下の **3種類** であり、それぞれ以下の色に対応しています。\n\
+      \n1.  **Public Subnet** : 水色 (Light Blue)\n2.  **Private Subnet (App)** : 薄黄色 (Light Yellow)\n3.  **DB Subnet** : 薄緑色\
+      \ (Light Green)"
+    fact_scores:
+      j01: present
+      j02: present
+      j03: present
+      j04: present
+      j05: present
+      j06: present
+      j07: present
+      j08: present
+      j09: present
+      j10: present
+      j11: partial
+      j12: present
+      j13: present
+      j14: partial
+      j15: present
+      j16: present
+      j17: present
+      j18: present
+      j19: present
+      j20: present
+      j21: present
+  case2:
+    copilot_answer: "添付の画像から読み取れる視覚的な情報に基づき、以下の通り回答します。\n\n**(1) VPC 境界の内側と外側に配置されているコンポーネント**\n紫色の点線矩形（`VPC: 10.0.0.0/16`）を境界として、以下の通り配置されています。\n\
+      \n*   **外側に配置されているコンポーネント:**\n    *   Route 53 DNS\n    *   CloudFront CDN\n    *   S3 Static Assets\n    *   IAM Roles\n\
+      \    *   CloudWatch Logs/Metrics\n*   **内側に配置されているコンポーネント:**\n    *   ALB (AZ-a) / ALB (AZ-b)\n    *   NAT GW (AZ-a)\
+      \ / NAT GW (AZ-b)\n    *   ECS Fargate App Service (AZ-a) / ECS Fargate App Service (AZ-b)\n    *   ElastiCache Redis（AZ-a側、AZ-b側にそれぞれ1つずつ）\n\
+      \    *   RDS PostgreSQL Primary\n    *   RDS PostgreSQL Read Replica\n\n**(2) トラフィックが通る階層（最上流 → 最下流の4層）**\n図の上から下への配置順序と枠の構成から、以下の4層に分かれています。\n\
+      \n*   **第1層（最上流）:** VPC外の上部に配置されている層（Route 53 DNS, CloudFront CDN, S3 Static Assets）\n*   **第2層:** **Public Subnet**\
+      \ の枠内に配置されている層（ALB, NAT GW）\n*   **第3層:** **Private Subnet (App)** の枠内に配置されている層（ECS Fargate App Service, ElastiCache\
+      \ Redis）\n*   **第4層（最下流）:** **DB Subnet** の枠内に配置されている層（RDS PostgreSQL Primary, RDS PostgreSQL Read Replica）\n\n**(3)\
+      \ 緑色の太い線と青緑/シアンの太い線の結びつきと意味の違い**\n\n*   **緑色で太い線:**\n    *   **結んでいるもの:** 「ECS Fargate App Service (AZ-a)」および「ECS Fargate\
+      \ App Service (AZ-b)」から、「RDS PostgreSQL Primary」へ向けて結ばれています。\n    *   **意味の違い:** 線の上に **`write`** と記載されており、書き込み操作であることを意味しています。\n\
+      *   **青緑/シアンで太い線:**\n    *   **結んでいるもの:** 「ECS Fargate App Service (AZ-b)」から、「RDS PostgreSQL Read Replica」へ向けて結ばれています。\n\
+      \    *   **意味の違い:** 線の上に **`read-only`** と記載されており、読み取り専用の操作であることを意味しています。\n\n**(4) 凡例に列挙されているサブネット種別と対応する色**\n下部の凡例ボックスには全体で5つの項目が並んでいますが、名称に「Subnet」と付くサブネットの種別は以下の\
+      \ **3種類** です。\n\n*   **Public Subnet:** 薄い青色（水色）\n*   **Private Subnet (App):** 薄い黄色\n*   **DB Subnet:** 薄い緑色\n*(※参考:\
+      \ 凡例にはサブネット以外の分類として、「External / DNS」が薄い紫色、「Cache」が薄いピンク色として示されています。)*"
+    fact_scores:
+      j01: present
+      j02: present
+      j03: present
+      j04: present
+      j05: present
+      j06: present
+      j07: present
+      j08: present
+      j09: present
+      j10: present
+      j11: partial
+      j12: present
+      j13: present
+      j14: partial
+      j15: present
+      j16: present
+      j17: present
+      j18: present
+      j19: present
+      j20: present
+      j21: present
+  score_reasons:
+    descriptions.generic:
+      j01: VPC外のリソースとしてRoute 53が明記
+      j02: VPC外のリソースとしてCloudFrontが明記
+      j03: VPC外のリソースとしてS3が明記
+      j04: VPC外のリソースとしてIAMが明記
+      j05: VPC外のリソースとしてCloudWatchが明記
+      j06: VPC内の両AZにALBが配置されていると明記
+      j07: VPC内の両AZにNAT GWが配置されていると明記
+      j08: VPC内の両AZにECS Fargateが配置と明記
+      j09: VPC内の両AZにElastiCacheが配置と明記
+      j10: VPC内にPrimaryとRead Replicaの記載あり
+      j11: 最上流の明記はないが階層1として構成と接続を記載
+      j12: 第2層の明記はないが配置順と所属サブネットを記載
+      j13: 第3層の明記はないが配置順と所属サブネットを記載
+      j14: Redisの所属サブネットが異なり事実と矛盾する
+      j15: 緑色の接続は記載されているが線の太さの言及がない
+      j16: 青緑やシアンではなく太い青色と記載されている
+      j17: 読み取り専用が青緑ではなく青色と記載されている
+      j18: 凡例に該当のサブネット3種が記載されている
+      j19: 薄い青色の背景であると明記されている
+      j20: 薄い黄色・オレンジの背景と明記されている
+      j21: 薄い緑色の背景と明記されているため。
+    descriptions.specialized:
+      j01: VPC外側にRoute 53の記載あり
+      j02: VPC外側にCloudFrontの記載あり
+      j03: VPC外側にS3の記載あり
+      j04: VPC外側にIAMの記載あり
+      j05: VPC外側にCloudWatchの記載あり
+      j06: VPC内の両AZにALBの記載あり
+      j07: VPC内の両AZにNAT GWの記載あり
+      j08: VPC内の両AZにECSの記載あり
+      j09: VPC内の両AZにRedisの記載あり
+      j10: VPC内にPrimaryとReplicaの記載あり
+      j11: 接続は記載されているが、第1層という言及がないため
+      j12: 配置は記載されているが、第2層という言及がないため
+      j13: 配置は記載されているが、第3層という言及がないため
+      j14: Redisの配置サブネットが異なり事実と矛盾するため
+      j15: 緑線との記載はあるが、太い線という言及がないため
+      j16: 青緑線との記載はあるが、太い線という言及がないため
+      j17: 緑はWrite、青緑はRead-Onlyと記載あり
+      j18: 凡例に3種類のサブネットの記載が含まれているため
+      j19: 凡例にて水色(Light Blue)と記載されている
+      j20: 凡例にて薄黄色と記載されているため
+      j21: 凡例に薄緑色であると記載があるため
+    case1.copilot_answer:
+      j01: VPC外側のRoute 53として明記
+      j02: VPC外側のCloudFrontとして明記
+      j03: VPC外側のS3として明記
+      j04: VPC外側のIAMとして明記
+      j05: VPC外側のCloudWatchとして明記
+      j06: 内側の両AZにALBが配置と明記
+      j07: 内側の両AZにNAT GWが配置と明記
+      j08: 内側の両AZにECSが配置と明記
+      j09: 内側の両AZにRedisが配置と明記
+      j10: 内側にPrimaryとReplicaの配置を明記
+      j11: 順序関係の「→」が言及されていないため
+      j12: 第2層のPublic SubnetにALBがあると記載
+      j13: 第3層のPrivate SubnetにECSがあると記載
+      j14: Redisは第3層に配置されていると記載
+      j15: ECSからPrimaryへのWriteと明記
+      j16: ECSからReplicaへのRead-Onlyと明記
+      j17: 緑が書き込み、青緑が読み取り専用と明記
+      j18: 3種類のサブネット名が完全に一致
+      j19: 水色(Light Blue)と記載されている
+      j20: 薄黄色(Light Yellow)と記載されている
+      j21: DB Subnetは薄緑色と記載があるため。
+    case2.copilot_answer:
+      j01: VPC外側にRoute 53の記載があるため。
+      j02: VPC外側にCloudFrontの記載があるため。
+      j03: VPC外側にS3の記載があるため。
+      j04: VPC外側にIAMの記載があるため。
+      j05: VPC外側にCloudWatchの記載があるため。
+      j06: VPC内側に両AZのALBの記載があるため。
+      j07: VPC内側に両AZのNAT GWの記載があるため。
+      j08: VPC内側に両AZのECSの記載があるため。
+      j09: VPC内側に両AZのRedisの記載があるため。
+      j10: VPC内側にRDSのPrimaryとReplicaの記載あり。
+      j11: Route 53とCloudFrontの接続関係の言及がない
+      j12: 第2層がALBとPublic Subnetであると記載
+      j13: 第3層がECSとPrivate Subnetであると記載
+      j14: RDSは第4層だがRedisは第3層と記載されている
+      j15: 緑の線がECSからRDS Primaryへのwriteと記載
+      j16: 青緑の線がECSからRDS RRへのread-onlyと記載
+      j17: 緑が書き込み、青緑が読み取り専用と明記
+      j18: サブネット種別が指定の3種類であると明記
+      j19: Public Subnetが薄い青色と記載
+      j20: Private Subnet (App)が薄い黄色と記載
+      j21: DB Subnetが薄い緑色と明記されている
