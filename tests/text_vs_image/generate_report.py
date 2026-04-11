@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-"""Generate report.html from test_cases.yaml.
+"""Generate report.html (v2) from test_cases.yaml.
 
 Renders a single self-contained HTML page with:
-- Aggregate fidelity scores across 4 columns (Generic / Specialized / Case1 / Case2)
-- Per-test-case detail with image, ground truth fact table, and 4 columns of evaluation
+- Phase 1: Gemini model comparison (describe matrix, per-case detail)
+- Phase 2: GPT-5.4 text vs image answer comparison
 - Mermaid blocks rendered live via mermaid.js CDN
 - Markdown blocks rendered via marked.js CDN
 
@@ -13,7 +13,7 @@ Run:
 from __future__ import annotations
 
 import base64
-import html
+import html as html_mod
 import json
 import sys
 from pathlib import Path
@@ -23,27 +23,32 @@ import yaml
 ROOT = Path(__file__).resolve().parent
 WORKSPACE = ROOT.parent.parent
 
-EVAL_COLUMNS = [
-    # (key, label, kind, source, badge_label)
-    # The "source" field now distinguishes:
-    #   - "describe": the LLM's raw description of the image
-    #   - "answer":   the LLM's answer to the user question (using either
-    #                 the specialized description or the image directly)
-    ("generic", "① Generic 記述", "description", "describe", "記述 (generic)"),
-    ("specialized", "② Specialized 記述", "description", "describe", "記述 (specialized)"),
-    ("case1", "③ Case 1: text→LLM 回答", "case", "answer", "回答 (text 経由)"),
-    ("case2", "④ Case 2: image→LLM 回答", "case", "answer", "回答 (image 直接)"),
+# ---------------------------------------------------------------------------
+# Score helpers
+# ---------------------------------------------------------------------------
+SCORE_WEIGHTS = {"present": 1.0, "partial": 0.5, "missing": 0.0}
+
+DESCRIBE_COLUMNS = [
+    # (model_key, prompt_key, short_label, css_class)
+    ("gemini_3_flash", "generic", "D1", "flash"),
+    ("gemini_3_flash", "specialized", "D2", "flash"),
+    ("gemini_31_flash_lite", "generic", "D3", "lite"),
+    ("gemini_31_flash_lite", "specialized", "D4", "lite"),
 ]
 
-SCORE_VALUES = ("present", "partial", "missing")
-SCORE_WEIGHTS = {"present": 1.0, "partial": 0.5, "missing": 0.0}
-SCORE_ICONS = {"present": "✓", "partial": "△", "missing": "✗", None: "—"}
-SCORE_COLORS = {
-    "present": "#16a34a",
-    "partial": "#ca8a04",
-    "missing": "#dc2626",
-    None: "#9ca3af",
-}
+ANSWER_COLUMNS = [
+    # (answer_key, short_label)
+    ("text_via_gpt", "A1"),
+    ("image_via_gpt", "A2"),
+]
+
+PROMPT_FILES = [
+    ("generic.md", "Generic (汎用)", "All image types", "全画像タイプ共通の構造的記述プロンプト。OCR・図表構造・色・レイアウトを網羅的に記述させる。"),
+    ("mixed_slide.md", "Mixed Slide", "mixed_slide", "pptxスライド画像用。フロー・グラフ・表・コードなど複数情報種別を漏れなく抽出するステップ式プロンプト。"),
+    ("ui_change.md", "UI Change Request", "ui_change_request", "UIモックアップ+変更要求吹き出し画像用。既存要素と変更要求を分離して構造化するプロンプト。"),
+    ("architecture_mermaid.md", "Architecture / Mermaid", "cloud_architecture", "システム構成図用。Mermaid flowchart形式でノード・接続・グルーピングを再現するプロンプト。"),
+    ("text_document.md", "Text Document", "text_document", "文書スクリーンショット用。Markdown形式で完全転写するプロンプト。"),
+]
 
 
 def _img_to_data_uri(image_path: Path) -> str:
@@ -53,122 +58,206 @@ def _img_to_data_uri(image_path: Path) -> str:
     return f"data:image/{mime};base64,{b64}"
 
 
-def _scores_for(case: dict, column_key: str, column_kind: str) -> dict:
-    """Return {fact_id: score} dict for a given column."""
-    if column_kind == "description":
-        return (case.get("description_scores") or {}).get(column_key) or {}
-    return (case.get(column_key) or {}).get("fact_scores") or {}
+def _get_describe_scores(case: dict, model_key: str, prompt_key: str) -> dict:
+    """Return {fact_id: {verdict, reason}} for a describe column."""
+    return (
+        (case.get("description_scores") or {})
+        .get(model_key, {})
+        .get(prompt_key, {})
+    )
 
 
-def _content_for(case: dict, column_key: str, column_kind: str) -> str:
-    if column_kind == "description":
-        return (case.get("descriptions") or {}).get(column_key) or ""
-    return (case.get(column_key) or {}).get("copilot_answer") or ""
+def _get_describe_text(case: dict, model_key: str, prompt_key: str) -> str:
+    return (
+        (case.get("descriptions") or {})
+        .get(model_key, {})
+        .get(prompt_key, "")
+    )
 
 
-def _per_case_score(case: dict, column_key: str, column_kind: str) -> tuple[float, int, int]:
-    """Return (weighted_sum, total_facts, num_scored)."""
-    facts = case.get("ground_truth_facts") or []
-    total = len(facts)
-    scores = _scores_for(case, column_key, column_kind)
-    weighted = 0.0
-    scored = 0
-    for fact in facts:
-        s = scores.get(fact["id"])
-        if s in SCORE_WEIGHTS:
-            scored += 1
-            weighted += SCORE_WEIGHTS[s]
-    return weighted, total, scored
+def _get_answer_scores(case: dict, answer_key: str) -> dict:
+    """Return {fact_id: {verdict, reason}} for an answer column."""
+    return (case.get("answer") or {}).get(answer_key, {}).get("fact_scores", {})
 
 
-def _aggregate(cases: list, column_key: str, column_kind: str) -> dict:
-    total_weighted = 0.0
-    total_facts = 0
-    total_scored = 0
-    for case in cases:
-        w, t, s = _per_case_score(case, column_key, column_kind)
-        total_weighted += w
-        total_facts += t
-        total_scored += s
-    return {
-        "weighted": total_weighted,
-        "total": total_facts,
-        "scored": total_scored,
-        "percent": (total_weighted / total_facts * 100) if total_facts else 0.0,
-        "coverage": (total_scored / total_facts * 100) if total_facts else 0.0,
-    }
+def _get_answer_text(case: dict, answer_key: str) -> str:
+    return (case.get("answer") or {}).get(answer_key, {}).get("response", "")
 
 
-def _render_html(data: dict) -> str:
-    cases = data.get("test_cases") or []
+def _calc_score_pct(scores: dict, fact_ids: list[str]) -> float | None:
+    """Calculate percentage score. Returns None if no facts."""
+    if not fact_ids:
+        return None
+    total = 0.0
+    for fid in fact_ids:
+        entry = scores.get(fid, {})
+        verdict = entry.get("verdict") if isinstance(entry, dict) else entry
+        total += SCORE_WEIGHTS.get(verdict, 0.0)
+    return total / len(fact_ids) * 100
 
-    aggregates = {
-        key: _aggregate(cases, key, kind)
-        for key, _, kind, _, _ in EVAL_COLUMNS
-    }
 
-    payload = {
-        "cases": [],
-        "columns": [
-            {
-                "key": k,
-                "label": label,
-                "kind": kind,
-                "source": source,
-                "badge": badge,
-            }
-            for k, label, kind, source, badge in EVAL_COLUMNS
-        ],
-        "aggregates": aggregates,
-    }
+def _fact_ids_for(case: dict) -> list[str]:
+    """Get fact IDs -- ground_truth_facts for extraction, reasoning_points for judgment."""
+    if case.get("test_type") == "judgment":
+        return [f["id"] for f in (case.get("reasoning_points") or [])]
+    return [f["id"] for f in (case.get("ground_truth_facts") or [])]
 
-    for case in cases:
-        image_path = WORKSPACE / case["image"]
-        case_payload = {
-            "id": case["id"],
-            "title": case["title"],
-            "image": case["image"],
-            "image_data_uri": _img_to_data_uri(image_path) if image_path.exists() else "",
-            "image_type": case.get("image_type", ""),
-            "specialized_prompt": case.get("specialized_prompt", ""),
-            "question": case.get("question", "").strip(),
-            "facts": case.get("ground_truth_facts") or [],
-            "columns": {},
-            "scores_per_column": {},
+
+def _facts_for(case: dict) -> list[dict]:
+    if case.get("test_type") == "judgment":
+        return case.get("reasoning_points") or []
+    return case.get("ground_truth_facts") or []
+
+
+def _read_prompt_file(filename: str) -> str:
+    p = ROOT / "prompts" / filename
+    if p.exists():
+        return p.read_text(encoding="utf-8")
+    return f"(file not found: {filename})"
+
+
+def _safe_avg(values: list[float]) -> float:
+    """Return average of values, or 0.0 if empty."""
+    return round(sum(values) / len(values), 1) if values else 0.0
+
+
+def _round_pct(pct: float | None) -> float | None:
+    return round(pct, 1) if pct is not None else None
+
+
+# ---------------------------------------------------------------------------
+# Build JSON payload -- split into focused helpers
+# ---------------------------------------------------------------------------
+
+def _build_describe_matrix(extraction_cases: list[dict]) -> dict:
+    """Average describe score per D1/D2/D3/D4 across extraction cases."""
+    matrix = {}
+    for model_key, prompt_key, label, _ in DESCRIBE_COLUMNS:
+        pcts = [
+            _calc_score_pct(
+                _get_describe_scores(c, model_key, prompt_key),
+                _fact_ids_for(c),
+            )
+            for c in extraction_cases
+        ]
+        matrix[label] = _safe_avg([p for p in pcts if p is not None])
+    return matrix
+
+
+def _build_model_avgs(extraction_cases: list[dict]) -> dict:
+    """Per-model average for generic and specialized prompts."""
+    avgs: dict = {}
+    for model_key in ("gemini_3_flash", "gemini_31_flash_lite"):
+        gen, spec = [], []
+        for case in extraction_cases:
+            fids = _fact_ids_for(case)
+            gp = _calc_score_pct(_get_describe_scores(case, model_key, "generic"), fids)
+            sp = _calc_score_pct(_get_describe_scores(case, model_key, "specialized"), fids)
+            if gp is not None:
+                gen.append(gp)
+            if sp is not None:
+                spec.append(sp)
+        avgs[model_key] = {"generic": _safe_avg(gen), "specialized": _safe_avg(spec)}
+    return avgs
+
+
+def _build_case_payload(case: dict) -> dict:
+    """Build the JSON-serialisable payload for a single test case."""
+    image_path = WORKSPACE / case["image"]
+    fids = _fact_ids_for(case)
+    facts = _facts_for(case)
+
+    describe_cols = {
+        label: {
+            "text": (text := _get_describe_text(case, mk, pk)),
+            "char_count": len(text),
+            "scores": _get_describe_scores(case, mk, pk),
+            "pct": _round_pct(_calc_score_pct(_get_describe_scores(case, mk, pk), fids)),
+            "tint": tint,
         }
-        score_reasons = case.get("score_reasons") or {}
-        for key, _label, kind, source, _badge in EVAL_COLUMNS:
-            content = _content_for(case, key, kind)
-            reasons_key = f"descriptions.{key}" if kind == "description" else f"{key}.copilot_answer"
-            case_payload["columns"][key] = {
-                "kind": kind,
-                "source": source,
-                "content": content,
-                "char_count": len(content),
-                "scores": _scores_for(case, key, kind),
-                "reasons": score_reasons.get(reasons_key, {}),
-            }
-            w, t, s = _per_case_score(case, key, kind)
-            case_payload["scores_per_column"][key] = {
-                "weighted": w,
-                "total": t,
-                "scored": s,
-                "percent": (w / t * 100) if t else 0.0,
-            }
-        payload["cases"].append(case_payload)
+        for mk, pk, label, tint in DESCRIBE_COLUMNS
+    }
 
-    payload_json = json.dumps(payload, ensure_ascii=False)
+    answer_cols = {
+        label: {
+            "text": (text := _get_answer_text(case, ak)),
+            "char_count": len(text),
+            "scores": _get_answer_scores(case, ak),
+            "pct": _round_pct(_calc_score_pct(_get_answer_scores(case, ak), fids)),
+        }
+        for ak, label in ANSWER_COLUMNS
+    }
 
-    return _HTML_TEMPLATE.replace("__DATA_JSON__", payload_json)
+    return {
+        "id": case["id"],
+        "title": case["title"],
+        "test_type": case.get("test_type", "extraction"),
+        "image": case["image"],
+        "image_data_uri": _img_to_data_uri(image_path) if image_path.exists() else "",
+        "image_type": case.get("image_type", ""),
+        "specialized_prompt": case.get("specialized_prompt", ""),
+        "question": case.get("question", "").strip(),
+        "facts": [{"id": f["id"], "text": f["text"]} for f in facts],
+        "describe_cols": describe_cols,
+        "answer_cols": answer_cols,
+    }
 
+
+def _build_prompts_payload() -> list[dict]:
+    return [
+        {
+            "filename": fn,
+            "display_name": dn,
+            "applies_to": at,
+            "intent": intent,
+            "content": _read_prompt_file(fn),
+        }
+        for fn, dn, at, intent in PROMPT_FILES
+    ]
+
+
+def _build_phase2_summary(extraction_cases: list[dict]) -> dict:
+    a1_all, a2_all = [], []
+    for case in extraction_cases:
+        fids = _fact_ids_for(case)
+        a1p = _calc_score_pct(_get_answer_scores(case, "text_via_gpt"), fids)
+        a2p = _calc_score_pct(_get_answer_scores(case, "image_via_gpt"), fids)
+        if a1p is not None:
+            a1_all.append(a1p)
+        if a2p is not None:
+            a2_all.append(a2p)
+    return {"a1_avg": _safe_avg(a1_all), "a2_avg": _safe_avg(a2_all)}
+
+
+def _build_payload(data: dict) -> dict:
+    cases = data.get("test_cases") or []
+    extraction_cases = [c for c in cases if c.get("test_type") == "extraction"]
+    judgment_cases = [c for c in cases if c.get("test_type") == "judgment"]
+
+    return {
+        "cases": [_build_case_payload(c) for c in cases],
+        "extraction_ids": [c["id"] for c in extraction_cases],
+        "judgment_ids": [c["id"] for c in judgment_cases],
+        "describe_matrix": _build_describe_matrix(extraction_cases),
+        "model_avgs": _build_model_avgs(extraction_cases),
+        "phase1_result": data.get("phase1_result") or {},
+        "phase2_summary": _build_phase2_summary(extraction_cases),
+        "prompts": _build_prompts_payload(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# HTML template
+# ---------------------------------------------------------------------------
 
 _HTML_TEMPLATE = r"""<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<title>Text vs Image Fidelity Report</title>
+<title>Text vs Image Fidelity Report v2</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 :root {
   --bg: #f8fafc;
@@ -181,6 +270,12 @@ _HTML_TEMPLATE = r"""<!doctype html>
   --partial: #ca8a04;
   --missing: #dc2626;
   --na: #9ca3af;
+  --flash-bg: #eff6ff;
+  --flash-border: #93c5fd;
+  --lite-bg: #f5f3ff;
+  --lite-border: #c4b5fd;
+  --answer-bg: #f0fdf4;
+  --answer-border: #86efac;
 }
 * { box-sizing: border-box; }
 body {
@@ -190,70 +285,46 @@ body {
   line-height: 1.55;
   margin: 0;
   padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
-h1, h2, h3 { color: var(--text); margin-top: 0; }
-h1 { font-size: 28px; }
-h2 { font-size: 22px; margin-top: 32px; }
-h3 { font-size: 16px; }
-.muted { color: var(--muted); font-size: 14px; }
-.summary {
+h1 { font-size: 28px; margin-top: 0; color: var(--text); }
+h2 { font-size: 22px; margin-top: 32px; color: var(--text); }
+h3 { font-size: 16px; color: var(--text); }
+.subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.section {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
 }
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 16px;
-}
-.summary-card {
-  background: var(--bg);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-}
-.summary-card.source-describe {
-  background: #eff6ff;
-  border-color: #93c5fd;
-}
-.summary-card.source-answer {
-  background: #f0fdf4;
-  border-color: #86efac;
-}
-.badge-mini {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 10px;
-  border: 1px solid currentColor;
-  background: white;
-  white-space: nowrap;
-}
-.badge-mini.source-describe { color: #1d4ed8; }
-.badge-mini.source-answer { color: #15803d; }
-.summary-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.summary-card .pct { font-size: 32px; font-weight: 700; margin: 8px 0; color: var(--accent); }
-.summary-card .detail { font-size: 12px; color: var(--muted); }
-.bar {
-  height: 8px;
-  background: var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-.bar > div { height: 100%; background: var(--accent); transition: width 0.3s; }
-.case {
+.muted { color: var(--muted); font-size: 13px; }
+
+/* Model info table */
+.model-table { border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+.model-table th, .model-table td { padding: 6px 12px; border: 1px solid var(--border); }
+.model-table th { background: var(--bg); font-weight: 600; }
+
+/* Describe matrix */
+.matrix-table { border-collapse: collapse; font-size: 14px; margin: 16px 0; }
+.matrix-table th, .matrix-table td { padding: 10px 20px; border: 1px solid var(--border); text-align: center; }
+.matrix-table th { background: var(--bg); font-weight: 600; }
+.matrix-table .winner { background: #dcfce7; font-weight: 700; }
+.matrix-table .model-name { text-align: left; font-weight: 600; }
+
+/* Fact table */
+.fact-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+.fact-table th, .fact-table td { padding: 6px 8px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+.fact-table th { background: var(--bg); font-weight: 600; font-size: 12px; }
+.fact-table td.score { text-align: center; font-weight: 700; font-size: 18px; cursor: default; }
+.score-present { color: var(--present); }
+.score-partial { color: var(--partial); }
+.score-missing { color: var(--missing); }
+.score-na { color: var(--na); }
+
+/* Case card */
+.case-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -268,142 +339,106 @@ h3 { font-size: 16px; }
   border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
 }
-.case-header h2 { margin: 0; }
+.case-header h3 { margin: 0; }
 .tag {
   display: inline-block;
   background: var(--bg);
   border: 1px solid var(--border);
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   margin-left: 8px;
 }
 .case-body {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 24px;
   margin-bottom: 16px;
 }
-.case-image img {
-  max-width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
+.case-image img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; }
 .question-block {
   background: var(--bg);
   border-left: 4px solid var(--accent);
   padding: 12px 16px;
   border-radius: 4px;
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 13px;
   white-space: pre-wrap;
 }
-.fact-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin-top: 12px;
-}
-.fact-table th, .fact-table td {
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  text-align: left;
-  vertical-align: top;
-}
-.fact-table th {
-  background: var(--bg);
-  font-weight: 600;
-  font-size: 12px;
-}
-.fact-table td.score {
-  text-align: center;
-  font-weight: 700;
-  font-size: 18px;
-}
-.score-present { color: var(--present); }
-.score-partial { color: var(--partial); }
-.score-missing { color: var(--missing); }
-.score-na { color: var(--na); }
-.eval-section-title {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-top: 24px;
-  margin-bottom: 8px;
-}
-.eval-section-title h3 { margin: 0; font-size: 16px; }
-.eval-section-title .hint { font-size: 12px; color: var(--muted); }
-.eval-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 8px;
-}
-.eval-col {
+
+/* Description cards grid */
+.desc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+.desc-card {
   border: 2px solid var(--border);
   border-radius: 8px;
   padding: 12px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
 }
-.eval-col.source-describe {
-  background: #eff6ff;
-  border-color: #93c5fd;
-}
-.eval-col.source-answer {
-  background: #f0fdf4;
-  border-color: #86efac;
-}
-.eval-col-badge {
-  position: absolute;
-  top: -10px;
-  left: 12px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 10px;
-  border: 1px solid currentColor;
-  background: white;
-}
-.eval-col.source-describe .eval-col-badge {
-  color: #1d4ed8;
-}
-.eval-col.source-answer .eval-col-badge {
-  color: #15803d;
-}
-.eval-col-header {
+.desc-card.flash { background: var(--flash-bg); border-color: var(--flash-border); }
+.desc-card.lite { background: var(--lite-bg); border-color: var(--lite-border); }
+.desc-card-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
-  margin-top: 6px;
 }
-.eval-col-header .col-name {
-  font-weight: 600;
-  font-size: 13px;
-}
-.eval-col-header .col-meta {
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
-.eval-col-header .col-chars {
+.desc-card-label { font-weight: 700; font-size: 14px; }
+.desc-card-meta { font-size: 11px; color: var(--muted); }
+.desc-card-score { font-size: 14px; font-weight: 700; color: var(--accent); }
+.desc-card-content {
   font-size: 11px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
+  white-space: pre-wrap;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  flex-grow: 1;
 }
-.eval-col-header .col-score {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
+.desc-card-content.rendered { white-space: normal; }
+
+/* Answer cards */
+.answer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px; }
+.answer-card {
+  border: 2px solid var(--answer-border);
+  background: var(--answer-bg);
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
-.eval-col-expand {
+.answer-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.answer-card-label { font-weight: 700; font-size: 14px; }
+.answer-card-score { font-size: 14px; font-weight: 700; color: var(--accent); }
+.answer-card-content {
+  font-size: 11px;
+  white-space: pre-wrap;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+.answer-card-content.rendered { white-space: normal; }
+
+/* Expand button */
+.expand-btn {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -414,8 +449,11 @@ h3 { font-size: 16px; }
   font-size: 11px;
   cursor: pointer;
   color: var(--muted);
+  z-index: 2;
 }
-.eval-col-expand:hover { color: var(--accent); border-color: var(--accent); }
+.expand-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Modal */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -427,7 +465,7 @@ h3 { font-size: 16px; }
   padding: 32px;
 }
 .modal-overlay.open { display: flex; }
-.modal {
+.modal-box {
   background: white;
   border-radius: 12px;
   max-width: 1000px;
@@ -445,98 +483,208 @@ h3 { font-size: 16px; }
   align-items: center;
 }
 .modal-header h3 { margin: 0; }
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--muted);
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+.modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
+.modal-body .rendered-md { white-space: normal; }
+.modal-body .rendered-md pre { white-space: pre-wrap; word-wrap: break-word; }
+.modal-body .mermaid { background: white; text-align: center; margin: 8px 0; }
+
+/* Phase 1 result banner */
+.phase1-banner {
+  background: #dcfce7;
+  border: 2px solid #86efac;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
 }
-.modal-body {
-  padding: 24px;
-  overflow-y: auto;
-  flex-grow: 1;
-}
-.eval-content {
+.phase1-banner strong { color: #15803d; }
+
+/* Prompt details */
+details { margin: 8px 0; }
+details summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--accent); padding: 4px 0; }
+details summary:hover { text-decoration: underline; }
+details .prompt-content {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: "SF Mono", "Fira Code", monospace;
   font-size: 12px;
   white-space: pre-wrap;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 10px;
-  max-height: 360px;
+  margin-top: 8px;
+  max-height: 400px;
   overflow-y: auto;
-  flex-grow: 1;
-  min-height: 120px;
 }
-.eval-content.empty {
-  color: var(--muted);
-  font-style: italic;
+.prompt-meta { font-size: 12px; color: var(--muted); margin: 4px 0 0 0; }
+
+/* Phase 2 flow diagram */
+.flow-diagram {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 16px 0;
+  white-space: pre;
+  overflow-x: auto;
 }
-.eval-content pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
-.eval-content .mermaid {
-  background: white;
-  text-align: center;
-  margin: 8px 0;
-}
+
+/* Legend */
 .legend {
   display: flex;
   gap: 16px;
   align-items: center;
   font-size: 12px;
   color: var(--muted);
-  margin-top: 16px;
+  margin: 16px 0 8px;
   padding: 8px 12px;
   background: var(--bg);
   border-radius: 6px;
 }
 .legend span { font-weight: 700; font-size: 16px; margin-right: 4px; }
-.toc {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px 24px;
-  margin-bottom: 24px;
-}
+
+/* TOC */
+.toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 24px; margin-bottom: 24px; }
 .toc ol { margin: 8px 0 0 0; padding-left: 20px; }
 .toc a { color: var(--accent); text-decoration: none; }
 .toc a:hover { text-decoration: underline; }
+
+/* Summary comparison table */
+.cmp-table { border-collapse: collapse; font-size: 14px; margin: 16px 0; }
+.cmp-table th, .cmp-table td { padding: 8px 16px; border: 1px solid var(--border); text-align: center; }
+.cmp-table th { background: var(--bg); font-weight: 600; }
+.cmp-table .better { background: #dcfce7; font-weight: 700; }
+
+/* Future work */
+.future-list { list-style: none; padding: 0; }
+.future-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.future-list li:last-child { border-bottom: none; }
+.future-list .future-tag {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
 @media (max-width: 1100px) {
   .case-body { grid-template-columns: 1fr; }
-  .eval-grid { grid-template-columns: 1fr 1fr; }
-  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .desc-grid { grid-template-columns: 1fr 1fr; }
+  .answer-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<h1>Text vs Image Fidelity Report (全自動 LLM 評価版)</h1>
-<p class="muted">画像を LLM に渡す 2 通りの経路（specialized 記述を経由 vs 画像を直接渡す）でどの程度の情報損失が起きるか、またプロンプト工夫で記述の質をどれだけ改善できるかを LLM (Gemini) を使って完全自動で評価。Copilot Chat の代替として同じ Gemini モデルを使用しているため、同一モデル内の自己参照バイアスがあり得ることに留意。</p>
+<!-- ===================== HEADER ===================== -->
+<h1>Text vs Image Fidelity Report v2</h1>
+<p class="subtitle">
+  <strong>Phase 1</strong> = Gemini model comparison (which model produces better image descriptions)<br>
+  <strong>Phase 2</strong> = GPT-5.4 text vs image (does GPT perform better with text descriptions or direct image input?)
+</p>
 
-<div class="summary">
-  <h2>集計サマリー</h2>
-  <p class="muted">各列の Ground Truth fact カバー率（present=1.0、partial=0.5、missing=0）。未採点は除外。</p>
-  <div id="summary-grid" class="summary-grid"></div>
-  <div class="legend">
-    <span class="score-present">✓</span> present (1.0)
-    <span class="score-partial">△</span> partial (0.5)
-    <span class="score-missing">✗</span> missing (0.0)
-    <span class="score-na">—</span> 未採点
-  </div>
+<table class="model-table">
+  <tr><th>Role</th><th>Model</th><th>Purpose</th></tr>
+  <tr><td>Describe</td><td>gemini-3-flash / gemini-3.1-flash-lite</td><td>Generate text descriptions from images (Phase 1)</td></tr>
+  <tr><td>Answer</td><td>GPT-5.4</td><td>Answer questions using text or image (Phase 2)</td></tr>
+  <tr><td>Judge</td><td>GPT-5.4</td><td>Score answers against ground truth facts</td></tr>
+</table>
+
+<div class="legend">
+  <span class="score-present">&#10003;</span> present (1.0)
+  <span class="score-partial">&#9651;</span> partial (0.5)
+  <span class="score-missing">&#10007;</span> missing (0.0)
+  <span class="score-na">&mdash;</span> not scored
 </div>
 
 <div class="toc">
-  <strong>テストケース一覧</strong>
-  <ol id="toc-list"></ol>
+  <strong>Table of Contents</strong>
+  <ol>
+    <li><a href="#phase1">Phase 1: Describe Model Comparison</a></li>
+    <li><a href="#phase1-detail">Phase 1: Per-Case Detail (extraction)</a></li>
+    <li><a href="#phase2">Phase 2: Answer Comparison (extraction)</a></li>
+    <li><a href="#phase2-judgment">Phase 2: Answer Comparison (judgment)</a></li>
+    <li><a href="#future">Future Work</a></li>
+  </ol>
 </div>
 
-<div id="cases"></div>
+<!-- ===================== PHASE 1 ===================== -->
+<div class="section" id="phase1">
+  <h2>Phase 1: Describe Model Comparison</h2>
+  <p class="muted">Two Gemini models each produce two descriptions (generic + specialized prompt) per image. Scored against ground truth facts. Extraction cases only.</p>
 
+  <div id="mermaid-flow" style="margin:16px 0;">
+    <div class="mermaid">
+flowchart LR
+    IMG["Image"] --> GF["gemini-3-flash"]
+    IMG --> GL["gemini-3.1-flash-lite"]
+    GF -->|generic.md| D1["D1"]
+    GF -->|specialized| D2["D2"]
+    GL -->|generic.md| D3["D3"]
+    GL -->|specialized| D4["D4"]
+    D1 & D2 -->|text| GPT["GPT-5.4"]
+    IMG -->|vision| GPT
+    GPT --> A1["A1 text answer"]
+    GPT --> A2["A2 image answer"]
+    </div>
+  </div>
+
+  <!-- Prompt documentation -->
+  <h3>Prompt Documentation</h3>
+  <div id="prompts-section"></div>
+
+  <!-- Describe matrix -->
+  <h3>Describe Matrix Summary (extraction cases)</h3>
+  <div id="matrix-section"></div>
+</div>
+
+<!-- ===================== PHASE 1 DETAIL ===================== -->
+<div id="phase1-detail">
+  <h2>Phase 1: Per-Case Detail (extraction)</h2>
+  <div id="phase1-cases"></div>
+</div>
+
+<!-- ===================== PHASE 2 ===================== -->
+<div class="section" id="phase2">
+  <h2>Phase 2: Answer Comparison (extraction)</h2>
+  <p class="muted">GPT-5.4 answers questions via two paths: A1 = text descriptions (D_generic + D_specialized from Phase 1 winner), A2 = direct image input.</p>
+
+  <div class="flow-diagram">A1 (text via GPT): D_generic + D_specialized + question  -->  GPT-5.4 text   --> answer
+A2 (image via GPT):              image + question  -->  GPT-5.4 vision --> answer</div>
+
+  <div id="phase2-summary-table"></div>
+  <div id="phase2-cases"></div>
+</div>
+
+<!-- ===================== PHASE 2 JUDGMENT ===================== -->
+<div id="phase2-judgment">
+  <h2>Phase 2: Answer Comparison (judgment)</h2>
+  <p class="muted">Judgment cases test reasoning quality rather than factual extraction. Scored against reasoning_points.</p>
+  <div id="judgment-cases"></div>
+</div>
+
+<!-- ===================== FUTURE WORK ===================== -->
+<div class="section" id="future">
+  <h2>Future Work</h2>
+  <ul class="future-list">
+    <li><span class="future-tag">Pipeline</span> pptx image extraction pipeline &mdash; automated slide-to-image conversion for batch processing</li>
+    <li><span class="future-tag">Quality</span> Image preprocessing &mdash; contrast enhancement, denoising, resolution normalization before description</li>
+    <li><span class="future-tag">Routing</span> Image type auto-detection dispatch layer &mdash; automatically select specialized prompt based on image content</li>
+    <li><span class="future-tag">Integration</span> Copilot Chat integration &mdash; plug the describe-then-answer pipeline into GitHub Copilot Chat</li>
+  </ul>
+</div>
+
+<!-- ===================== MODAL ===================== -->
 <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
+  <div class="modal-box">
     <div class="modal-header">
       <h3 id="modal-title"></h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
@@ -547,172 +695,390 @@ const DATA = __DATA_JSON__;
 
 mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
 
-function escapeHtml(str) {
-  return (str || "").replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  }[c]));
+function esc(str) {
+  return (str || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-function renderContent(text) {
-  if (!text || !text.trim()) {
-    return '<div class="eval-content empty">（未入力）</div>';
-  }
-  // Use marked to render Markdown, then post-process Mermaid blocks
+function renderMd(text) {
+  if (!text || !text.trim()) return '<em class="muted">(empty)</em>';
   let html;
-  try {
-    html = marked.parse(text, { breaks: true, gfm: true });
-  } catch (e) {
-    html = '<pre>' + escapeHtml(text) + '</pre>';
-  }
-  // Replace mermaid code blocks: marked outputs <pre><code class="language-mermaid">...</code></pre>
+  try { html = marked.parse(text, { breaks: true, gfm: true }); }
+  catch(e) { html = '<pre>' + esc(text) + '</pre>'; }
   html = html.replace(
     /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g,
-    (m, code) => '<div class="mermaid">' + code.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'") + '</div>'
+    (m, code) => '<div class="mermaid">' + code.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'") + '</div>'
   );
-  return '<div class="eval-content">' + html + '</div>';
-}
-
-function renderSummary() {
-  const grid = document.getElementById('summary-grid');
-  grid.innerHTML = '';
-  for (const col of DATA.columns) {
-    const agg = DATA.aggregates[col.key];
-    const card = document.createElement('div');
-    card.className = 'summary-card source-' + col.source;
-    const pct = agg.total ? agg.percent.toFixed(1) : '—';
-    const cov = agg.total ? agg.coverage.toFixed(0) : '0';
-    card.innerHTML = `
-      <div class="badge-mini source-${col.source}">${escapeHtml(col.badge)}</div>
-      <div class="label">${escapeHtml(col.label)}</div>
-      <div class="pct">${pct}<small style="font-size:14px;color:var(--muted);">%</small></div>
-      <div class="detail">採点済 ${agg.scored}/${agg.total} facts (${cov}%)</div>
-      <div class="bar"><div style="width:${agg.total ? agg.percent : 0}%;"></div></div>
-    `;
-    grid.appendChild(card);
-  }
-}
-
-function renderToc() {
-  const ol = document.getElementById('toc-list');
-  ol.innerHTML = '';
-  for (const c of DATA.cases) {
-    const li = document.createElement('li');
-    li.innerHTML = `<a href="#${c.id}">${escapeHtml(c.title)}</a> <span class="muted">(${escapeHtml(c.image_type)})</span>`;
-    ol.appendChild(li);
-  }
-}
-
-function renderFactTable(c) {
-  let html = '<table class="fact-table"><thead><tr><th style="width:30px;">#</th><th>Ground Truth Fact</th>';
-  for (const col of DATA.columns) {
-    html += `<th style="width:80px;text-align:center;">${escapeHtml(col.label)}</th>`;
-  }
-  html += '</tr></thead><tbody>';
-  for (let i = 0; i < c.facts.length; i++) {
-    const f = c.facts[i];
-    html += `<tr><td>${i + 1}</td><td>${escapeHtml(f.text)}</td>`;
-    for (const col of DATA.columns) {
-      const score = (c.columns[col.key].scores || {})[f.id] || null;
-      const reason = (c.columns[col.key].reasons || {})[f.id] || '';
-      const cls = score ? `score-${score}` : 'score-na';
-      const icon = score === 'present' ? '✓' : score === 'partial' ? '△' : score === 'missing' ? '✗' : '—';
-      const tip = reason ? ` title="${escapeHtml(reason)}"` : '';
-      html += `<td class="score ${cls}"${tip}>${icon}</td>`;
-    }
-    html += '</tr>';
-  }
-  html += '</tbody></table>';
   return html;
 }
 
-function renderCase(c) {
-  const div = document.createElement('div');
-  div.className = 'case';
-  div.id = c.id;
+function verdictIcon(v) {
+  if (!v) return {icon: '\u2014', cls: 'score-na'};
+  const map = {present: {icon: '\u2713', cls: 'score-present'}, partial: {icon: '\u25B3', cls: 'score-partial'}, missing: {icon: '\u2717', cls: 'score-missing'}};
+  return map[v] || {icon: '\u2014', cls: 'score-na'};
+}
 
-  let evalCols = '';
-  for (const col of DATA.columns) {
-    const score = c.scores_per_column[col.key];
-    const pct = score.total && score.scored ? score.percent.toFixed(0) + '%' : '—';
-    const colData = c.columns[col.key];
-    const charText = colData.content ? `${colData.char_count.toLocaleString()} 文字` : '0 文字';
-    evalCols += `
-      <div class="eval-col source-${col.source}" data-case="${c.id}" data-col="${col.key}">
-        <span class="eval-col-badge">${escapeHtml(col.badge)}</span>
-        <button class="eval-col-expand" onclick="openModal('${c.id}','${col.key}')">⛶ 拡大</button>
-        <div class="eval-col-header">
-          <span class="col-name">${escapeHtml(col.label)}</span>
-          <span class="col-meta">
-            <span class="col-chars">${charText}</span>
-            <span class="col-score">${pct}</span>
-          </span>
+function getVerdict(scores, fid) {
+  const entry = scores[fid];
+  if (!entry) return {verdict: null, reason: ''};
+  if (typeof entry === 'string') return {verdict: entry, reason: ''};
+  return {verdict: entry.verdict || null, reason: entry.reason || ''};
+}
+
+// =========================================================================
+// Phase 1: Prompts
+// =========================================================================
+function renderPrompts() {
+  const el = document.getElementById('prompts-section');
+  let html = '';
+  for (const p of DATA.prompts) {
+    html += `<details>
+      <summary>${esc(p.display_name)} <span class="muted" style="font-weight:normal;font-size:12px;">(${esc(p.applies_to)})</span></summary>
+      <p class="prompt-meta">${esc(p.intent)}</p>
+      <div class="prompt-content">${esc(p.content)}</div>
+    </details>`;
+  }
+  el.innerHTML = html;
+}
+
+// =========================================================================
+// Phase 1: Matrix
+// =========================================================================
+function renderMatrix() {
+  const el = document.getElementById('matrix-section');
+  const ma = DATA.model_avgs;
+  const p1 = DATA.phase1_result;
+
+  // Find best scores for highlighting
+  const flash_avg = (ma.gemini_3_flash.generic + ma.gemini_3_flash.specialized) / 2;
+  const lite_avg = (ma.gemini_31_flash_lite.generic + ma.gemini_31_flash_lite.specialized) / 2;
+
+  let html = '<table class="matrix-table"><thead><tr><th></th><th>generic</th><th>specialized</th><th>avg</th></tr></thead><tbody>';
+
+  // Flash row
+  const flashIsWinner = flash_avg >= lite_avg;
+  html += '<tr>';
+  html += '<td class="model-name">gemini-3-flash</td>';
+  html += `<td${ma.gemini_3_flash.generic >= ma.gemini_31_flash_lite.generic ? ' class="winner"' : ''}>${ma.gemini_3_flash.generic.toFixed(1)}%</td>`;
+  html += `<td${ma.gemini_3_flash.specialized >= ma.gemini_31_flash_lite.specialized ? ' class="winner"' : ''}>${ma.gemini_3_flash.specialized.toFixed(1)}%</td>`;
+  html += `<td${flashIsWinner ? ' class="winner"' : ''}>${flash_avg.toFixed(1)}%</td>`;
+  html += '</tr>';
+
+  // Lite row
+  html += '<tr>';
+  html += '<td class="model-name">gemini-3.1-flash-lite</td>';
+  html += `<td${ma.gemini_31_flash_lite.generic > ma.gemini_3_flash.generic ? ' class="winner"' : ''}>${ma.gemini_31_flash_lite.generic.toFixed(1)}%</td>`;
+  html += `<td${ma.gemini_31_flash_lite.specialized > ma.gemini_3_flash.specialized ? ' class="winner"' : ''}>${ma.gemini_31_flash_lite.specialized.toFixed(1)}%</td>`;
+  html += `<td${!flashIsWinner ? ' class="winner"' : ''}>${lite_avg.toFixed(1)}%</td>`;
+  html += '</tr>';
+
+  html += '</tbody></table>';
+
+  // Phase 1 result banner
+  if (p1.selected_model) {
+    html += `<div class="phase1-banner">
+      <strong>Selected model: ${esc(p1.selected_model)}</strong><br>
+      <span class="muted">${esc(p1.selection_reason)}</span>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// =========================================================================
+// Phase 1: Per-case detail (extraction only)
+// =========================================================================
+function renderPhase1Cases() {
+  const container = document.getElementById('phase1-cases');
+  const extCases = DATA.cases.filter(c => c.test_type === 'extraction');
+
+  for (const c of extCases) {
+    const div = document.createElement('div');
+    div.className = 'case-card';
+    div.id = 'p1-' + c.id;
+
+    // Fact table with D1-D4 columns
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Ground Truth Fact</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D1</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D2</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D3</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D4</th>';
+    factHtml += '</tr></thead><tbody>';
+
+    for (let i = 0; i < c.facts.length; i++) {
+      const f = c.facts[i];
+      factHtml += `<tr><td>${i+1}</td><td>${esc(f.text)}</td>`;
+      for (const label of ['D1','D2','D3','D4']) {
+        const col = c.describe_cols[label];
+        const {verdict, reason} = getVerdict(col.scores, f.id);
+        const vi = verdictIcon(verdict);
+        const tip = reason ? ` title="${esc(reason)}"` : '';
+        factHtml += `<td class="score ${vi.cls}"${tip}>${vi.icon}</td>`;
+      }
+      factHtml += '</tr>';
+    }
+    factHtml += '</tbody></table>';
+
+    // Description cards
+    let descCards = '';
+    for (const label of ['D1','D2','D3','D4']) {
+      const col = c.describe_cols[label];
+      const pctStr = col.pct !== null ? col.pct.toFixed(1) + '%' : '\u2014';
+      descCards += `
+        <div class="desc-card ${col.tint}">
+          <button class="expand-btn" onclick="openModal('${c.id}','describe','${label}')">&#9974; expand</button>
+          <div class="desc-card-header">
+            <span class="desc-card-label">${label}</span>
+            <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="desc-card-score">${pctStr}</span></span>
+          </div>
+          <div class="desc-card-content rendered">${renderMd(col.text)}</div>
+        </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="case-header">
+        <h3>${esc(c.id)} &mdash; ${esc(c.title)}
+          <span class="tag">${esc(c.image_type)}</span>
+          <span class="tag">${esc(c.specialized_prompt)}</span>
+        </h3>
+      </div>
+      <div class="case-body">
+        <div class="case-image">
+          ${c.image_data_uri ? `<img src="${c.image_data_uri}" alt="${esc(c.title)}" />` : '<em>(image missing)</em>'}
+          <p class="muted" style="font-size:11px;">${esc(c.image)}</p>
         </div>
-        ${renderContent(colData.content)}
+        <div>
+          <h3>Question</h3>
+          <div class="question-block">${esc(c.question)}</div>
+          <h3>Ground Truth Facts &mdash; D1/D2/D3/D4 Scores</h3>
+          ${factHtml}
+        </div>
       </div>
+      <h3>Description Cards
+        <span class="muted" style="font-size:12px;">&mdash;
+          <span style="color:#1d4ed8;">blue = flash (D1/D2)</span>,
+          <span style="color:#7c3aed;">purple = lite (D3/D4)</span>
+        </span>
+      </h3>
+      <div class="desc-grid">${descCards}</div>
     `;
+    container.appendChild(div);
   }
-
-  div.innerHTML = `
-    <div class="case-header">
-      <h2>${escapeHtml(c.id)} — ${escapeHtml(c.title)}
-        <span class="tag">type: ${escapeHtml(c.image_type)}</span>
-        <span class="tag">prompt: ${escapeHtml(c.specialized_prompt)}</span>
-      </h2>
-    </div>
-    <div class="case-body">
-      <div class="case-image">
-        ${c.image_data_uri ? `<img src="${c.image_data_uri}" alt="${escapeHtml(c.title)}" />` : '<em>(image missing)</em>'}
-        <p class="muted" style="font-size:12px;">${escapeHtml(c.image)}</p>
-      </div>
-      <div>
-        <h3>質問</h3>
-        <div class="question-block">${escapeHtml(c.question)}</div>
-        <h3>Ground Truth ファクト採点</h3>
-        ${renderFactTable(c)}
-      </div>
-    </div>
-    <div class="eval-section-title">
-      <h3>各評価対象の出力</h3>
-      <span class="hint">← <strong style="color:#1d4ed8;">青枠 ①② = 画像 → LLM 記述 (describe)</strong> ／ <strong style="color:#15803d;">緑枠 ③④ = LLM 記述/画像 → LLM 回答 (answer)</strong> →</span>
-    </div>
-    <div class="eval-grid">${evalCols}</div>
-  `;
-  return div;
 }
 
-function renderAll() {
-  renderSummary();
-  renderToc();
-  const container = document.getElementById('cases');
-  for (const c of DATA.cases) {
-    container.appendChild(renderCase(c));
+// =========================================================================
+// Phase 2: Extraction cases
+// =========================================================================
+function renderPhase2() {
+  // Summary table
+  const summaryEl = document.getElementById('phase2-summary-table');
+  const extCases = DATA.cases.filter(c => c.test_type === 'extraction');
+
+  let sumHtml = '<table class="cmp-table"><thead><tr><th>Case</th><th>A1 (text via GPT)</th><th>A2 (image via GPT)</th><th>D1+D2 ref</th></tr></thead><tbody>';
+  for (const c of extCases) {
+    const a1 = c.answer_cols['A1'];
+    const a2 = c.answer_cols['A2'];
+    const d1pct = c.describe_cols['D1'].pct;
+    const d2pct = c.describe_cols['D2'].pct;
+    const refPct = (d1pct !== null && d2pct !== null) ? ((d1pct + d2pct)/2).toFixed(1)+'%' : '\u2014';
+    const a1str = a1.pct !== null ? a1.pct.toFixed(1)+'%' : '\u2014';
+    const a2str = a2.pct !== null ? a2.pct.toFixed(1)+'%' : '\u2014';
+    const a1better = (a1.pct || 0) > (a2.pct || 0);
+    const a2better = (a2.pct || 0) > (a1.pct || 0);
+    sumHtml += `<tr><td style="text-align:left;font-weight:600;">${esc(c.id)}</td>`;
+    sumHtml += `<td${a1better?' class="better"':''}>${a1str}</td>`;
+    sumHtml += `<td${a2better?' class="better"':''}>${a2str}</td>`;
+    sumHtml += `<td>${refPct}</td></tr>`;
   }
-  // run mermaid after content is in the DOM
-  setTimeout(() => mermaid.run({ querySelector: '.mermaid' }), 100);
+  // Average row
+  const ps = DATA.phase2_summary;
+  const a1avg = ps.a1_avg, a2avg = ps.a2_avg;
+  sumHtml += `<tr style="font-weight:700;border-top:2px solid var(--border);">`;
+  sumHtml += `<td style="text-align:left;">Average</td>`;
+  sumHtml += `<td${a1avg > a2avg?' class="better"':''}>${a1avg.toFixed(1)}%</td>`;
+  sumHtml += `<td${a2avg > a1avg?' class="better"':''}>${a2avg.toFixed(1)}%</td>`;
+  sumHtml += `<td>\u2014</td></tr>`;
+  sumHtml += '</tbody></table>';
+  summaryEl.innerHTML = sumHtml;
+
+  // Per-case detail
+  const container = document.getElementById('phase2-cases');
+  for (const c of extCases) {
+    const div = document.createElement('div');
+    div.className = 'case-card';
+    div.id = 'p2-' + c.id;
+
+    // Fact table with A1/A2
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Ground Truth Fact</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (text)</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (image)</th>';
+    factHtml += '</tr></thead><tbody>';
+
+    for (let i = 0; i < c.facts.length; i++) {
+      const f = c.facts[i];
+      factHtml += `<tr><td>${i+1}</td><td>${esc(f.text)}</td>`;
+      for (const label of ['A1','A2']) {
+        const col = c.answer_cols[label];
+        const {verdict, reason} = getVerdict(col.scores, f.id);
+        const vi = verdictIcon(verdict);
+        const tip = reason ? ` title="${esc(reason)}"` : '';
+        factHtml += `<td class="score ${vi.cls}"${tip}>${vi.icon}</td>`;
+      }
+      factHtml += '</tr>';
+    }
+    factHtml += '</tbody></table>';
+
+    // Answer cards
+    let answerCards = '';
+    for (const label of ['A1','A2']) {
+      const col = c.answer_cols[label];
+      const pctStr = col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014';
+      const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+      answerCards += `
+        <div class="answer-card">
+          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; expand</button>
+          <div class="answer-card-header">
+            <span class="answer-card-label">${fullLabel}</span>
+            <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="answer-card-score">${pctStr}</span></span>
+          </div>
+          <div class="answer-card-content rendered">${renderMd(col.text)}</div>
+        </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="case-header">
+        <h3>${esc(c.id)} &mdash; ${esc(c.title)} <span class="tag">extraction</span></h3>
+      </div>
+      <h3>Fact Scores: A1 vs A2</h3>
+      ${factHtml}
+      <h3>Answer Cards</h3>
+      <div class="answer-grid">${answerCards}</div>
+    `;
+    container.appendChild(div);
+  }
 }
 
-function openModal(caseId, colKey) {
+// =========================================================================
+// Phase 2: Judgment cases
+// =========================================================================
+function renderJudgmentCases() {
+  const container = document.getElementById('judgment-cases');
+  const judgCases = DATA.cases.filter(c => c.test_type === 'judgment');
+
+  for (const c of judgCases) {
+    const div = document.createElement('div');
+    div.className = 'case-card';
+    div.id = 'j-' + c.id;
+
+    // Fact table with A1/A2
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Reasoning Point</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (text)</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (image)</th>';
+    factHtml += '</tr></thead><tbody>';
+
+    for (let i = 0; i < c.facts.length; i++) {
+      const f = c.facts[i];
+      factHtml += `<tr><td>${i+1}</td><td>${esc(f.text)}</td>`;
+      for (const label of ['A1','A2']) {
+        const col = c.answer_cols[label];
+        const {verdict, reason} = getVerdict(col.scores, f.id);
+        const vi = verdictIcon(verdict);
+        const tip = reason ? ` title="${esc(reason)}"` : '';
+        factHtml += `<td class="score ${vi.cls}"${tip}>${vi.icon}</td>`;
+      }
+      factHtml += '</tr>';
+    }
+    factHtml += '</tbody></table>';
+
+    // Answer cards
+    let answerCards = '';
+    for (const label of ['A1','A2']) {
+      const col = c.answer_cols[label];
+      const pctStr = col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014';
+      const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+      answerCards += `
+        <div class="answer-card">
+          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; expand</button>
+          <div class="answer-card-header">
+            <span class="answer-card-label">${fullLabel}</span>
+            <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="answer-card-score">${pctStr}</span></span>
+          </div>
+          <div class="answer-card-content rendered">${renderMd(col.text)}</div>
+        </div>`;
+    }
+
+    // Question block
+    div.innerHTML = `
+      <div class="case-header">
+        <h3>${esc(c.id)} &mdash; ${esc(c.title)} <span class="tag">judgment</span></h3>
+      </div>
+      <h3>Question</h3>
+      <div class="question-block">${esc(c.question)}</div>
+      <h3>Reasoning Points: A1 vs A2</h3>
+      ${factHtml}
+      <h3>Answer Cards</h3>
+      <div class="answer-grid">${answerCards}</div>
+    `;
+    container.appendChild(div);
+  }
+}
+
+// =========================================================================
+// Modal
+// =========================================================================
+function openModal(caseId, kind, label) {
   const c = DATA.cases.find(x => x.id === caseId);
   if (!c) return;
-  const col = DATA.columns.find(x => x.key === colKey);
-  const colData = c.columns[colKey];
   const titleEl = document.getElementById('modal-title');
   const bodyEl = document.getElementById('modal-body');
-  titleEl.innerText = `${c.id} ${c.title} — ${col.label} (${col.badge}, ${colData.char_count.toLocaleString()} 文字)`;
-  bodyEl.innerHTML = renderContent(colData.content);
+
+  let text = '';
+  let subtitle = '';
+  if (kind === 'describe') {
+    const col = c.describe_cols[label];
+    text = col.text;
+    subtitle = `${label} (${col.char_count.toLocaleString()} chars, ${col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014'})`;
+  } else {
+    const col = c.answer_cols[label];
+    text = col.text;
+    const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+    subtitle = `${fullLabel} (${col.char_count.toLocaleString()} chars, ${col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014'})`;
+  }
+
+  titleEl.textContent = `${c.id} ${c.title} \u2014 ${subtitle}`;
+  bodyEl.innerHTML = '<div class="rendered-md">' + renderMd(text) + '</div>';
   document.getElementById('modal').classList.add('open');
   setTimeout(() => mermaid.run({ querySelector: '#modal-body .mermaid' }), 50);
 }
+
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-renderAll();
+// =========================================================================
+// Init
+// =========================================================================
+function init() {
+  renderPrompts();
+  renderMatrix();
+  renderPhase1Cases();
+  renderPhase2();
+  renderJudgmentCases();
+  // Render mermaid after DOM is populated
+  setTimeout(() => mermaid.run({ querySelector: '.mermaid' }), 200);
+}
+
+init();
 </script>
 </body>
 </html>
 """
+
+
+def _render_html(data: dict) -> str:
+    payload = _build_payload(data)
+    payload_json = json.dumps(payload, ensure_ascii=False)
+    return _HTML_TEMPLATE.replace("__DATA_JSON__", payload_json)
 
 
 def main() -> int:
@@ -725,7 +1091,7 @@ def main() -> int:
     html_text = _render_html(data)
     out = ROOT / "report.html"
     out.write_text(html_text, encoding="utf-8")
-    print(f"wrote {out.relative_to(WORKSPACE)} ({out.stat().st_size} bytes)")
+    print(f"wrote {out.relative_to(WORKSPACE)} ({out.stat().st_size:,} bytes)")
     return 0
 
 
