@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<title>Text vs Image Fidelity Report v2</title>
+<title>画像の文字化 vs 画像直接入力 — 精度比較レポート v2</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
@@ -320,6 +320,9 @@ details .prompt-content {
   margin-right: 8px;
 }
 
+.mermaid-container { text-align: center; margin: 24px 0; }
+.fact-table tbody tr:hover { background: #f0f9ff; }
+
 @media (max-width: 1100px) {
   .case-body { grid-template-columns: 1fr; }
   .desc-grid { grid-template-columns: 1fr 1fr; }
@@ -330,43 +333,43 @@ details .prompt-content {
 <body>
 
 <!-- ===================== HEADER ===================== -->
-<h1>Text vs Image Fidelity Report v2</h1>
+<h1>画像の文字化 vs 画像直接入力 — 精度比較レポート v2</h1>
 <p class="subtitle">
-  <strong>Phase 1</strong> = Gemini model comparison (which model produces better image descriptions)<br>
-  <strong>Phase 2</strong> = GPT-5.4 text vs image (does GPT perform better with text descriptions or direct image input?)
+  <strong>Phase 1</strong> = Gemini モデル比較（どのモデルがより良い画像記述を生成するか）<br>
+  <strong>Phase 2</strong> = GPT-5.4 テキスト vs 画像（テキスト記述と画像直接入力のどちらが高精度か？）
 </p>
 
 <table class="model-table">
-  <tr><th>Role</th><th>Model</th><th>Purpose</th></tr>
-  <tr><td>Describe</td><td>gemini-3-flash / gemini-3.1-flash-lite</td><td>Generate text descriptions from images (Phase 1)</td></tr>
-  <tr><td>Answer</td><td>GPT-5.4</td><td>Answer questions using text or image (Phase 2)</td></tr>
-  <tr><td>Judge</td><td>GPT-5.4</td><td>Score answers against ground truth facts</td></tr>
+  <tr><th>役割</th><th>モデル</th><th>用途</th></tr>
+  <tr><td>Describe</td><td>gemini-3-flash / gemini-3.1-flash-lite</td><td>画像からテキスト記述を生成（Phase 1）</td></tr>
+  <tr><td>Answer</td><td>GPT-5.4</td><td>テキストまたは画像を使って質問に回答（Phase 2）</td></tr>
+  <tr><td>Judge</td><td>GPT-5.4</td><td>正解ファクトに対して回答を採点</td></tr>
 </table>
 
 <div class="legend">
-  <span class="score-present">&#10003;</span> present (1.0)
-  <span class="score-partial">&#9651;</span> partial (0.5)
-  <span class="score-missing">&#10007;</span> missing (0.0)
-  <span class="score-na">&mdash;</span> not scored
+  <span class="score-present">&#10003;</span> 正確に含まれている (1.0点)
+  <span class="score-partial">&#9651;</span> 部分的に含まれている (0.5点)
+  <span class="score-missing">&#10007;</span> 含まれていない (0.0点)
+  <span class="score-na">&mdash;</span> 未採点
 </div>
 
 <div class="toc">
-  <strong>Table of Contents</strong>
+  <strong>目次</strong>
   <ol>
-    <li><a href="#phase1">Phase 1: Describe Model Comparison</a></li>
-    <li><a href="#phase1-detail">Phase 1: Per-Case Detail (extraction)</a></li>
-    <li><a href="#phase2">Phase 2: Answer Comparison (extraction)</a></li>
-    <li><a href="#phase2-judgment">Phase 2: Answer Comparison (judgment)</a></li>
-    <li><a href="#future">Future Work</a></li>
+    <li><a href="#phase1">Phase 1: 記述モデル比較</a></li>
+    <li><a href="#phase1-detail">Phase 1: ケース別詳細 (情報抽出)</a></li>
+    <li><a href="#phase2">Phase 2: 回答精度の比較 (情報抽出テスト)</a></li>
+    <li><a href="#phase2-judgment">Phase 2: 回答精度の比較 (判断テスト)</a></li>
+    <li><a href="#future">今後の課題</a></li>
   </ol>
 </div>
 
 <!-- ===================== PHASE 1 ===================== -->
 <div class="section" id="phase1">
-  <h2>Phase 1: Describe Model Comparison</h2>
-  <p class="muted">Two Gemini models each produce two descriptions (generic + specialized prompt) per image. Scored against ground truth facts. Extraction cases only.</p>
+  <h2>Phase 1: 記述モデル比較</h2>
+  <p class="muted">2つの Gemini モデルがそれぞれ2種類の記述（汎用プロンプト + 専用プロンプト）を画像ごとに生成。正解ファクトと照合して採点。情報抽出ケースのみ対象。</p>
 
-  <div id="mermaid-flow" style="margin:16px 0;">
+  <div class="mermaid-container" id="mermaid-flow">
     <div class="mermaid">
 flowchart LR
     IMG["Image"] --> GF["gemini-3-flash"]
@@ -380,30 +383,31 @@ flowchart LR
     GPT --> A1["A1 text answer"]
     GPT --> A2["A2 image answer"]
     </div>
+    <p class="muted" style="margin-top:8px;">D1-D4 = 各モデル&times;各プロンプトで生成した画像記述。A1 = テキスト記述経由で回答、A2 = 画像直接入力で回答。</p>
   </div>
 
   <!-- Prompt documentation -->
-  <h3>Prompt Documentation</h3>
+  <h3>使用したプロンプト一覧</h3>
   <div id="prompts-section"></div>
 
   <!-- Describe matrix -->
-  <h3>Describe Matrix Summary (extraction cases)</h3>
+  <h3>記述マトリックス概要 (情報抽出ケース)</h3>
   <div id="matrix-section"></div>
 </div>
 
 <!-- ===================== PHASE 1 DETAIL ===================== -->
 <div id="phase1-detail">
-  <h2>Phase 1: Per-Case Detail (extraction)</h2>
+  <h2>Phase 1: ケース別詳細 (情報抽出)</h2>
   <div id="phase1-cases"></div>
 </div>
 
 <!-- ===================== PHASE 2 ===================== -->
 <div class="section" id="phase2">
-  <h2>Phase 2: Answer Comparison (extraction)</h2>
-  <p class="muted">GPT-5.4 answers questions via two paths: A1 = text descriptions (D_generic + D_specialized from Phase 1 winner), A2 = direct image input.</p>
+  <h2>Phase 2: 回答精度の比較 (情報抽出テスト)</h2>
+  <p class="muted">GPT-5.4 が2つの経路で質問に回答: A1 = テキスト記述経由（Phase 1 採用モデルの汎用+専用記述）、A2 = 画像直接入力。</p>
 
-  <div class="flow-diagram">A1 (text via GPT): D_generic + D_specialized + question  -->  GPT-5.4 text   --> answer
-A2 (image via GPT):              image + question  -->  GPT-5.4 vision --> answer</div>
+  <div class="flow-diagram">A1 (テキスト経由): D_汎用 + D_専用 + 質問  -->  GPT-5.4 テキスト --> 回答
+A2 (画像直接):              画像 + 質問  -->  GPT-5.4 ビジョン --> 回答</div>
 
   <div id="phase2-summary-table"></div>
   <div id="phase2-cases"></div>
@@ -411,19 +415,19 @@ A2 (image via GPT):              image + question  -->  GPT-5.4 vision --> answe
 
 <!-- ===================== PHASE 2 JUDGMENT ===================== -->
 <div id="phase2-judgment">
-  <h2>Phase 2: Answer Comparison (judgment)</h2>
-  <p class="muted">Judgment cases test reasoning quality rather than factual extraction. Scored against reasoning_points.</p>
+  <h2>Phase 2: 回答精度の比較 (判断テスト)</h2>
+  <p class="muted">判断ケースは事実抽出ではなく推論の質をテスト。推論ポイントに対して採点。</p>
   <div id="judgment-cases"></div>
 </div>
 
 <!-- ===================== FUTURE WORK ===================== -->
 <div class="section" id="future">
-  <h2>Future Work</h2>
+  <h2>今後の課題</h2>
   <ul class="future-list">
-    <li><span class="future-tag">Pipeline</span> pptx image extraction pipeline &mdash; automated slide-to-image conversion for batch processing</li>
-    <li><span class="future-tag">Quality</span> Image preprocessing &mdash; contrast enhancement, denoising, resolution normalization before description</li>
-    <li><span class="future-tag">Routing</span> Image type auto-detection dispatch layer &mdash; automatically select specialized prompt based on image content</li>
-    <li><span class="future-tag">Integration</span> Copilot Chat integration &mdash; plug the describe-then-answer pipeline into GitHub Copilot Chat</li>
+    <li><span class="future-tag">Pipeline</span> pptx 画像抽出パイプライン &mdash; スライド&rarr;画像変換の自動化</li>
+    <li><span class="future-tag">Quality</span> 画像の前処理 &mdash; コントラスト補正、ノイズ除去、解像度正規化</li>
+    <li><span class="future-tag">Routing</span> 画像種別の自動判定 &mdash; 画像内容に基づく専用プロンプトの自動選択</li>
+    <li><span class="future-tag">Integration</span> Copilot Chat 統合 &mdash; describe-then-answer パイプラインの GitHub Copilot への組み込み</li>
   </ul>
 </div>
 
@@ -500,7 +504,7 @@ function renderMatrix() {
   const flash_avg = (ma.gemini_3_flash.generic + ma.gemini_3_flash.specialized) / 2;
   const lite_avg = (ma.gemini_31_flash_lite.generic + ma.gemini_31_flash_lite.specialized) / 2;
 
-  let html = '<table class="matrix-table"><thead><tr><th></th><th>generic</th><th>specialized</th><th>avg</th></tr></thead><tbody>';
+  let html = '<table class="matrix-table"><thead><tr><th></th><th>汎用</th><th>専用</th><th>平均</th></tr></thead><tbody>';
 
   // Flash row
   const flashIsWinner = flash_avg >= lite_avg;
@@ -524,7 +528,7 @@ function renderMatrix() {
   // Phase 1 result banner
   if (p1.selected_model) {
     html += `<div class="phase1-banner">
-      <strong>Selected model: ${esc(p1.selected_model)}</strong><br>
+      <strong>採用モデル: ${esc(p1.selected_model)}</strong><br>
       <span class="muted">${esc(p1.selection_reason)}</span>
     </div>`;
   }
@@ -545,11 +549,11 @@ function renderPhase1Cases() {
     div.id = 'p1-' + c.id;
 
     // Fact table with D1-D4 columns
-    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Ground Truth Fact</th>';
-    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D1</th>';
-    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D2</th>';
-    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D3</th>';
-    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D4</th>';
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>正解ファクト</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D1 (Flash/汎用)</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--flash-bg);">D2 (Flash/専用)</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D3 (Lite/汎用)</th>';
+    factHtml += '<th style="width:60px;text-align:center;background:var(--lite-bg);">D4 (Lite/専用)</th>';
     factHtml += '</tr></thead><tbody>';
 
     for (let i = 0; i < c.facts.length; i++) {
@@ -573,7 +577,7 @@ function renderPhase1Cases() {
       const pctStr = col.pct !== null ? col.pct.toFixed(1) + '%' : '\u2014';
       descCards += `
         <div class="desc-card ${col.tint}">
-          <button class="expand-btn" onclick="openModal('${c.id}','describe','${label}')">&#9974; expand</button>
+          <button class="expand-btn" onclick="openModal('${c.id}','describe','${label}')">&#9974; 全文表示</button>
           <div class="desc-card-header">
             <span class="desc-card-label">${label}</span>
             <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="desc-card-score">${pctStr}</span></span>
@@ -595,16 +599,16 @@ function renderPhase1Cases() {
           <p class="muted" style="font-size:11px;">${esc(c.image)}</p>
         </div>
         <div>
-          <h3>Question</h3>
+          <h3>質問</h3>
           <div class="question-block">${esc(c.question)}</div>
-          <h3>Ground Truth Facts &mdash; D1/D2/D3/D4 Scores</h3>
+          <h3>正解ファクト vs 記述の採点結果</h3>
           ${factHtml}
         </div>
       </div>
-      <h3>Description Cards
+      <h3>LLM が生成した記述テキスト
         <span class="muted" style="font-size:12px;">&mdash;
-          <span style="color:#1d4ed8;">blue = flash (D1/D2)</span>,
-          <span style="color:#7c3aed;">purple = lite (D3/D4)</span>
+          <span style="color:#1d4ed8;">青 = Flash (D1/D2)</span>、
+          <span style="color:#7c3aed;">紫 = Lite (D3/D4)</span>
         </span>
       </h3>
       <div class="desc-grid">${descCards}</div>
@@ -621,7 +625,7 @@ function renderPhase2() {
   const summaryEl = document.getElementById('phase2-summary-table');
   const extCases = DATA.cases.filter(c => c.test_type === 'extraction');
 
-  let sumHtml = '<table class="cmp-table"><thead><tr><th>Case</th><th>A1 (text via GPT)</th><th>A2 (image via GPT)</th><th>D1+D2 ref</th></tr></thead><tbody>';
+  let sumHtml = '<table class="cmp-table"><thead><tr><th>ケース</th><th>A1 (テキスト経由)</th><th>A2 (画像直接)</th><th>参考: 記述スコア</th></tr></thead><tbody>';
   for (const c of extCases) {
     const a1 = c.answer_cols['A1'];
     const a2 = c.answer_cols['A2'];
@@ -641,7 +645,7 @@ function renderPhase2() {
   const ps = DATA.phase2_summary;
   const a1avg = ps.a1_avg, a2avg = ps.a2_avg;
   sumHtml += `<tr style="font-weight:700;border-top:2px solid var(--border);">`;
-  sumHtml += `<td style="text-align:left;">Average</td>`;
+  sumHtml += `<td style="text-align:left;">平均</td>`;
   sumHtml += `<td${a1avg > a2avg?' class="better"':''}>${a1avg.toFixed(1)}%</td>`;
   sumHtml += `<td${a2avg > a1avg?' class="better"':''}>${a2avg.toFixed(1)}%</td>`;
   sumHtml += `<td>\u2014</td></tr>`;
@@ -656,9 +660,9 @@ function renderPhase2() {
     div.id = 'p2-' + c.id;
 
     // Fact table with A1/A2
-    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Ground Truth Fact</th>';
-    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (text)</th>';
-    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (image)</th>';
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>正解ファクト</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (テキスト経由)</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (画像直接)</th>';
     factHtml += '</tr></thead><tbody>';
 
     for (let i = 0; i < c.facts.length; i++) {
@@ -680,10 +684,10 @@ function renderPhase2() {
     for (const label of ['A1','A2']) {
       const col = c.answer_cols[label];
       const pctStr = col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014';
-      const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+      const fullLabel = label === 'A1' ? 'A1: テキスト経由' : 'A2: 画像直接';
       answerCards += `
         <div class="answer-card">
-          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; expand</button>
+          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; 全文表示</button>
           <div class="answer-card-header">
             <span class="answer-card-label">${fullLabel}</span>
             <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="answer-card-score">${pctStr}</span></span>
@@ -696,9 +700,9 @@ function renderPhase2() {
       <div class="case-header">
         <h3>${esc(c.id)} &mdash; ${esc(c.title)} <span class="tag">extraction</span></h3>
       </div>
-      <h3>Fact Scores: A1 vs A2</h3>
+      <h3>ファクト採点: テキスト経由 vs 画像直接</h3>
       ${factHtml}
-      <h3>Answer Cards</h3>
+      <h3>GPT-5.4 の回答テキスト</h3>
       <div class="answer-grid">${answerCards}</div>
     `;
     container.appendChild(div);
@@ -718,9 +722,9 @@ function renderJudgmentCases() {
     div.id = 'j-' + c.id;
 
     // Fact table with A1/A2
-    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>Reasoning Point</th>';
-    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (text)</th>';
-    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (image)</th>';
+    let factHtml = '<table class="fact-table"><thead><tr><th>#</th><th>推論ポイント</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A1 (テキスト経由)</th>';
+    factHtml += '<th style="width:80px;text-align:center;background:var(--answer-bg);">A2 (画像直接)</th>';
     factHtml += '</tr></thead><tbody>';
 
     for (let i = 0; i < c.facts.length; i++) {
@@ -742,10 +746,10 @@ function renderJudgmentCases() {
     for (const label of ['A1','A2']) {
       const col = c.answer_cols[label];
       const pctStr = col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014';
-      const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+      const fullLabel = label === 'A1' ? 'A1: テキスト経由' : 'A2: 画像直接';
       answerCards += `
         <div class="answer-card">
-          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; expand</button>
+          <button class="expand-btn" onclick="openModal('${c.id}','answer','${label}')">&#9974; 全文表示</button>
           <div class="answer-card-header">
             <span class="answer-card-label">${fullLabel}</span>
             <span><span class="desc-card-meta">${col.char_count.toLocaleString()} chars</span> <span class="answer-card-score">${pctStr}</span></span>
@@ -759,11 +763,11 @@ function renderJudgmentCases() {
       <div class="case-header">
         <h3>${esc(c.id)} &mdash; ${esc(c.title)} <span class="tag">judgment</span></h3>
       </div>
-      <h3>Question</h3>
+      <h3>質問</h3>
       <div class="question-block">${esc(c.question)}</div>
-      <h3>Reasoning Points: A1 vs A2</h3>
+      <h3>推論ポイント: テキスト経由 vs 画像直接</h3>
       ${factHtml}
-      <h3>Answer Cards</h3>
+      <h3>GPT-5.4 の回答テキスト</h3>
       <div class="answer-grid">${answerCards}</div>
     `;
     container.appendChild(div);
@@ -788,7 +792,7 @@ function openModal(caseId, kind, label) {
   } else {
     const col = c.answer_cols[label];
     text = col.text;
-    const fullLabel = label === 'A1' ? 'A1: text via GPT' : 'A2: image via GPT';
+    const fullLabel = label === 'A1' ? 'A1: テキスト経由' : 'A2: 画像直接';
     subtitle = `${fullLabel} (${col.char_count.toLocaleString()} chars, ${col.pct !== null ? col.pct.toFixed(1)+'%' : '\u2014'})`;
   }
 
