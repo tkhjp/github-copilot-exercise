@@ -690,6 +690,149 @@ def make_complex_architecture(path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# tc04 — Text-only document (spec page screenshot, no diagrams)
+# ---------------------------------------------------------------------------
+
+def make_text_document(path: Path) -> None:
+    """A4-ish document page with only text: title, paragraphs, bullet list, table."""
+    w, h = 900, 1200
+    img = Image.new("RGB", (w, h), "#fefefe")
+    draw = ImageDraw.Draw(img)
+    title_font = _bold_font(28)
+    h2_font = _bold_font(22)
+    body_font = _font(16)
+    small_font = _font(13)
+    table_font = _font(15)
+    table_hdr_font = _bold_font(15)
+
+    margin = 60
+    y = 50
+
+    # Header line
+    draw.text((margin, y), "ACME Corp.", fill="#6b7280", font=small_font)
+    draw.text((w - margin - 180, y), "Confidential — Draft v2.1", fill="#6b7280", font=small_font)
+    y += 30
+    draw.line([(margin, y), (w - margin, y)], fill="#d1d5db", width=1)
+    y += 30
+
+    # Title
+    draw.text((margin, y), "System Requirements Specification", fill="#111827", font=title_font)
+    y += 50
+    draw.text((margin, y), "Chapter 3: Non-Functional Requirements", fill="#374151", font=h2_font)
+    y += 50
+
+    # Paragraph 1
+    p1 = (
+        "This chapter defines the non-functional requirements (NFRs) for the ShopApp "
+        "e-commerce platform. These requirements apply to the production environment "
+        "running on AWS ap-northeast-1 and must be met before the GA release scheduled "
+        "for 2026-Q3."
+    )
+    y = _draw_wrapped(draw, p1, margin, y, w - 2 * margin, body_font)
+    y += 30
+
+    # Section 3.1
+    draw.text((margin, y), "3.1 Performance Requirements", fill="#1f2937", font=h2_font)
+    y += 40
+
+    p2 = (
+        "All API endpoints must meet the following latency and throughput targets "
+        "under normal operating conditions (defined as < 80% CPU utilization across "
+        "the ECS cluster)."
+    )
+    y = _draw_wrapped(draw, p2, margin, y, w - 2 * margin, body_font)
+    y += 20
+
+    # Bullet list
+    bullets = [
+        "API response time (p95): <= 200 ms",
+        "API response time (p99): <= 500 ms",
+        "Search query throughput: >= 500 requests/sec",
+        "Database query timeout: 3 seconds (hard limit)",
+        "Page load time (LCP): <= 1.5 seconds on 4G network",
+        "Batch processing (nightly): complete within 2 hours",
+    ]
+    for bullet in bullets:
+        draw.text((margin + 20, y), "\u2022", fill="#374151", font=body_font)
+        draw.text((margin + 40, y), bullet, fill="#374151", font=body_font)
+        y += 28
+    y += 20
+
+    # Section 3.2
+    draw.text((margin, y), "3.2 Availability & Reliability", fill="#1f2937", font=h2_font)
+    y += 40
+
+    p3 = (
+        "The system must achieve the uptime and recovery targets listed below. "
+        "Planned maintenance windows (Sunday 02:00-06:00 JST) are excluded from "
+        "the uptime calculation."
+    )
+    y = _draw_wrapped(draw, p3, margin, y, w - 2 * margin, body_font)
+    y += 20
+
+    # Table
+    headers = ["Requirement", "Target", "Priority"]
+    rows = [
+        ["Monthly uptime", ">= 99.9%", "Must"],
+        ["RTO (Recovery Time Objective)", "<= 15 minutes", "Must"],
+        ["RPO (Recovery Point Objective)", "<= 5 minutes", "Must"],
+        ["Failover (AZ-level)", "Automatic", "Should"],
+        ["Data backup retention", "90 days", "Must"],
+    ]
+    col_w = [380, 200, 120]
+    table_x = margin
+    row_h = 32
+    # header
+    draw.rectangle([table_x, y, table_x + sum(col_w), y + row_h], fill="#374151")
+    cx = table_x
+    for i, hdr in enumerate(headers):
+        draw.text((cx + 10, y + 8), hdr, fill="white", font=table_hdr_font)
+        cx += col_w[i]
+    y += row_h
+    # rows
+    for r, row in enumerate(rows):
+        bg = "#f9fafb" if r % 2 == 0 else "white"
+        draw.rectangle([table_x, y, table_x + sum(col_w), y + row_h], fill=bg, outline="#e5e7eb")
+        cx = table_x
+        for i, val in enumerate(row):
+            draw.text((cx + 10, y + 8), val, fill="#1f2937", font=table_font)
+            cx += col_w[i]
+        y += row_h
+    draw.rectangle([table_x, y - row_h * len(rows) - row_h, table_x + sum(col_w), y], outline="#9ca3af", width=1)
+    y += 30
+
+    # Footer
+    draw.line([(margin, h - 60), (w - margin, h - 60)], fill="#d1d5db", width=1)
+    draw.text((margin, h - 50), "Page 12", fill="#9ca3af", font=small_font)
+    draw.text((w - margin - 200, h - 50), "Last updated: 2026-03-15", fill="#9ca3af", font=small_font)
+
+    img.save(path, "PNG")
+
+
+def _draw_wrapped(draw, text: str, x: int, y: int, max_w: int, font) -> int:
+    """Draw word-wrapped text, return y after the last line."""
+    words = text.split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        test = (current + " " + word).strip()
+        tw, _ = _text_size(draw, test, font)
+        if tw > max_w:
+            if current:
+                lines.append(current)
+            current = word
+        else:
+            current = test
+    if current:
+        lines.append(current)
+    line_h = _text_size(draw, "Ag", font)[1] + 6
+    for line in lines:
+        draw.text((x, y), line, fill="#374151", font=font)
+        y += line_h
+    return y
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -698,6 +841,7 @@ def main() -> None:
     make_mixed_slide(IMAGES / "01_mixed_slide.png")
     make_ui_change_rfp(IMAGES / "02_ui_change.png")
     make_complex_architecture(IMAGES / "03_complex_arch.png")
+    make_text_document(IMAGES / "04_text_document.png")
     for p in sorted(IMAGES.glob("*.png")):
         print(f"wrote {p.relative_to(WORKSPACE)} ({p.stat().st_size} bytes)")
 
