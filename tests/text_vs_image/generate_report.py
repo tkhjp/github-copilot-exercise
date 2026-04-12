@@ -347,6 +347,18 @@ body {
 #sidenav a:hover { color: var(--accent); background: #eff6ff; }
 #sidenav a.active { color: var(--accent); background: #dbeafe; font-weight: 600; }
 #sidenav .nav-divider { border-top: 1px solid var(--border); margin: 10px 0; }
+#sidenav a.nav-sub-heading {
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text);
+  padding: 5px 8px 3px 12px;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-left: 3px solid #16a34a;
+}
+#sidenav a.nav-sub-heading:hover { background: #f0fdf4; color: #15803d; }
+#sidenav a.nav-sub-heading.active { background: #dcfce7; color: #15803d; }
 h1 { font-size: 28px; margin-top: 0; color: var(--text); }
 h2 { font-size: 22px; margin-top: 32px; color: var(--text); }
 h3 { font-size: 16px; color: var(--text); }
@@ -651,8 +663,8 @@ details .prompt-content {
 
   <div class="nav-group">
     <div class="nav-heading"><span class="nav-badge p1">P1</span> 記述モデル比較</div>
-    <a href="#phase1">実験フロー・プロンプト</a>
-    <a href="#phase1-detail">ケース別詳細</a>
+    <a href="#phase1" class="nav-sub-heading" style="border-left-color:var(--accent);">実験フロー・プロンプト</a>
+    <a href="#phase1-detail" class="nav-sub-heading" style="border-left-color:var(--accent);">ケース別詳細</a>
     <div id="nav-p1-cases"></div>
   </div>
 
@@ -660,9 +672,9 @@ details .prompt-content {
 
   <div class="nav-group">
     <div class="nav-heading"><span class="nav-badge p2">P2</span> 回答精度の比較</div>
-    <a href="#phase2">情報抽出テスト</a>
+    <a href="#phase2" class="nav-sub-heading">情報抽出テスト</a>
     <div id="nav-p2-ext-cases"></div>
-    <a href="#phase2-judgment">判断テスト</a>
+    <a href="#phase2-judgment" class="nav-sub-heading">判断テスト</a>
     <div id="nav-p2-jdg-cases"></div>
   </div>
 
