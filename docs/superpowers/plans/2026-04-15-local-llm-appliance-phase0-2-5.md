@@ -38,7 +38,7 @@
 - `tests/benchmarks/test_scenarios.py`
 - `tests/lib/__init__.py`
 - `tests/lib/test_local_llm_client.py`
-- `requirements-dev.txt` — pytest, pytest-mock, psutil (dev/benchmark only)
+- `requirements-dev.txt` — pytest, pytest-mock (test-only; psutil lives in `tools/requirements.txt` since it is runtime-imported by `benchmarks/metrics.py`)
 
 **Modified:**
 - `tools/requirements.txt` — add `psutil>=5.9` (shared between benchmarks and local client metrics)
