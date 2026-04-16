@@ -1,27 +1,31 @@
 #!/usr/bin/env python
-"""CLI: describe all embedded images in a .docx file via Gemini Vision.
+"""CLI: describe all embedded images in a .docx file via the configured backend.
 
 Usage:
     python tools/describe_docx.py <path>
+
+Backend is selected by LLM_BACKEND (gemini (default) | local).
 
 Writes Markdown to stdout. Errors to stderr.
 """
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
 from lib.docx_extractor import extract_images
-from lib.gemini_client import GeminiDescribeError, describe_image, load_config
 from lib.safe_path import UnsafePathError, resolve_safe
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
+_BACKEND = os.environ.get("LLM_BACKEND", "gemini").lower()
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Describe embedded images in a docx file via Gemini Vision"
+        description="Describe embedded images in a docx file via configured LLM backend"
     )
     parser.add_argument("path", help="Path to .docx file")
     args = parser.parse_args()
@@ -45,15 +49,29 @@ def main() -> int:
     rel_display = safe.relative_to(WORKSPACE_ROOT)
     print(f"# {rel_display} の埋め込み画像記述")
     print(f"- 抽出画像数: {len(images)}")
+    print(f"- backend: `{_BACKEND}`")
     print()
 
     if not images:
         print("（埋め込み画像が見つかりませんでした）")
         return 0
 
+    if _BACKEND == "local":
+        from lib.local_llm_client import (
+            LocalLLMError as _BackendError,
+            describe_image as _describe,
+            load_config as _load_config,
+        )
+    else:
+        from lib.gemini_client import (
+            GeminiDescribeError as _BackendError,
+            describe_image as _describe,
+            load_config as _load_config,
+        )
+
     try:
-        config = load_config(WORKSPACE_ROOT)
-    except GeminiDescribeError as exc:
+        config = _load_config(WORKSPACE_ROOT)
+    except _BackendError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 5
     print(f"- model: `{config.model}`")
@@ -63,9 +81,9 @@ def main() -> int:
     for img in images:
         print(f"## 画像 {img.image_index} (`{img.mime_type}`, rel_id=`{img.rel_id}`)")
         try:
-            description = describe_image(img.blob, img.mime_type, config)
+            description = _describe(img.blob, img.mime_type, config)
             print(description)
-        except GeminiDescribeError as exc:
+        except _BackendError as exc:
             failures += 1
             print(f"_(記述失敗: {exc})_")
         print()
