@@ -87,3 +87,40 @@ def test_s2_vision_single_requires_non_empty_image():
             image_bytes=b"",
             mime_type="image/png",
         )
+
+
+from benchmarks.scenarios.s3_vision_pptx_batch import S3VisionPptxBatch
+
+
+def test_s3_vision_pptx_batch_runs_once_per_image():
+    fake_adapter = MagicMock()
+    fake_adapter.chat_vision.return_value = MagicMock(
+        content="ok",
+        prompt_tokens=200,
+        completion_tokens=40,
+        wall_seconds=2.0,
+    )
+    images = [
+        (b"\x89PNG\r\n\x1a\na", "image/png"),
+        (b"\x89PNG\r\n\x1a\nb", "image/png"),
+        (b"\x89PNG\r\n\x1a\nc", "image/png"),
+    ]
+    scenario = S3VisionPptxBatch(
+        tool="ollama",
+        model="qwen2.5-vl:7b",
+        images=images,
+    )
+    result = scenario.run(fake_adapter)
+    assert result.scenario_name == "s3"
+    assert len(result.runs) == 3
+    assert fake_adapter.chat_vision.call_count == 3
+
+
+def test_s3_vision_pptx_batch_requires_at_least_one_image():
+    import pytest as _pt
+    with _pt.raises(ValueError, match="images"):
+        S3VisionPptxBatch(
+            tool="ollama",
+            model="qwen2.5-vl:7b",
+            images=[],
+        )
