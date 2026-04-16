@@ -51,3 +51,39 @@ def test_s1_text_only_respects_n_runs():
     result = scenario.run(fake_adapter)
     assert len(result.runs) == 3
     assert fake_adapter.chat_text.call_count == 3
+
+
+from benchmarks.scenarios.s2_vision_single import S2VisionSingle
+
+
+def test_s2_vision_single_invokes_vision_chat():
+    fake_adapter = MagicMock()
+    fake_adapter.chat_vision.return_value = MagicMock(
+        content="an image of a diagram",
+        prompt_tokens=200,
+        completion_tokens=80,
+        wall_seconds=3.5,
+    )
+    scenario = S2VisionSingle(
+        tool="ollama",
+        model="qwen2.5-vl:7b",
+        image_bytes=b"\x89PNG\r\n\x1a\nfake",
+        mime_type="image/png",
+        n_runs=2,
+    )
+    result = scenario.run(fake_adapter)
+    assert result.scenario_name == "s2"
+    assert len(result.runs) == 2
+    assert fake_adapter.chat_vision.call_count == 2
+    assert result.runs[0].completion_tokens == 80
+
+
+def test_s2_vision_single_requires_non_empty_image():
+    import pytest as _pt
+    with _pt.raises(ValueError, match="image_bytes"):
+        S2VisionSingle(
+            tool="ollama",
+            model="qwen2.5-vl:7b",
+            image_bytes=b"",
+            mime_type="image/png",
+        )
