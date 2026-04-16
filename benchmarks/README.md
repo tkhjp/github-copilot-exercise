@@ -47,3 +47,10 @@ Each run writes two files under `--out-dir` (default `benchmarks/out/`):
 - `0` — all runs succeeded
 - `1` — at least one run failed but some succeeded
 - `2` — all runs failed
+
+## Regression baseline
+
+Phase 5 preserves `LLM_BACKEND=gemini` (default) as the working configuration.
+The Gemini path was expected to be smoke-tested against `samples/diagram.png` at the end of
+Phase 5 implementation and produce valid Japanese Markdown output — see the
+Phase 5 commit log. This test was not executed during Phase 5 implementation due to missing GEMINI_API_KEY.
