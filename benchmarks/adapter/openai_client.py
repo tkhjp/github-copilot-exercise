@@ -30,6 +30,20 @@ class AdapterConfig:
 
 @dataclass(frozen=True)
 class ChatResult:
+    """Result of one chat call.
+
+    wall_seconds measures the server round-trip only — bracketing the
+    chat.completions.create call. It excludes OpenAI() client construction
+    (one-time cost in __init__) and post-response attribute access, so it
+    feeds tokens/sec throughput calculations cleanly.
+
+    prompt_tokens / completion_tokens are 0 when the backend does not report
+    usage (some OpenAI-compatible servers omit the field). Callers that need
+    to distinguish "zero tokens consumed" from "unreported" should upgrade
+    to Optional[int] at that point — the adapter currently chooses silent-0
+    because no downstream consumer (benchmarks, Phase 5 prototype) reads
+    tokens for anything other than telemetry.
+    """
     content: str
     prompt_tokens: int
     completion_tokens: int
@@ -79,9 +93,14 @@ class LocalLLMAdapter:
 
         content = response.choices[0].message.content or ""
         if not content.strip():
+            # Strict on content: empty or whitespace-only is always useless for
+            # benchmarking and for the image-describer use case.
             raise RuntimeError(
                 f"Backend {self._config.base_url} returned empty content"
             )
+        # Lenient on usage: some backends (llama.cpp --api mode, older LM Studio)
+        # omit the usage block entirely. Default to 0 rather than raise — tokens
+        # are telemetry, not correctness.
         usage = response.usage
         return ChatResult(
             content=content,
