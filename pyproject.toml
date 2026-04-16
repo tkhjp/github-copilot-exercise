@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-ra --strict-markers"
+# pythonpath lets tests import benchmarks.* (from repo root) and lib.* (mirroring
+# how tools/describe_*.py files import their siblings). Pytest 8+ handles this
+# natively, replacing the sys.path manipulation that would otherwise live in
+# tests/conftest.py.
+pythonpath = [".", "tools"]
