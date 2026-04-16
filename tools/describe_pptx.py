@@ -22,6 +22,11 @@ from lib.safe_path import UnsafePathError, resolve_safe
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
+_VALID_BACKENDS = {"gemini", "local"}
+
+# _BACKEND is captured at module import time. Changing os.environ["LLM_BACKEND"]
+# after import has no effect — use a fresh subprocess if you need to switch
+# backends mid-process.
 _BACKEND = os.environ.get("LLM_BACKEND", "gemini").lower()
 
 
@@ -36,6 +41,14 @@ def main() -> int:
         help='Slide selector: "all" (default), "3", "1-3", "1,3,5", "1-3,5"',
     )
     args = parser.parse_args()
+
+    if _BACKEND not in _VALID_BACKENDS:
+        print(
+            f"ERROR: unknown LLM_BACKEND={_BACKEND!r}. "
+            f"Expected one of: {sorted(_VALID_BACKENDS)}",
+            file=sys.stderr,
+        )
+        return 7
 
     try:
         safe = resolve_safe(args.path, WORKSPACE_ROOT)

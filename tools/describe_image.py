@@ -24,6 +24,11 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
 SUPPORTED_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tiff"}
 
+_VALID_BACKENDS = {"gemini", "local"}
+
+# _BACKEND is captured at module import time. Changing os.environ["LLM_BACKEND"]
+# after import has no effect — use a fresh subprocess (or module reimport in
+# tests) if you need to switch backends mid-process.
 _BACKEND = os.environ.get("LLM_BACKEND", "gemini").lower()
 
 
@@ -50,6 +55,14 @@ def main() -> int:
     parser.add_argument("path", help="Path to image file (relative or absolute)")
     args = parser.parse_args()
 
+    if _BACKEND not in _VALID_BACKENDS:
+        print(
+            f"ERROR: unknown LLM_BACKEND={_BACKEND!r}. "
+            f"Expected one of: {sorted(_VALID_BACKENDS)}",
+            file=sys.stderr,
+        )
+        return 7
+
     try:
         safe = resolve_safe(args.path, WORKSPACE_ROOT)
     except (UnsafePathError, FileNotFoundError, IsADirectoryError) as exc:
@@ -69,36 +82,29 @@ def main() -> int:
 
     if _BACKEND == "local":
         from lib.local_llm_client import (
-            LocalLLMError,
+            LocalLLMError as _BackendError,
             describe_image as _describe,
             load_config as _load_config,
         )
-        try:
-            config = _load_config(WORKSPACE_ROOT)
-            description = _describe(image_bytes, mime, config)
-        except LocalLLMError as exc:
-            print(f"ERROR: {exc}", file=sys.stderr)
-            return 5
-        model_display = config.model
     else:
         from lib.gemini_client import (
-            GeminiDescribeError,
+            GeminiDescribeError as _BackendError,
             describe_image as _describe,
             load_config as _load_config,
         )
-        try:
-            config = _load_config(WORKSPACE_ROOT)
-            description = _describe(image_bytes, mime, config)
-        except GeminiDescribeError as exc:
-            print(f"ERROR: {exc}", file=sys.stderr)
-            return 5
-        model_display = config.model
+
+    try:
+        config = _load_config(WORKSPACE_ROOT)
+        description = _describe(image_bytes, mime, config)
+    except _BackendError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 5
 
     rel_display = safe.relative_to(WORKSPACE_ROOT)
     print(f"# {rel_display} の記述")
     print(f"- mime: `{mime}`")
     print(f"- backend: `{_BACKEND}`")
-    print(f"- model: `{model_display}`")
+    print(f"- model: `{config.model}`")
     print()
     print(description)
     return 0
