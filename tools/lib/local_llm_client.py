@@ -22,14 +22,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from benchmarks.adapter.openai_client import AdapterConfig, LocalLLMAdapter  # noqa: E402
 
-DESCRIBE_PROMPT = (
-    "この画像を構造的に記述してください。"
-    "含まれる**テキスト内容**（OCR的に全て書き出す）、"
-    "**図表・ダイアグラムの構造**（ノード・接続・階層）、"
-    "**色とレイアウト**、"
-    "**主要な視覚要素**を網羅し、日本語で詳細に出力してください。"
-    "推測ではなく画像から直接読み取れる情報のみを記述してください。"
-)
+from lib.describe_prompts import DESCRIBE_PROMPT  # noqa: E402,F401 (re-exported for back-compat)
 
 
 class LocalLLMError(RuntimeError):
@@ -44,7 +37,40 @@ class LocalLLMConfig:
     timeout_seconds: float = 120.0
 
 
+# Module-level adapter cache. Each distinct AdapterConfig-equivalent key maps
+# to a single LocalLLMAdapter instance, so repeated calls (e.g. per-slide in
+# describe_pptx.py) don't rebuild the underlying httpx connection pool.
+_ADAPTER_CACHE: dict[tuple[str, str, str, float], LocalLLMAdapter] = {}
+
+
+def _clear_adapter_cache() -> None:
+    """Reset the module-level adapter cache. Intended for test isolation."""
+    _ADAPTER_CACHE.clear()
+
+
+def _get_adapter(config: LocalLLMConfig) -> LocalLLMAdapter:
+    """Return a cached adapter for this config, building one on first use."""
+    key = (config.base_url, config.model, config.api_key, config.timeout_seconds)
+    if key not in _ADAPTER_CACHE:
+        adapter_cfg = AdapterConfig(
+            base_url=config.base_url,
+            model=config.model,
+            api_key=config.api_key,
+            timeout_seconds=config.timeout_seconds,
+        )
+        _ADAPTER_CACHE[key] = LocalLLMAdapter(adapter_cfg)
+    return _ADAPTER_CACHE[key]
+
+
 def load_config(workspace_root: Path) -> LocalLLMConfig:
+    """Load LLM_* env vars from the workspace .env (if present) or environment.
+
+    Precedence: shell environment wins over the .env file. python-dotenv's
+    load_dotenv defaults to override=False, so a value already exported in
+    the shell is not replaced by a .env entry with the same name. This is
+    the same precedence gemini_client.py uses; tests that want deterministic
+    behavior should monkeypatch.delenv before asserting.
+    """
     env_path = workspace_root / ".env"
     if env_path.exists():
         load_dotenv(env_path)
@@ -59,11 +85,19 @@ def load_config(workspace_root: Path) -> LocalLLMConfig:
             f"LLM_MODEL not set. Expected in {env_path} or environment."
         )
     api_key = os.environ.get("LLM_API_KEY", "not-needed")
+
     timeout_raw = os.environ.get("LLM_TIMEOUT_SECONDS", "120")
     try:
         timeout = float(timeout_raw)
-    except ValueError:
-        timeout = 120.0
+    except ValueError as exc:
+        raise LocalLLMError(
+            f"LLM_TIMEOUT_SECONDS must be a number, got {timeout_raw!r}"
+        ) from exc
+    if timeout <= 0:
+        raise LocalLLMError(
+            f"LLM_TIMEOUT_SECONDS must be > 0, got {timeout_raw!r}"
+        )
+
     return LocalLLMConfig(
         base_url=base_url,
         model=model,
@@ -85,13 +119,7 @@ def describe_image(
     if not image_bytes:
         raise LocalLLMError("Empty image bytes")
 
-    adapter_cfg = AdapterConfig(
-        base_url=config.base_url,
-        model=config.model,
-        api_key=config.api_key,
-        timeout_seconds=config.timeout_seconds,
-    )
-    adapter = LocalLLMAdapter(adapter_cfg)
+    adapter = _get_adapter(config)
 
     try:
         result = adapter.chat_vision(

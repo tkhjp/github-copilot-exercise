@@ -14,16 +14,9 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-DEFAULT_MODEL = "gemini-2.5-flash"
+from lib.describe_prompts import DESCRIBE_PROMPT  # noqa: F401 (re-exported)
 
-DESCRIBE_PROMPT = (
-    "この画像を構造的に記述してください。"
-    "含まれる**テキスト内容**（OCR的に全て書き出す）、"
-    "**図表・ダイアグラムの構造**（ノード・接続・階層）、"
-    "**色とレイアウト**、"
-    "**主要な視覚要素**を網羅し、日本語で詳細に出力してください。"
-    "推測ではなく画像から直接読み取れる情報のみを記述してください。"
-)
+DEFAULT_MODEL = "gemini-2.5-flash"
 
 
 class GeminiDescribeError(RuntimeError):

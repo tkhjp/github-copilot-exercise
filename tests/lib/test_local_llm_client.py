@@ -12,9 +12,20 @@ import pytest
 from lib.local_llm_client import (
     LocalLLMConfig,
     LocalLLMError,
+    _clear_adapter_cache,
     describe_image,
     load_config,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_adapter_cache():
+    """Clear the module-level adapter cache before every test in this file,
+    so patches of LocalLLMAdapter aren't shadowed by cached instances from
+    a prior test."""
+    _clear_adapter_cache()
+    yield
+    _clear_adapter_cache()
 
 
 def test_load_config_reads_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -69,6 +80,43 @@ def test_describe_image_returns_content_from_adapter():
     ):
         out = describe_image(b"\x89PNG\r\n\x1a\nfake", "image/png", cfg)
     assert out == "結果"
+
+
+def test_load_config_rejects_unparseable_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """G1: LLM_TIMEOUT_SECONDS that doesn't parse as float must raise
+    LocalLLMError with a clear message, not silently fall back to 120."""
+    monkeypatch.setenv("LLM_BASE_URL", "http://127.0.0.1:11434/v1")
+    monkeypatch.setenv("LLM_MODEL", "qwen2.5-vl:7b")
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "abc")
+    with pytest.raises(LocalLLMError, match="LLM_TIMEOUT_SECONDS"):
+        load_config(tmp_path)
+
+
+@pytest.mark.parametrize("bad_value", ["0", "-5", "-0.1"])
+def test_load_config_rejects_non_positive_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, bad_value: str
+):
+    """G1: timeouts <= 0 must raise, since the OpenAI SDK will either reject
+    them or hang indefinitely — either way, 'silent fallback to 120' masks
+    a real misconfiguration."""
+    monkeypatch.setenv("LLM_BASE_URL", "http://127.0.0.1:11434/v1")
+    monkeypatch.setenv("LLM_MODEL", "qwen2.5-vl:7b")
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", bad_value)
+    with pytest.raises(LocalLLMError, match="> 0"):
+        load_config(tmp_path)
+
+
+def test_load_config_accepts_valid_positive_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """G1 happy path: a valid positive timeout flows through to the config."""
+    monkeypatch.setenv("LLM_BASE_URL", "http://127.0.0.1:11434/v1")
+    monkeypatch.setenv("LLM_MODEL", "qwen2.5-vl:7b")
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "45.5")
+    cfg = load_config(tmp_path)
+    assert cfg.timeout_seconds == 45.5
 
 
 def test_describe_image_wraps_adapter_errors():
