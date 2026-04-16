@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import mimetypes
+import re
 import sys
 from pathlib import Path
 
@@ -27,6 +28,15 @@ from benchmarks.scenarios.s2_vision_single import S2VisionSingle
 from benchmarks.scenarios.s3_vision_pptx_batch import S3VisionPptxBatch
 
 _SUPPORTED_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
+
+# Windows-illegal filename chars: \ / : * ? " < > | (plus control chars).
+# Used to sanitize the model id in output filenames.
+_ILLEGAL_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+
+
+def _safe_filename_component(s: str) -> str:
+    """Replace Windows-illegal filename chars with '-'."""
+    return _ILLEGAL_FILENAME_CHARS.sub("-", s)
 
 
 def _guess_mime(path: Path) -> str:
@@ -43,12 +53,18 @@ def _guess_mime(path: Path) -> str:
     }.get(path.suffix.lower(), "application/octet-stream")
 
 
-def _build_scenario(args: argparse.Namespace):
+def _build_scenario(args: argparse.Namespace, parser: argparse.ArgumentParser):
+    """Build the scenario object from CLI args.
+
+    Argument-level errors (missing --image, bad --pptx-dir, empty image dir)
+    call parser.error() which prints usage and exits with code 2 — distinct
+    from exit code 1 (partial run failure) returned by main().
+    """
     if args.scenario == "s1":
         return S1TextOnly(tool=args.tool, model=args.model, n_runs=args.n_runs)
     if args.scenario == "s2":
         if not args.image:
-            raise SystemExit("--image is required for scenario s2")
+            parser.error("--image is required for scenario s2")
         image_path = Path(args.image)
         return S2VisionSingle(
             tool=args.tool,
@@ -59,20 +75,27 @@ def _build_scenario(args: argparse.Namespace):
         )
     if args.scenario == "s3":
         if not args.pptx_dir:
-            raise SystemExit("--pptx-dir is required for scenario s3")
+            parser.error("--pptx-dir is required for scenario s3")
         pptx_dir = Path(args.pptx_dir)
         if not pptx_dir.is_dir():
-            raise SystemExit(f"--pptx-dir '{pptx_dir}' is not a directory")
+            parser.error(f"--pptx-dir '{pptx_dir}' is not a directory")
         images: list[tuple[bytes, str]] = []
         for entry in sorted(pptx_dir.iterdir()):
             if entry.is_file() and entry.suffix.lower() in _SUPPORTED_IMAGE_EXTS:
                 images.append((entry.read_bytes(), _guess_mime(entry)))
         if not images:
-            raise SystemExit(f"no supported images found under {pptx_dir}")
+            parser.error(f"no supported images found under {pptx_dir}")
+        # S3 processes each image exactly once; --n-runs does not apply.
+        if args.n_runs != 3:
+            print(
+                f"note: --n-runs={args.n_runs} is ignored for scenario s3 "
+                f"(one run per image, got {len(images)} images)",
+                file=sys.stderr,
+            )
         return S3VisionPptxBatch(
             tool=args.tool, model=args.model, images=images
         )
-    raise SystemExit(f"unknown scenario: {args.scenario}")
+    parser.error(f"unknown scenario: {args.scenario}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -100,11 +123,11 @@ def main(argv: list[str] | None = None) -> int:
         timeout_seconds=args.timeout,
     )
     adapter = LocalLLMAdapter(config)
-    scenario = _build_scenario(args)
+    scenario = _build_scenario(args, parser)
     result: ScenarioResult = scenario.run(adapter)
 
     out_dir = Path(args.out_dir)
-    stem = f"{args.tool}_{args.scenario}_{args.model.replace(':', '-').replace('/', '-')}"
+    stem = f"{_safe_filename_component(args.tool)}_{args.scenario}_{_safe_filename_component(args.model)}"
     csv_path = out_dir / f"{stem}.csv"
     md_path = out_dir / f"{stem}.md"
     write_csv(result.runs, csv_path)
@@ -118,7 +141,9 @@ def main(argv: list[str] | None = None) -> int:
 
     ok_count = sum(1 for r in result.runs if r.ok)
     if ok_count == 0:
-        return 2
+        # 10 (not 2) so downstream scripts can tell "all runs failed" from
+        # argparse's exit 2 (bad CLI args, no runs attempted).
+        return 10
     if ok_count < len(result.runs):
         return 1
     return 0

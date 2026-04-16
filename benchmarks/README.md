@@ -35,6 +35,11 @@ S3 vision-pptx-batch (images exported from a pptx or any directory of .png/.jpg)
         --base-url http://127.0.0.1:11434/v1 \
         --scenario s3 --pptx-dir samples/pptx_images
 
+**Note:** `--n-runs` is ignored for scenario `s3` — the batch runs each image in
+`--pptx-dir` exactly once. If you want multiple passes, invoke the harness
+multiple times or duplicate images in the directory. A warning is printed to
+stderr if `--n-runs` is passed with a non-default value for s3.
+
 ## Output
 
 Each run writes two files under `--out-dir` (default `benchmarks/out/`):
@@ -44,9 +49,17 @@ Each run writes two files under `--out-dir` (default `benchmarks/out/`):
 
 ## Exit codes
 
-- `0` — all runs succeeded
-- `1` — at least one run failed but some succeeded
-- `2` — all runs failed
+Two scopes:
+
+- **Argument / environment errors** (bad CLI usage, missing `--image`, empty
+  `--pptx-dir`): argparse exits with code `2` before any runs execute. No
+  CSV/Markdown output is written.
+- **Run-result outcomes** returned from `main()` *after* output is written:
+  - `0` — all runs succeeded
+  - `1` — at least one run failed but some succeeded
+  - `10` — every run failed (distinguished from argparse's `2` so downstream
+    scripts can tell "never started" from "started and fully failed";
+    presence of the output CSV/Markdown files is another signal)
 
 ## Regression baseline
 
