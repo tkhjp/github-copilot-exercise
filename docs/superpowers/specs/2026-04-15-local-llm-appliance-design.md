@@ -32,7 +32,7 @@
 
 ### 1.4 範囲内
 
-- 主流ホスティングツールの横断調査（5〜7 種） + 短名単（2〜3 種）の深度評測
+- 主流ホスティングツールの横断調査（5〜7 種） + 選定候補（2〜3 種）の深度評測
 - Vision モデルの横断評測（3〜5 種、3B〜13B レンジ）
 - 開発機（RTX 5090）上での全 benchmark（**CPU-only モード強制**で目標機挙動を模擬）
 - 目標 mini PC 上で 1 回の検証パス
@@ -174,7 +174,7 @@
   - 活発度（直近 release、issue 応答）
 - 候補集合: **Ollama、llama.cpp、LM Studio、IPEX-LLM、OpenVINO-GenAI、text-generation-webui、vLLM（除外項として記録）**
 
-**退出条件：** マトリクス表が完成し、**短名単 2〜3 種が明文で確定、除外されたツールは各々除外理由を 1 行記載**。
+**退出条件：** マトリクス表が完成し、**選定候補 2〜3 種が明文で確定、除外されたツールは各々除外理由を 1 行記載**。
 
 ### Phase 2 — Benchmark harness 構築（1 日）
 
@@ -190,18 +190,18 @@
 
 **退出条件：** harness が任意 1 候補上で S1/S2/S3 を通し、レポートファイルが生成できる。
 
-### Phase 3 — 短名単深度評測（2〜3 日）
+### Phase 3 — 選定候補深度評測（2〜3 日）
 
 **作業内容：**
 
-- 短名単の各ツールに対して順次:
+- 選定候補の各ツールに対して順次:
   1. インストール／起動（Windows native 経路優先、WSL は代替、両方記録）
   2. **共通 vision モデル**（基準: Qwen2.5-VL 7B Q4_K_M または等価）をロード
   3. CPU-only モードで S1/S2/S3 実行
   4. 記録項目: インストール摩擦、安定性、ドキュメント品質、Windows サービス化経路（NSSM / winsw / ツール同梱）
 - 横断比較表を出力: 性能 + 運用 + API の 3 軸
 
-**退出条件：** 短名単の全ツールで完全な benchmark データ取得済み; 勝者ツールが**書面で選定**され、否決可能な粒度で理由が明示されている。
+**退出条件：** 選定候補の全ツールで完全な benchmark データ取得済み; 勝者ツールが**書面で選定**され、否決可能な粒度で理由が明示されている。
 
 ### Phase 4 — モデル横断評測（勝者ツール上）（2 日）
 
@@ -245,7 +245,7 @@
 - 全データを統合し `docs/report/local-llm-selection-report.md` を作成、以下の構造:
   1. Executive summary（1 ページで「何を選ぶか／なぜか／何が走るか」）
   2. 背景と命題（Copilot preview 無効化 → Gemini 経由化 → governance 問題 → 本地化検証; 副次効果として Splashtop 統合可能性）
-  3. ツールマトリクス + 短名単 + 除外理由
+  3. ツールマトリクス + 選定候補 + 除外理由
   4. Benchmark 方法とデータ
   5. モデル横断評測と選定
   6. 目標機検証結果
@@ -258,7 +258,7 @@
 
 ### 総工数見積もり
 
-**9〜10 営業日**（buffer 込み）; Phase 1 の桌面調査を一部削って短名単を直接評測に進める場合は **7 日**まで圧縮可能。
+**9〜10 営業日**（buffer 込み）; Phase 1 の桌面調査を一部削って選定候補を直接評測に進める場合は **7 日**まで圧縮可能。
 
 ---
 
@@ -271,7 +271,7 @@
 | D1 | Design doc（本文書） | `docs/superpowers/specs/2026-04-15-local-llm-appliance-design.md` | Phase 0 |
 | D2 | ツール調査マトリクス | `docs/report/local-llm/01-tool-matrix.md` | Phase 1 |
 | D3 | Benchmark harness + adapter コード | `benchmarks/`、`adapter/` | Phase 2 |
-| D4 | 短名単深度評測データ + 結論 | `docs/report/local-llm/02-tool-shortlist-benchmark.md` + CSV | Phase 3 |
+| D4 | 選定候補深度評測データ + 結論 | `docs/report/local-llm/02-tool-shortlist-benchmark.md` + CSV | Phase 3 |
 | D5 | モデル横断評測データ + 選定結論 | `docs/report/local-llm/03-model-selection.md` + CSV | Phase 4 |
 | D6 | 本地 LLM client コード | `tools/lib/local_llm_client.py` + `.env.example` 更新 | Phase 5 |
 | D7 | 目標機検証データ | `docs/report/local-llm/04-target-validation.md` | Phase 6 |
@@ -285,7 +285,7 @@
 | R2 | **目標機アクセスが遅延する** — 現状 Q4 の回答で「D に近い A、ほぼ確定」 | 中 | 高 | Phase 6 を最後に置き阻塞を最小化; Phase 5 末時点で未確定なら、Phase 6 を「申請提出 + 報告の残り部分完成 + 検証は後続タスクとして明記」に切替 |
 | R3 | **目標機性能が 7B vision モデルの実用速度に不足** | 中 | 高 | Phase 4 で小モデル（3B / 4B）を事前準備; レポートでは「速度 vs 品質」のトレードオフ区間を明示; 3B でも不足なら結論で**素直にハードウェア引き上げまたは CPU テキスト + 外部 vision のハイブリッド案**を推奨 |
 | R4 | **Windows native でのツールインストール摩擦超過**（特に llama.cpp 自コンパイル経験があってもサービス化は別; IPEX-LLM Windows 安定性） | 中 | 中 | Phase 1 調査時点で記録; Phase 3 では各ツール**固定 0.5 日予算**、超過時は「除外 + 理由記録」に降格 |
-| R5 | **Qwen2.5-VL の Ollama / llama.cpp 公式サポートが追い付かない** | 中 | 中 | Phase 1 で短名単ツールの**候補モデル対応状況**を事前検証（最低限ロード可能／vision 推論可能であること）; サポート不十分なモデルは候補池から事前除外 |
+| R5 | **Qwen2.5-VL の Ollama / llama.cpp 公式サポートが追い付かない** | 中 | 中 | Phase 1 で選定候補ツールの**候補モデル対応状況**を事前検証（最低限ロード可能／vision 推論可能であること）; サポート不十分なモデルは候補池から事前除外 |
 | R6 | **品質評価に主観バイアス** — 「出力の良し悪し」に定量基準がない | 高 | 中 | Gemini 出力を**参照ベースライン**（正解ではない）とし、差分記述を基本に、点数化はしない; 各テスト画像に対し 3〜5 個の「必ず正しく抽出されるべき事実」を定義し、これを hard check point とする |
 | R7 | **範囲蔓延** — 評測中に「ついでに Open WebUI も」等の衝動 | 中 | 低 | 1 節で明示的 out-of-scope を設置済み; 評測中に類似衝動が出たら「後続提言」に記録、本 Phase には入れない |
 | R8 | **並発需求の後期突発** — 「複数人同時に使えないの?」 | 低 | 高 | 単一ユーザー前提は範囲説明書で明示済み; 真に必要になれば**独立した次フェーズ**として扱い、本回結論に影響させない |
@@ -294,8 +294,8 @@
 
 **ハード（全て達成必須）:**
 
-- ✅ ツールマトリクス + 短名単理由が書面化され、review で否決可能な粒度である
-- ✅ 短名単ツール 2 種以上が S1/S2/S3 完全 benchmark を通過
+- ✅ ツールマトリクス + 選定候補理由が書面化され、review で否決可能な粒度である
+- ✅ 選定候補ツール 2 種以上が S1/S2/S3 完全 benchmark を通過
 - ✅ 第一候補 vision モデル 1 種 + 代替候補 1 種（異なるサイズティア）が書面で確定
 - ✅ 最小プロトタイプが `LLM_BACKEND=local` で [tools/describe_image.py](../../../tools/describe_image.py)、[tools/describe_pptx.py](../../../tools/describe_pptx.py)、[tools/describe_docx.py](../../../tools/describe_docx.py) の 3 コマンドを通過
 - ✅ `LLM_BACKEND=gemini` のフォールバックでも正常動作（現状を壊さない）

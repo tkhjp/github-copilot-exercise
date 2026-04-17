@@ -1,4 +1,4 @@
-# ローカル LLM ホスト短名単 Benchmark
+# ローカル LLM ホスト選定 Benchmark（Phase 3）
 
 **ステータス:** 完了
 **Phase:** 3
@@ -7,7 +7,7 @@
 
 ## 固定 benchmark プロトコル
 
-- 短名単: `Ollama`, `llama.cpp`, `LM Studio`
+- 選定 3 ツール: `Ollama`, `llama.cpp`, `LM Studio`
 - 共通モデル: `Gemma 4 E4B`（`Q4_K_M` 相当、約 5 GB）
 - 入力:
   - S1: text-only
@@ -114,7 +114,7 @@ LM Studio のデフォルト sampling パラメータはモデルを早めに止
   2. **Windows 運用性が 3 ホスト中最良:** `lms server` / `lms daemon` の headless モードが native、無人起動に追加ツール不要、`--gpu off` フラグで CPU-only 強制、`lms import --hard-link` で他ホストと model ファイルを zero-copy で共有可能、cold-start 約 4 秒は最速。
   3. **wall 時間のリード**（S2 46.8 秒 vs Ollama 108.7 秒 vs llama.cpp 94.5 秒）は主に応答長の短さに由来し、生の推論速度の差ではない。ただし appliance ユースケース（ユーザー 1 発話 = 画像 1 枚の記述、短時間で返す）では、同じ tok/s でも短い応答のほうが UX は良い。前提は Phase 4 の品質スコアリングで「短い出力でも ground-truth をカバーしている」ことが確認されること。
 
-- **除外した短名単ホスト:**
+- **勝者に選ばれなかった 2 ツール:**
   - **Ollama:** 強力な候補だが以下で LM Studio に劣る:(a) Windows サービスは native で稼働するが、CPU-only を強制するには server 側の環境変数ではなく Modelfile レベルの alias が必要； (b) 同じ tok/s でも S2 wall が遅い。LM Studio の商用ライセンス条項が将来問題になった場合の差し替え先として完全に許容できる。
   - **llama.cpp:** 制御性と GGUF 互換性は最強だが、S3 wall が最遅で、サービス化（NSSM/winsw + 明示 mmproj パス + 自動更新なし）の手数が最多。production appliance より、デバッグ／参照用ホストとして温存するのが適切。
 
