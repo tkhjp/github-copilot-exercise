@@ -9,7 +9,7 @@
 
 **Phase 3 で実測評価する 3 ツール（選定）:**
 
-| ツール | 選定の決め手 |
+| ツール | 選定の理由 |
 |---|---|
 | **Ollama** | OpenAI 互換 API と Windows インストーラが最もシンプル。baseline appliance に最適 |
 | **llama.cpp** | 最も低レベルで閉域運用しやすい。GGUF 互換性と Intel 最適化余地の参照実装 |
@@ -17,7 +17,7 @@
 
 **除外した 4 ツール:**
 
-| ツール | 除外の決め手 |
+| ツール | 除外の理由 |
 |---|---|
 | vLLM | Linux/GPU 高並発サーバ向け、Windows single-user appliance と運用軸が不一致 |
 | OpenVINO-GenAI | 独立 OpenAI 互換 HTTP host ではなく「推論ライブラリ」に近い |
