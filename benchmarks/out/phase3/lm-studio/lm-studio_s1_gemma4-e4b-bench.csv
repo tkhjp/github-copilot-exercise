@@ -1,0 +1,4 @@
+scenario,tool,model,wall_seconds,prompt_tokens,completion_tokens,completion_tok_per_sec,ttft_seconds,rss_peak_mb,cpu_percent_avg,ok,error
+s1,lm-studio,gemma4-e4b-bench,0.995286200006376,26,8,8.0379,0.0,0.0,0.0,True,
+s1,lm-studio,gemma4-e4b-bench,0.7734864000085508,26,8,10.3428,0.0,0.0,0.0,True,
+s1,lm-studio,gemma4-e4b-bench,0.7730119999905583,26,8,10.3491,0.0,0.0,0.0,True,

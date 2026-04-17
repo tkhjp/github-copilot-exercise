@@ -1,0 +1,4 @@
+scenario,tool,model,wall_seconds,prompt_tokens,completion_tokens,completion_tok_per_sec,ttft_seconds,rss_peak_mb,cpu_percent_avg,ok,error
+s2,llama-cpp,gemma-4-E4B-it-GGUF,121.78246129999752,333,1480,12.1528,0.0,0.0,0.0,True,
+s2,llama-cpp,gemma-4-E4B-it-GGUF,94.52556580000964,333,1320,13.9645,0.0,0.0,0.0,True,
+s2,llama-cpp,gemma-4-E4B-it-GGUF,94.31727390000015,333,1336,14.1650,0.0,0.0,0.0,True,

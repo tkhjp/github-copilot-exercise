@@ -1,0 +1,4 @@
+scenario,tool,model,wall_seconds,prompt_tokens,completion_tokens,completion_tok_per_sec,ttft_seconds,rss_peak_mb,cpu_percent_avg,ok,error
+s2,ollama,gemma4-e4b-bench,108.71059740000055,314,1669,15.3527,0.0,0.0,0.0,True,
+s2,ollama,gemma4-e4b-bench,110.02551619999576,314,1763,16.0236,0.0,0.0,0.0,True,
+s2,ollama,gemma4-e4b-bench,106.4343446999992,314,1705,16.0193,0.0,0.0,0.0,True,
