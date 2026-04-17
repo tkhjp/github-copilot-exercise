@@ -20,7 +20,11 @@
 
 ### 1.2 核心命題（Thesis）
 
-> **社内 mini PC 上にデプロイする本地 LLM appliance** により、先行 image-describer PoC の**外部 Gemini API 呼び出しを本地エンドポイントに置き換える**ことが本作業の主目的である。副次的効果として、Splashtop ベースのワークステーション共有ワークフローも同一 appliance に集約できる。チームメンバーは該 mini PC の OpenAI 互換エンドポイントをネットワーク経由で利用し、**画像データを含め一切社外に出さない**。
+> **本作業の主目的は、Splashtop 経由でアクセスする隔離端末（社内機房の Windows mini PC）上にローカル LLM を serve し、その画像認識能力がどの程度あるかを実機で調査することである。** データを社外に出さずに完結する構成での capability research であり、即時に Gemini API を置き換えると決め打つものではない。
+>
+> 比較ベースラインとして、先行 image-describer PoC の Gemini API 出力を「事実上の上限」として参照する。ローカル LLM がどこまで近づけるかを測ることで、将来的な本地化判断（採用するか／いつするか／どの構成で）の根拠を整える。
+>
+> Splashtop は隔離端末へのアクセス経路であり、置き換え対象ではない。隔離端末上で LLM を serve することにより、画像データを含め推論に必要な入力は端末内で完結する。
 
 ### 1.3 目的
 
@@ -57,30 +61,41 @@
 
 ## 2. アーキテクチャとデータフロー
 
-### 2.1 目標状態アーキテクチャ（配備後）
+### 2.1 調査構成（隔離端末上の LLM serve + Splashtop 経由でのアクセス）
 
 ```
-[開発者 PC (複数)]                         [社内 LAN]              [目標 mini PC]
-  VS Code + Copilot Chat                                           i5-14500T / 32GB / iGPU only
-    │ （preview 無効のため画像を直接扱えない）
-    │ run_in_terminal で CLI を呼ぶ
-    ▼
-  tools/describe_image.py   ─── HTTP ─────────────────────▶     ┌─────────────────────┐
-  tools/describe_pptx.py    (OpenAI 互換 API)                    │ LLM Host            │
-  .env:                                                          │ (Ollama/llama.cpp/  │
-    LLM_BACKEND=local                                            │  LM Studio のどれか)│
-    LLM_BASE_URL=http://mini-pc:port/v1                          │ + Vision Model      │
-                                                                  │ (Qwen2.5-VL 7B 等)  │
-                                                                  └─────────────────────┘
-                                                                   Windows Service 化
-                                                                   LAN ポート公開
+[利用者の手元 PC]                                       [社内機房：隔離端末（mini PC）]
+                                                         i5-14500T / 32 GB / iGPU only
+  ┌─────────────────────────┐                          ┌──────────────────────────────┐
+  │ Splashtop クライアント   │ ───── Splashtop ─────▶   │ Splashtop ホスト             │
+  │ （遠隔デスクトップで端末 │   セッション             │ + デスクトップ環境           │
+  │  にログイン）            │                          │                              │
+  └─────────────────────────┘                          │ ┌──────────────────────────┐ │
+                                                        │ │ ローカル LLM Host         │ │
+                                                        │ │ (Ollama / llama.cpp /    │ │
+                                                        │ │  LM Studio)              │ │
+                                                        │ │ + Vision Model           │ │
+                                                        │ │   (Gemma 4 E4B 等)       │ │
+                                                        │ │ + tools/describe_*.py    │ │
+                                                        │ │   （LLM_BACKEND=local）  │ │
+                                                        │ └──────────────────────────┘ │
+                                                        │                              │
+                                                        │ 外部通信なし／データ端末内完結 │
+                                                        └──────────────────────────────┘
 ```
 
-**先行 PoC からの差分：**
+**この構成の要点：**
 
-- 先行 image-describer PoC との違いは**本 appliance への呼び出し先を差し替えるだけ**（`.env` の `LLM_BACKEND` で `gemini` → `local` に切替）
-- Copilot Chat → CLI → 画像処理 API という全体構造は変えない
-- 置き換え対象は「Gemini API 呼び出し」のみ
+- 利用者は手元 PC から **Splashtop で隔離端末にログイン**し、端末内で `tools/describe_*.py` などの CLI を叩く。Splashtop は隔離端末へのアクセス経路であり、本作業で置き換える対象ではない。
+- LLM サーバ（OpenAI 互換 endpoint）と CLI クライアントは**同一の隔離端末内**で完結する。端末から外部へ画像データが出る経路はない。
+- benchmark や評価レポートは「この構成における画像認識能力がどこまで実用域に届いているか」を計測するために実施する。
+- 比較ベースラインとして先行 PoC の **Gemini API 出力を上限の参考**として並べるが、本作業のスコープは「ローカル LLM の能力評価」であり、Gemini を即時に置き換えるための実装プロジェクトではない。
+
+**先行 PoC との位置関係：**
+
+- 先行 image-describer PoC は「外部 Gemini を呼ぶ CLI」を実装した。
+- 本プロジェクトは同じ CLI に `LLM_BACKEND=local` のスイッチを追加し、ローカル LLM endpoint に向ける構成を**評価環境として**用意する。
+- スイッチ自体は将来的な置き換え判断の前提条件となるが、本作業の成果物は「能力調査の結論レポート」であり、運用切替を実行する作業ではない。
 
 **設計原則：**
 

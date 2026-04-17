@@ -9,11 +9,19 @@
 
 ## 1. プロジェクトの目的
 
-社内ポリシーで GitHub Copilot Chat の preview 機能（画像入力など）が無効化されており、Copilot Chat 単体では画像を扱えない。このため先行 PoC ([image-describer-poc](../image-describer-poc-verification.md)) では Copilot から `run_in_terminal` 経由で CLI を呼び、CLI が外部 Gemini API に画像を送って Markdown を得る構成を採った。
+本プロジェクトの主目的は、**Splashtop 経由でアクセスする隔離端末（社内機房の Windows mini PC）上に LLM を serve し、その画像認識能力がどの程度あるかを調査すること**である。データを社外に出さずに完結する構成での capability research。
 
-しかし Gemini API は外部呼び出しであり、画像データが社外に出る — governance 上の問題が残る。
+### 背景
 
-本プロジェクトは、**社内機房の Windows mini PC 上にローカル LLM appliance を立てて、Gemini API 呼び出しを本地 endpoint に置き換えること**を主目的としている。副次効果として、Splashtop ベースのワークステーション共有ワークフローも同一 appliance に集約できる。
+- 社内ポリシーで GitHub Copilot Chat の preview 機能（画像入力など）が無効化されており、Copilot Chat 単体では画像を扱えない。
+- 先行 PoC ([image-describer-poc](../image-describer-poc-verification.md)) では Copilot から `run_in_terminal` 経由で CLI を呼び、CLI が外部 Gemini API に画像を送って Markdown を得る構成を採った。これは画像データが社外に出るため、governance 観点では暫定策にすぎない。
+- 隔離端末上のローカル LLM が画像認識をどこまで実用レベルでこなせるかが分かれば、データを社外に出さずに同種のユースケースを成立させる道筋が見えてくる。
+
+### 本プロジェクトの位置付け
+
+- **調査対象:** 隔離端末（Splashtop 経由でアクセス、Windows mini PC、CPU + iGPU のみ、外部通信なし前提）上で動かすローカル LLM の **画像認識能力**。
+- **比較ベースライン:** 既存の Gemini API 経由 image-describer PoC の出力を「事実上の上限」として参照。ローカル LLM がどこまで近づけるかを測る基準にする（即時に置き換えるかどうかを判定するためではなく、capability gap を把握するため）。
+- **アクセス経路:** Splashtop は「隔離端末に入るための手段」であり、置き換え対象ではない。
 
 詳細な背景・命題・スコープは [設計書（design spec）](../../superpowers/specs/2026-04-15-local-llm-appliance-design.md) を参照。
 
