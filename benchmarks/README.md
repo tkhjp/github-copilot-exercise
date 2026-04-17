@@ -17,28 +17,32 @@ Measures local LLM host candidates under three scenarios:
 S1 text-only:
 
     python -m benchmarks.harness --tool ollama \
-        --model qwen2.5-vl:7b \
+        --model gemma4-e4b-bench \
         --base-url http://127.0.0.1:11434/v1 \
         --scenario s1 --n-runs 3
 
 S2 vision-single:
 
     python -m benchmarks.harness --tool ollama \
-        --model qwen2.5-vl:7b \
+        --model gemma4-e4b-bench \
         --base-url http://127.0.0.1:11434/v1 \
         --scenario s2 --image samples/diagram.png --n-runs 3
 
 S3 vision-pptx-batch (images exported from a pptx or any directory of .png/.jpg):
 
     python -m benchmarks.harness --tool ollama \
-        --model qwen2.5-vl:7b \
+        --model gemma4-e4b-bench \
         --base-url http://127.0.0.1:11434/v1 \
-        --scenario s3 --pptx-dir samples/pptx_images
+        --scenario s3 --pptx-dir tests/text_vs_image/images
 
 **Note:** `--n-runs` is ignored for scenario `s3` — the batch runs each image in
 `--pptx-dir` exactly once. If you want multiple passes, invoke the harness
 multiple times or duplicate images in the directory. A warning is printed to
 stderr if `--n-runs` is passed with a non-default value for s3.
+
+For the Phase 3 shortlist run in this repo, `tests/text_vs_image/images/` is the
+fixed S3 batch directory. Do not replace it with a different image set when
+comparing shortlist hosts.
 
 ## Output
 

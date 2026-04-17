@@ -41,14 +41,46 @@ Each candidate's `start.ps1` (created in Phase 3) is responsible for
 enforcing the above. The dev-rig-to-target benchmark comparison is only
 valid if every candidate is actually capped at 14 threads.
 
-## Tools (populated during Phase 1)
+## Tools
 
-The following subdirectories will be created during Phase 1/3 shortlist work,
-each with a `start.ps1` launch script and a `notes.md` with install/version details:
+The shortlist directories now live under `candidates/`:
 
 - `ollama/` — Ollama on Windows native
-- `llama-cpp/` — llama.cpp (Windows native, already compiled locally)
-- `lm-studio/` — LM Studio (GUI; document server-mode startup)
+- `llama-cpp/` — llama.cpp (`llama-server`) on Windows native
+- `lm-studio/` — LM Studio / `lms` / `llmster`
+
+Each candidate directory contains:
+
+- `notes.md` — pinned version, install source URL, model/import notes, service path
+- `start.ps1` — CPU-only startup wrapper that sets `LLM_BASE_URL` and `LLM_MODEL`
+
+## Phase 3 benchmark conventions
+
+The common benchmark target is **Gemma 4 E4B (`Q4_K_M` equivalent, ~5 GB)**.
+Chosen because (a) vision is native, (b) the ~5 GB footprint fits comfortably
+on the target mini PC's 32 GB RAM, and (c) Google positions E4B as the
+"developer laptop" tier, which matches our dev-rig-to-target extrapolation.
+To keep Phase 3 comparable, do not swap in a different model family per tool.
+
+Recommended model identifiers:
+
+- Ollama: base model `gemma4:e4b`; benchmark alias `gemma4-e4b-bench`
+  (custom Modelfile with `PARAMETER num_thread 14`)
+- llama.cpp: GGUF file `gemma-4-E4B-it-Q4_K_M.gguf` (from
+  `unsloth/gemma-4-E4B-it-GGUF` on Hugging Face) + the matching
+  `mmproj-*.gguf` for the vision encoder
+- LM Studio: loaded identifier `gemma4-e4b-bench` (import the GGUF
+  from the Hub or a local path; set CPU threads = 14 in Server settings)
+
+Phase 3 inputs are fixed:
+
+- S1: text-only (`benchmarks/scenarios/s1_text_only.py`)
+- S2: `samples/diagram.png`
+- S3: `tests/text_vs_image/images/`
+
+Phase 4 varies only the **quantization** of Gemma 4 E4B (`Q4_K_M`, `Q5_K_M`,
+`Q8_0`, and optionally `FP16`/`BF16`) on the Phase 3 winning host. No other
+model family is introduced.
 
 ## Endpoint contract
 
