@@ -1,37 +1,94 @@
-# Target Mini PC Validation
+# Target Mini PC 検証（Phase 6）
 
-**Status:** Pending execution  
-**Phase:** 6  
-**Date:** _(fill in)_  
-**Executor:** _(fill in)_  
+**ステータス:** 未着手
+**Phase:** 6
+**日付:** _(記入)_
+**実施者:** _(記入)_
 
-## Target configuration
+---
 
-- Host winner from Phase 3:
-- First-choice model from Phase 4:
-- Mini PC hardware:
-- OS:
-- Endpoint URL:
+## 1. 結論
 
-## Validation runs
+> このセクションは Phase 6 完了後に**最初に**埋める。読者がここだけ読めば判定が分かる構成にする。
 
-| Run | Scenario | Status | TTFT | tok/s | end-to-end | Notes |
+| 項目 | 内容 |
+|---|---|
+| **判定** | `使用可能` / `限界的` / `不可` のいずれか — _(記入)_ |
+| **使用ホスト** | LM Studio（Phase 3 勝者） |
+| **使用モデル** | Gemma 4 E4B Q4_K_M（Phase 4 第一候補） |
+| **dev rig 比のスループット劣化倍率** | _(記入)_ × |
+| **Phase 7 への含意** | _(記入: 採用推奨／量子化を Q3 に下げる検討／別 vision モデル検討／配備見送り、など)_ |
+
+### 判定基準（事前合意）
+
+- **使用可能:** dev rig CPU-only baseline との差が 2x 以内かつ全シナリオ完走
+- **限界的:** 差が 2x を超えるが完走、用途を絞れば実用域
+- **不可:** 完走しない（timeout / OOM 等）— backup の Q5_K_M で再判定 or 別バリアントへの切替検討
+
+### 主要な発見（記入）
+
+- _(記入: 例「S3 1 画像あたり 280 秒、dev rig 比 3.4x の劣化、limit 設定で完走」)_
+- _(記入: 例「mmproj による vision encoder のオーバーヘッドが想定より大きい」)_
+
+---
+
+## 2. Target 構成
+
+| 項目 | 値 |
+|---|---|
+| Mini PC ハードウェア | i5-14500T / 32 GB RAM / iGPU only（UHD 770） |
+| OS | Windows 11 Pro 24H2 |
+| ホスト | LM Studio v_(記入)_ |
+| モデル ID | `gemma-4-e4b-it@q4_k_m` |
+| ロード alias | `gemma4-e4b-bench` |
+| エンドポイント URL | `http://_(記入)_:1234/v1` |
+| 接続経路（dev rig 検証時） | _(記入: localhost / LAN / VPN)_ |
+
+---
+
+## 3. 実測結果
+
+### 3.1 Validation runs
+
+| Run | Scenario | 状態 | TTFT | tok/s | end-to-end | 備考 |
 |---|---|---|---|---|---|---|
-| 1 | S2 | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
-| 2 | S3 | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
-| 3 | `describe_image.py` end-to-end | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
+| 1 | S2（`samples/diagram.png`） | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ |
+| 2 | S3（4 画像） | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ |
+| 3 | `describe_image.py` end-to-end（dev rig → mini PC） | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ | _(記入)_ |
 
-## Dev-rig CPU-only baseline comparison
+### 3.2 Dev-rig CPU-only baseline 比較
 
-| Metric | Dev rig CPU-only | Mini PC | Delta | Within 2x? |
+| 指標 | Dev rig CPU-only（Phase 4 Q4） | Mini PC | Delta（倍率） | 2x 以内？ |
 |---|---|---|---|---|
-| S2 TTFT | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
-| S2 tok/s | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
-| S3 tok/s | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
-| S3 end-to-end | _(pending)_ | _(pending)_ | _(pending)_ | _(pending)_ |
+| S2 wall (s) | 46.8 | _(記入)_ | _(記入)_ × | _(記入)_ |
+| S2 tok/s | 14.8 | _(記入)_ | _(記入)_ × | _(記入)_ |
+| S3 wall/画像 (s) | 81.9 | _(記入)_ | _(記入)_ × | _(記入)_ |
+| S3 tok/s | 14.6 | _(記入)_ | _(記入)_ × | _(記入)_ |
 
-## Conclusion
+---
 
-- **Classification:** `使用可能 / 限界的 / 不可`
-- **Reason:** _(fill in)_
-- **If downgraded from the dev-rig conclusion, why:** _(fill in)_
+## 4. 詳細所見
+
+_(記入: dev rig 比で速度劣化があった場合、その由来の推測 — Intel AMX サポート差、メモリ帯域差、iGPU 使用の有無、プロセス競合 など)_
+
+### dev rig CPU-only モード模擬の妥当性
+
+_(記入: 模擬構成と実機の挙動がどれくらい一致したか／差があったとすればその原因、今後の dev rig 模擬精度を上げるための示唆)_
+
+### 想定外の事象
+
+_(記入: timeout 設定、OOM、サービス再起動、その他)_
+
+---
+
+## 5. 結論を Phase 7 に渡すための要約
+
+_(記入: 1 段落、最終統合レポートの「target 機検証」セクションにそのまま埋め込める形で)_
+
+---
+
+## 6. 生データ
+
+_(Phase 6 完了後にリンク)_
+
+- `benchmarks/out/phase6/` 配下の CSV/MD
