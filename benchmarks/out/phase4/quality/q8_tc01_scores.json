@@ -1,0 +1,130 @@
+{
+  "case_id": "tc01",
+  "quant": "q8",
+  "model": "gemma4-e4b-q8",
+  "describe_seconds": 44.22967780000181,
+  "n_facts": 24,
+  "score_avg": 0.7083333333333334,
+  "facts": [
+    {
+      "id": "f01",
+      "text": "タイトルは '2026 Q1 Operations Overview'",
+      "verdict": "missing"
+    },
+    {
+      "id": "f02",
+      "text": "サブタイトルは 'Revenue, Fulfillment, and Metrics'",
+      "verdict": "missing"
+    },
+    {
+      "id": "f03",
+      "text": "フローチャートのセクション見出しは 'Order Flow'",
+      "verdict": "present"
+    },
+    {
+      "id": "f04",
+      "text": "フローは 3 ステップ (Receive Order → Validate Payment → Ship Product)",
+      "verdict": "present"
+    },
+    {
+      "id": "f05",
+      "text": "フローの矢印は左→右の単方向",
+      "verdict": "present"
+    },
+    {
+      "id": "f06",
+      "text": "棒グラフのセクション見出しは 'Monthly Revenue (MJPY)'",
+      "verdict": "present"
+    },
+    {
+      "id": "f07",
+      "text": "Jan の値は 120",
+      "verdict": "present"
+    },
+    {
+      "id": "f08",
+      "text": "Feb の値は 85",
+      "verdict": "present"
+    },
+    {
+      "id": "f09",
+      "text": "Mar の値は 160",
+      "verdict": "present"
+    },
+    {
+      "id": "f10",
+      "text": "Apr の値は 140",
+      "verdict": "present"
+    },
+    {
+      "id": "f11",
+      "text": "Mar の棒だけ色が異なる (オレンジ系)",
+      "verdict": "missing"
+    },
+    {
+      "id": "f12",
+      "text": "テーブルのセクション見出しは 'Regional Sales (MJPY)'",
+      "verdict": "present"
+    },
+    {
+      "id": "f13",
+      "text": "テーブルは 5 列 (Region, Jan, Feb, Mar, Total)",
+      "verdict": "missing"
+    },
+    {
+      "id": "f14",
+      "text": "テーブルは 4 行 (Tokyo, Osaka, Nagoya, Fukuoka)",
+      "verdict": "missing"
+    },
+    {
+      "id": "f15",
+      "text": "Tokyo の Mar の値は 160",
+      "verdict": "present"
+    },
+    {
+      "id": "f16",
+      "text": "Tokyo の Total の値は 365",
+      "verdict": "present"
+    },
+    {
+      "id": "f17",
+      "text": "Fukuoka の Total の値は 150",
+      "verdict": "missing"
+    },
+    {
+      "id": "f18",
+      "text": "コードのファイル名は 'quarterly_total.py'",
+      "verdict": "present"
+    },
+    {
+      "id": "f19",
+      "text": "関数名は 'quarterly_total'",
+      "verdict": "present"
+    },
+    {
+      "id": "f20",
+      "text": "引数は 'region: str'",
+      "verdict": "present"
+    },
+    {
+      "id": "f21",
+      "text": "戻り値型注釈は '-> int'",
+      "verdict": "present"
+    },
+    {
+      "id": "f22",
+      "text": "コードは 'data = SALES[region]' を含む",
+      "verdict": "missing"
+    },
+    {
+      "id": "f23",
+      "text": "フッター注釈に 'Q1 total revenue: 975 million JPY' と記載",
+      "verdict": "present"
+    },
+    {
+      "id": "f24",
+      "text": "フッター注釈に 'Mar was the strongest month' と記載",
+      "verdict": "present"
+    }
+  ]
+}

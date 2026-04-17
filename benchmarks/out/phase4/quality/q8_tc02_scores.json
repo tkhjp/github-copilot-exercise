@@ -1,0 +1,110 @@
+{
+  "case_id": "tc02",
+  "quant": "q8",
+  "model": "gemma4-e4b-q8",
+  "describe_seconds": 62.81947390000278,
+  "n_facts": 20,
+  "score_avg": 0.45,
+  "facts": [
+    {
+      "id": "f01",
+      "text": "ドキュメントタイトルは 'UI Change Request — ShopApp Product Search'",
+      "verdict": "missing"
+    },
+    {
+      "id": "f02",
+      "text": "アプリ名は 'ShopApp'",
+      "verdict": "missing"
+    },
+    {
+      "id": "f03",
+      "text": "画面の右上に 'Login' ボタンがある",
+      "verdict": "missing"
+    },
+    {
+      "id": "f04",
+      "text": "検索バー (text input) が存在する",
+      "verdict": "present"
+    },
+    {
+      "id": "f05",
+      "text": "'Search' ボタンがあり、現在は青色",
+      "verdict": "present"
+    },
+    {
+      "id": "f06",
+      "text": "サイドバーにフィルター (Filters) セクションがある",
+      "verdict": "missing"
+    },
+    {
+      "id": "f07",
+      "text": "カテゴリチェックボックスは 3 つ (Electronics, Books, Clothing)",
+      "verdict": "missing"
+    },
+    {
+      "id": "f08",
+      "text": "価格レンジスライダーがある (¥0 - ¥50,000)",
+      "verdict": "missing"
+    },
+    {
+      "id": "f09",
+      "text": "結果テーブルの列は Product, Price, Stock の 3 列",
+      "verdict": "present"
+    },
+    {
+      "id": "f10",
+      "text": "結果テーブルには少なくとも 3 行のデータがある",
+      "verdict": "present"
+    },
+    {
+      "id": "f11",
+      "text": "ページネーション (< 1 2 3 >) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f12",
+      "text": "変更要求 1: 'Remember last search' チェックボックスを検索バー近くに追加",
+      "verdict": "present"
+    },
+    {
+      "id": "f13",
+      "text": "変更要求 2: Search ボタンの色を青から緑に変更",
+      "verdict": "present"
+    },
+    {
+      "id": "f14",
+      "text": "変更要求 3: 結果テーブルの右上に CSV エクスポートボタンを追加",
+      "verdict": "present"
+    },
+    {
+      "id": "f15",
+      "text": "変更要求 4: 1 ページあたり 20 件表示に変更",
+      "verdict": "present"
+    },
+    {
+      "id": "f16",
+      "text": "変更要求 1 の吹き出しは検索バー領域を指している",
+      "verdict": "missing"
+    },
+    {
+      "id": "f17",
+      "text": "変更要求 2 の吹き出しは Search ボタンを指している",
+      "verdict": "missing"
+    },
+    {
+      "id": "f18",
+      "text": "変更要求 3 の吹き出しは結果テーブルを指している",
+      "verdict": "missing"
+    },
+    {
+      "id": "f19",
+      "text": "変更要求 4 の吹き出しはページネーション領域を指している",
+      "verdict": "missing"
+    },
+    {
+      "id": "f20",
+      "text": "凡例に 'Red = change request, Gray = existing UI' と記載",
+      "verdict": "missing"
+    }
+  ]
+}

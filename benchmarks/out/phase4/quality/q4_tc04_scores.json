@@ -1,0 +1,120 @@
+{
+  "case_id": "tc04",
+  "quant": "q4",
+  "model": "gemma4-e4b-q4",
+  "describe_seconds": 39.20054279999749,
+  "n_facts": 22,
+  "score_avg": 0.9545454545454546,
+  "facts": [
+    {
+      "id": "f01",
+      "text": "ヘッダーに 'ACME Corp.' と記載",
+      "verdict": "present"
+    },
+    {
+      "id": "f02",
+      "text": "ヘッダーに 'Confidential — Draft v2.1' と記載",
+      "verdict": "present"
+    },
+    {
+      "id": "f03",
+      "text": "タイトルは 'System Requirements Specification'",
+      "verdict": "present"
+    },
+    {
+      "id": "f04",
+      "text": "サブタイトルは 'Chapter 3: Non-Functional Requirements'",
+      "verdict": "present"
+    },
+    {
+      "id": "f05",
+      "text": "本文に 'ShopApp e-commerce platform' への言及がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f06",
+      "text": "本文に 'AWS ap-northeast-1' への言及がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f07",
+      "text": "本文に 'GA release scheduled for 2026-Q3' への言及がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f08",
+      "text": "セクション 3.1 は 'Performance Requirements'",
+      "verdict": "present"
+    },
+    {
+      "id": "f09",
+      "text": "API response time (p95) は <= 200 ms",
+      "verdict": "partial"
+    },
+    {
+      "id": "f10",
+      "text": "API response time (p99) は <= 500 ms",
+      "verdict": "partial"
+    },
+    {
+      "id": "f11",
+      "text": "Search query throughput は >= 500 requests/sec",
+      "verdict": "present"
+    },
+    {
+      "id": "f12",
+      "text": "Database query timeout は 3 seconds (hard limit)",
+      "verdict": "present"
+    },
+    {
+      "id": "f13",
+      "text": "Page load time (LCP) は <= 1.5 seconds on 4G network",
+      "verdict": "present"
+    },
+    {
+      "id": "f14",
+      "text": "Batch processing (nightly) は complete within 2 hours",
+      "verdict": "present"
+    },
+    {
+      "id": "f15",
+      "text": "セクション 3.2 は 'Availability & Reliability'",
+      "verdict": "present"
+    },
+    {
+      "id": "f16",
+      "text": "テーブルに Monthly uptime >= 99.9% (Priority: Must) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f17",
+      "text": "テーブルに RTO <= 15 minutes (Priority: Must) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f18",
+      "text": "テーブルに RPO <= 5 minutes (Priority: Must) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f19",
+      "text": "テーブルに Failover (AZ-level) = Automatic (Priority: Should) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f20",
+      "text": "テーブルに Data backup retention = 90 days (Priority: Must) がある",
+      "verdict": "present"
+    },
+    {
+      "id": "f21",
+      "text": "フッターに 'Page 12' と記載",
+      "verdict": "present"
+    },
+    {
+      "id": "f22",
+      "text": "フッターに 'Last updated: 2026-03-15' と記載",
+      "verdict": "present"
+    }
+  ]
+}

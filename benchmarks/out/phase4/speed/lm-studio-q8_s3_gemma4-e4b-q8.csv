@@ -1,0 +1,5 @@
+scenario,tool,model,wall_seconds,prompt_tokens,completion_tokens,completion_tok_per_sec,ttft_seconds,rss_peak_mb,cpu_percent_avg,ok,error
+s3,lm-studio-q8,gemma4-e4b-q8,122.23975609999616,317,1139,9.3178,0.0,0.0,0.0,True,
+s3,lm-studio-q8,gemma4-e4b-q8,113.58901979999791,311,1062,9.3495,0.0,0.0,0.0,True,
+s3,lm-studio-q8,gemma4-e4b-q8,138.66534449999745,311,1290,9.3030,0.0,0.0,0.0,True,
+s3,lm-studio-q8,gemma4-e4b-q8,105.68987390000257,317,988,9.3481,0.0,0.0,0.0,True,

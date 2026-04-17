@@ -1,0 +1,37 @@
+{
+  "quant": "q5",
+  "model": "gemma4-e4b-q5",
+  "judge_model": "gemini-2.5-flash",
+  "cases": [
+    {
+      "case_id": "tc01",
+      "quant": "q5",
+      "n_facts": 24,
+      "score_avg": 0.6666666666666666,
+      "describe_seconds": 27.256401499995263
+    },
+    {
+      "case_id": "tc02",
+      "quant": "q5",
+      "n_facts": 20,
+      "score_avg": 0.55,
+      "describe_seconds": 51.02465259999735
+    },
+    {
+      "case_id": "tc03",
+      "quant": "q5",
+      "n_facts": 26,
+      "score_avg": 0.6730769230769231,
+      "describe_seconds": 134.23138860000472
+    },
+    {
+      "case_id": "tc04",
+      "quant": "q5",
+      "n_facts": 22,
+      "score_avg": 1.0,
+      "describe_seconds": 40.942711199997575
+    }
+  ],
+  "avg_score": 0.7224358974358974,
+  "avg_describe_seconds": 63.36378847499873
+}
