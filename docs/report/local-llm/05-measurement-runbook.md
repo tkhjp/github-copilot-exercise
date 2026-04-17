@@ -486,47 +486,45 @@ lms server stop
 3. 性能差が 20% 以内なら運用性を優先する
 4. fastest でも運用上の致命傷がある host は採用しない
 
-## 6. Phase 4 — quantization sweep
+## 6. Phase 4 — 量子化 sweep
 
-プロジェクトのスコープは 1 つのモデルファミリー（**Gemma 4 E4B**）に固定されています。
-Phase 4 は異なるモデルファミリーではなく、その 1 モデルの **quantization variant** を
-比較します。目的は target mini PC にとっての「品質と速度のスイートスポット」特定です。
+本プロジェクトのスコープは 1 つのモデルファミリー（**Gemma 4 E4B**）に固定されています。したがって Phase 4 は異なるモデル同士を比べるのではなく、その 1 モデルの量子化バリアントを比較する構成です。目的は target mini PC にとっての「品質と速度のスイートスポット」を特定することです。
 
-### 6.1 Phase 4 固定条件
+### 6.1 Phase 4 の固定条件
 
-- host: Phase 3 winner のみ
-- model family: **Gemma 4 E4B**（固定）
-- quantization pool:
-  - `Q4_K_M`（~5 GB、Phase 3 baseline）
-  - `Q5_K_M`（~6 GB）
-  - `Q8_0`（~8 GB）
-  - `FP16` / `BF16`（~15 GB、任意、RAM 余裕があるときのみ）
-- speed inputs:
+- ホスト: Phase 3 の勝者のみ
+- モデルファミリー: **Gemma 4 E4B**（固定）
+- 量子化プール:
+  - `Q4_K_M`（約 5 GB、Phase 3 baseline）
+  - `Q5_K_M`（約 6 GB）
+  - `Q8_0`（約 8 GB）
+  - `FP16` / `BF16`（約 15 GB、RAM に余裕があるときのみ、任意）
+- 速度入力:
   - S2: `samples/diagram.png`
   - S3: `tests/text_vs_image/images/`
-- quality cases:
+- 品質テストケース:
   - `tc01`
   - `tc02`
   - `tc03`
   - `tc04`
-- score rule:
+- スコアリング規則:
   - `present = 1`
   - `partial = 0.5`
   - `missing = 0`
 
-### 6.2 host identifier を先に確定する
+### 6.2 ホスト側 identifier を先に確定する
 
-[03-model-selection.md](/mnt/d/Work/github-copilot-exercise/docs/report/local-llm/03-model-selection.md) の `Host identifier` 列を**先に**埋めます。
+[03-model-selection.md](/mnt/d/Work/github-copilot-exercise/docs/report/local-llm/03-model-selection.md) の `Host identifier` 列を**最初に**埋めます。
 
-この列には、その host で実際に benchmark に渡す `--model` 値を quantization ごとに入れます。
+この列には、対象ホスト上で benchmark コマンドに渡す `--model` の値を量子化ごとに記入します。
 
 例:
 
-- Ollama: 各 quant 用に別 Modelfile + alias（例: `gemma4-e4b-q4km-bench`, `gemma4-e4b-q5km-bench`, `gemma4-e4b-q8-bench`）
-- llama.cpp: 各 quantization の GGUF ファイルを別 path で保存し、そのファイル名を identifier に使う
-- LM Studio: `lms load --identifier` で quantization ごとに別 ID を付ける
+- Ollama: 量子化ごとに別 Modelfile と alias を作成（例: `gemma4-e4b-q4km-bench`、`gemma4-e4b-q5km-bench`、`gemma4-e4b-q8-bench`）
+- llama.cpp: 量子化ごとの GGUF を別 path に置き、そのファイル名を identifier として使う
+- LM Studio: `lms load --identifier` で量子化ごとに別 ID を付ける
 
-**ここで使う identifier は、この後の speed / quality の全コマンドで固定**します。
+**ここで決めた identifier は、以降の速度／品質の全コマンドで固定**します。
 
 ### 6.3 speed benchmark
 
