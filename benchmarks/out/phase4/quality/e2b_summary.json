@@ -1,0 +1,37 @@
+{
+  "quant": "e2b",
+  "model": "gemma-4-e2b-it",
+  "judge_model": "gemini-2.5-flash",
+  "cases": [
+    {
+      "case_id": "tc01",
+      "quant": "e2b",
+      "n_facts": 24,
+      "score_avg": 0.6458333333333334,
+      "describe_seconds": 14.347032699995907
+    },
+    {
+      "case_id": "tc02",
+      "quant": "e2b",
+      "n_facts": 20,
+      "score_avg": 0.75,
+      "describe_seconds": 17.672802600005525
+    },
+    {
+      "case_id": "tc03",
+      "quant": "e2b",
+      "n_facts": 26,
+      "score_avg": 0.5769230769230769,
+      "describe_seconds": 44.81505179999658
+    },
+    {
+      "case_id": "tc04",
+      "quant": "e2b",
+      "n_facts": 22,
+      "score_avg": 0.8636363636363636,
+      "describe_seconds": 17.71755149999808
+    }
+  ],
+  "avg_score": 0.7090981934731935,
+  "avg_describe_seconds": 23.638109649999024
+}

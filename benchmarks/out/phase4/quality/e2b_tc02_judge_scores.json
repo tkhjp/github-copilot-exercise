@@ -1,0 +1,114 @@
+{
+  "case_id": "tc02_judge",
+  "quant": "e2b",
+  "model": "gemma-4-e2b-it",
+  "test_type": "judgment",
+  "n_runs": 3,
+  "describe_seconds": 45.89117983333563,
+  "n_facts": 7,
+  "score_avg": 0.7380952380952381,
+  "score_std": 0.1486904285332952,
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.5714285714285714,
+      "describe_seconds": 46.46322369999689
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8571428571428571,
+      "describe_seconds": 44.646392500006186
+    },
+    {
+      "run": 3,
+      "score_avg": 0.7857142857142857,
+      "describe_seconds": 46.56392330000381
+    }
+  ],
+  "facts": [
+    {
+      "id": "j01",
+      "text": "変更 1 (Remember last search): 工数は Small or Medium",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j02",
+      "text": "変更 2 (ボタン色変更): 工数は Small",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j03",
+      "text": "変更 3 (CSV エクスポート): 工数は Medium or Large",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j04",
+      "text": "変更 4 (20 件表示): 工数は Small",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "j05",
+      "text": "変更 3 はバックエンド変更が必要",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j06",
+      "text": "技術リスク最高は変更 3 (CSV エクスポート)",
+      "verdict": "present",
+      "verdicts": [
+        "missing",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.3333333333333333
+    },
+    {
+      "id": "j07",
+      "text": "4 つの変更は基本的に並列実装可能",
+      "verdict": "present",
+      "verdicts": [
+        "missing",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    }
+  ]
+}

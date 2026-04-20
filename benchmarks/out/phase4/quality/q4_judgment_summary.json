@@ -1,0 +1,32 @@
+{
+  "quant": "q4",
+  "model": "gemma-4-e4b-it@q4_k_m",
+  "judge_model": "gemini-2.5-flash",
+  "test_type": "judgment",
+  "n_runs": 3,
+  "cases": [
+    {
+      "case_id": "tc02_judge",
+      "quant": "q4",
+      "test_type": "judgment",
+      "n_facts": 7,
+      "n_runs": 3,
+      "score_avg": 0.7380952380952381,
+      "score_std": 0.10910894511799614,
+      "describe_seconds": 87.86386339999929
+    },
+    {
+      "case_id": "tc03_judge",
+      "quant": "q4",
+      "test_type": "judgment",
+      "n_facts": 9,
+      "n_runs": 3,
+      "score_avg": 0.5,
+      "score_std": 0.05555555555555558,
+      "describe_seconds": 47.96056836666685
+    }
+  ],
+  "avg_score": 0.6190476190476191,
+  "avg_score_std": 0.08233225033677585,
+  "avg_describe_seconds": 67.91221588333306
+}

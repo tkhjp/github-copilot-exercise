@@ -1,0 +1,32 @@
+{
+  "quant": "q8",
+  "model": "gemma-4-e4b-it@q8_0",
+  "judge_model": "gemini-2.5-flash",
+  "test_type": "judgment",
+  "n_runs": 3,
+  "cases": [
+    {
+      "case_id": "tc02_judge",
+      "quant": "q8",
+      "test_type": "judgment",
+      "n_facts": 7,
+      "n_runs": 3,
+      "score_avg": 0.7857142857142857,
+      "score_std": 0.12371791482634832,
+      "describe_seconds": 139.02658636666698
+    },
+    {
+      "case_id": "tc03_judge",
+      "quant": "q8",
+      "test_type": "judgment",
+      "n_facts": 9,
+      "n_runs": 3,
+      "score_avg": 0.5370370370370371,
+      "score_std": 0.08486251286955263,
+      "describe_seconds": 87.25636206666483
+    }
+  ],
+  "avg_score": 0.6613756613756614,
+  "avg_score_std": 0.10429021384795048,
+  "avg_describe_seconds": 113.1414742166659
+}

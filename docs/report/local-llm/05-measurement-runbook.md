@@ -488,17 +488,18 @@ lms server stop
 
 ## 6. Phase 4 — 量子化 sweep
 
-本プロジェクトのスコープは 1 つのモデルファミリー（**Gemma 4 E4B**）に固定されています。したがって Phase 4 は異なるモデル同士を比べるのではなく、その 1 モデルの量子化バリアントを比較する構成です。目的は target mini PC にとっての「品質と速度のスイートスポット」を特定することです。
+本プロジェクトのスコープは Gemma 4 ファミリーに固定されています。初版（2026-04-17）は **Gemma 4 E4B** の量子化 3 点（Q4_K_M / Q5_K_M / Q8_0）を比較する設計で、2026-04-20 に **Gemma 4 E2B** Q4_K_S を同じシナリオで追加計測しました。したがって Phase 4 は「量子化バリアント比較」＋「モデルサイズバリアント比較」の 2 軸構成です。目的は target mini PC にとっての「品質と速度のスイートスポット」を特定することです。
 
 ### 6.1 Phase 4 の固定条件
 
 - ホスト: Phase 3 の勝者のみ
-- モデルファミリー: **Gemma 4 E4B**（固定）
-- 量子化プール:
-  - `Q4_K_M`（約 5 GB、Phase 3 baseline）
-  - `Q5_K_M`（約 6 GB）
-  - `Q8_0`（約 8 GB）
-  - `FP16` / `BF16`（約 15 GB、RAM に余裕があるときのみ、任意）
+- モデルファミリー: **Gemma 4**（固定）
+- 候補プール:
+  - **Gemma 4 E2B Q4_K_S**（約 3 GB、unsloth/gemma-4-E2B-it-GGUF、2026-04-20 追加）
+  - Gemma 4 E4B `Q4_K_M`（約 5 GB、Phase 3 baseline）
+  - Gemma 4 E4B `Q5_K_M`（約 6 GB）
+  - Gemma 4 E4B `Q8_0`（約 8 GB）
+  - Gemma 4 E4B `FP16` / `BF16`（約 15 GB、RAM に余裕があるときのみ、任意）
 - 速度入力:
   - S2: `samples/diagram.png`
   - S3: `tests/text_vs_image/images/`
@@ -523,6 +524,7 @@ lms server stop
 - Ollama: 量子化ごとに別 Modelfile と alias を作成（例: `gemma4-e4b-q4km-bench`、`gemma4-e4b-q5km-bench`、`gemma4-e4b-q8-bench`）
 - llama.cpp: 量子化ごとの GGUF を別 path に置き、そのファイル名を identifier として使う
 - LM Studio: `lms load --identifier` で量子化ごとに別 ID を付ける
+- **Gemma 4 E2B 追加分:** unsloth の HF URL から `lms get https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF --gguf -y` でダウンロードし、`lms load gemma-4-e2b-it --gpu off` で CPU-only ロード。model ID は `gemma-4-e2b-it`
 
 **ここで決めた identifier は、以降の速度／品質の全コマンドで固定**します。
 
@@ -592,25 +594,76 @@ py -3.13 tools/describe_image.py tests/text_vs_image/images/04_text_document.png
   | Tee-Object -FilePath benchmarks/out/phase4/quality/<MODEL_ID>__tc04.md
 ```
 
-### 6.5 manual scoring
+### 6.5 quality scoring（LLM judge + 人手クロスチェック）
 
-truth source は [tests/text_vs_image/test_cases.yaml](/mnt/d/Work/github-copilot-exercise/tests/text_vs_image/test_cases.yaml) の `ground_truth_facts` です。
+truth source は [tests/text_vs_image/test_cases.yaml](/mnt/d/Work/github-copilot-exercise/tests/text_vs_image/test_cases.yaml) の `ground_truth_facts` です。スコア付けは 2 経路で行います。
 
-各 case について:
+#### (a) LLM judge で一次スコアを自動生成
 
-1. `test_cases.yaml` を開く
-2. 対応する `ground_truth_facts` を 1 行ずつ読む
-3. `benchmarks/out/phase4/quality/<MODEL_ID>__tcXX.md` と照合する
-4. 各 fact に対して以下を付ける
-   - `present`
-   - `partial`
-   - `missing`
-5. 数値化する
-   - `present = 1`
-   - `partial = 0.5`
-   - `missing = 0`
-6. `sum(score) / fact_count` を case score とする
-7. `tc01`〜`tc04` の平均を model average とする
+抽出テスト（`tc01`〜`tc04`）:
+
+```powershell
+py -3.13 tests/text_vs_image/phase4_quality_eval.py `
+  --base-url <WINNER_BASE_URL> `
+  --quant-label <LABEL> `
+  --llm-model <MODEL_ID> `
+  --out-dir benchmarks/out/phase4/quality
+```
+
+判断テスト（`tc02_judge` / `tc03_judge`）を別途走らせる:
+
+```powershell
+py -3.13 tests/text_vs_image/phase4_quality_eval.py `
+  --base-url <WINNER_BASE_URL> `
+  --quant-label <LABEL> `
+  --llm-model <MODEL_ID> `
+  --out-dir benchmarks/out/phase4/quality `
+  --case-ids tc02_judge tc03_judge
+```
+
+**マルチラン（stochastic ノイズの分離）:** judgment は describe 側 / judge 側の両方で単発スコアが振れやすい。同じコマンドに `--n-runs N` を付けると、各 case を N 回独立に describe+judge し、`{quant}_{tc}_run{k}_description.md` + `{quant}_{tc}_run{k}_scores.json` を per-run で残しつつ、`{quant}_{tc}_scores.json` に mean/std と per-fact agreement を集約する。Phase 4 判断テストは `--n-runs 3` で採取するのを現状の推奨とする（実績: E2B の std が最大で ±0.144、n=1 スコアと n=3 平均で 0.14 ずれるケースあり）。
+
+```powershell
+py -3.13 tests/text_vs_image/phase4_quality_eval.py `
+  --base-url <WINNER_BASE_URL> `
+  --quant-label <LABEL> `
+  --llm-model <MODEL_ID> `
+  --out-dir benchmarks/out/phase4/quality `
+  --case-ids tc02_judge tc03_judge `
+  --n-runs 3
+```
+
+`<LABEL>` はレポート／集計で使うキー（例: `q4`、`q5`、`q8`、`e2b`）。スクリプトは指定ケースの describe を実行し、Gemini 2.5 Flash が各 item（fact または reasoning point）を present/partial/missing で判定、`{LABEL}_{tcNN}_description.md` + `{LABEL}_{tcNN}_scores.json` を書き出します。サマリは test_type ごとに分離して出力: 抽出は `{LABEL}_summary.json`、判断は `{LABEL}_judgment_summary.json`。
+
+#### (b) 人手クロスチェック UI
+
+LLM judge に単一依存しないため、静的 HTML UI を経由した人手 verdict も並列で取ります。
+
+```powershell
+py -3.13 tests/text_vs_image/generate_human_eval_ui.py
+# → tests/text_vs_image/human_eval.html が生成される
+```
+
+ブラウザで開くと（全 quant × tc が 1 ファイル内に埋め込まれた状態で）画像・モデル出力・ground truth facts・LLM verdict が並列表示される。各 fact を `present / partial / missing` の 3 択でクリック → localStorage に自動保存 → 画面下の `Export JSON` で `human_scores.json` をダウンロード。
+
+集計:
+
+```powershell
+py -3.13 tests/text_vs_image/import_human_scores.py `
+  --scores-json <DOWNLOADS_DIR>\human_scores.json `
+  --quality-dir benchmarks/out/phase4/quality
+```
+
+これにより `{LABEL}_{tcNN}_human_scores.json` と `{LABEL}_human_summary.json` が書き出され、同一テーブルに LLM avg／人手 avg／差分 Δ が出力されます。Δ が 0.05 を超える fact には judge 固有の偏りが疑われるので、該当 case 周辺の prompt / scoring ルールを要レビュー。
+
+#### 数値化ルール（LLM judge、人手とも共通）
+
+- `present = 1`
+- `partial = 0.5`
+- `missing = 0`
+- `sum(score) / fact_count` を case score、`tc01`〜`tc04` の平均を model average とする
+
+最低限の基準線として LLM judge の `_summary.json` を先に得て Phase 4 を回せ、人手 UI は LLM 判定の事後チェックとして回してください。
 
 ### 6.6 model selection の決め方
 

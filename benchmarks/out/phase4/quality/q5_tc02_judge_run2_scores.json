@@ -1,0 +1,47 @@
+{
+  "case_id": "tc02_judge",
+  "quant": "q5",
+  "model": "gemma-4-e4b-it@q5_k_m",
+  "test_type": "judgment",
+  "run": 2,
+  "describe_seconds": 100.85923799999728,
+  "n_facts": 7,
+  "score_avg": 0.7142857142857143,
+  "facts": [
+    {
+      "id": "j01",
+      "text": "変更 1 (Remember last search): 工数は Small or Medium",
+      "verdict": "present"
+    },
+    {
+      "id": "j02",
+      "text": "変更 2 (ボタン色変更): 工数は Small",
+      "verdict": "present"
+    },
+    {
+      "id": "j03",
+      "text": "変更 3 (CSV エクスポート): 工数は Medium or Large",
+      "verdict": "present"
+    },
+    {
+      "id": "j04",
+      "text": "変更 4 (20 件表示): 工数は Small",
+      "verdict": "missing"
+    },
+    {
+      "id": "j05",
+      "text": "変更 3 はバックエンド変更が必要",
+      "verdict": "present"
+    },
+    {
+      "id": "j06",
+      "text": "技術リスク最高は変更 3 (CSV エクスポート)",
+      "verdict": "missing"
+    },
+    {
+      "id": "j07",
+      "text": "4 つの変更は基本的に並列実装可能",
+      "verdict": "present"
+    }
+  ]
+}
