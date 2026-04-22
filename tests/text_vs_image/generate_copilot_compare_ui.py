@@ -77,18 +77,45 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   .out-panel h3 .avg strong { color: #A100FF; }
   .out-body { padding: 10px 12px; font-size: 12.5px; line-height: 1.5; overflow-y: auto; max-height: 420px; white-space: pre-wrap; word-break: break-word; }
 
+  /* --- Summary card --- */
+  .summary-card { background: #fff; border: 1px solid #e2d5ee; border-radius: 6px; overflow: hidden; }
+  .summary-card h3 { margin: 0; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #460073; border-bottom: 1px solid #e2d5ee; background: #f7f3fb; letter-spacing: 0.02em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .summary-card h3 .sum-tc { color: #A100FF; font-family: Consolas, monospace; text-transform: none; font-size: 11px; }
+  .summary-card table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .summary-card th, .summary-card td { padding: 6px 12px; text-align: center; font-variant-numeric: tabular-nums; }
+  .summary-card thead th { background: #f7f3fb; font-weight: 700; color: #460073; font-size: 11px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #e2d5ee; }
+  .summary-card thead th:first-child { background: #f7f3fb; }
+  .summary-card tbody th { text-align: left; font-weight: 600; color: #4a4a4a; font-size: 11px; width: 200px; background: #faf7fd; }
+  .summary-card tbody tr { border-top: 1px solid #f0e8fa; }
+  .summary-card tbody tr:first-child { border-top: none; }
+  .summary-card .delta.pos { color: #1a873b; font-weight: 700; }
+  .summary-card .delta.neg { color: #b93a3a; font-weight: 700; }
+  .summary-card .delta.zero { color: #8a8a8a; }
+
+  /* --- LLM verdict badge (shared with human_eval.html styling) --- */
+  .j-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 99px; font-weight: 700; font-size: 10px; line-height: 1.3; }
+  .j-badge .j-score { font-weight: 500; opacity: 0.85; }
+  .j-badge.vp { background: #e3f3e7; color: #136a2f; }
+  .j-badge.vpa { background: #fdecd8; color: #9f5a1c; }
+  .j-badge.vm { background: #f7dcdc; color: #8c2d2d; }
+  .j-badge.vn { background: #f1edf7; color: #8a8a8a; }
+  .j-agree { font-weight: 700; padding: 1px 4px; border-radius: 3px; font-size: 9px; background: rgba(185, 58, 58, 0.15); color: #b93a3a; margin-left: 2px; }
+  .j-agree.stable { background: rgba(19, 106, 47, 0.12); color: #136a2f; }
+
   /* --- Scoring grid --- */
   .score-section { background: #fff; border: 1px solid #e2d5ee; border-radius: 6px; }
   .score-section h3 { margin: 0; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #460073; border-bottom: 1px solid #e2d5ee; background: #f7f3fb; letter-spacing: 0.02em; text-transform: uppercase; }
-  .score-header, .score-row { display: grid; grid-template-columns: 46px minmax(280px, 2.2fr) 1fr 1fr 1fr; gap: 8px; align-items: center; padding: 8px 12px; }
+  .score-header, .score-row { display: grid; grid-template-columns: 46px minmax(260px, 2fr) 1.1fr 1.1fr 1.1fr; gap: 8px; align-items: center; padding: 8px 12px; }
   .score-header { background: #f7f3fb; font-size: 10px; color: #8a8a8a; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid #e2d5ee; position: sticky; top: 0; }
   .score-header div { text-align: center; }
   .score-header .col-id, .score-header .col-text { text-align: left; }
-  .score-row { border-bottom: 1px solid #f0e8fa; }
+  .score-row { border-bottom: 1px solid #f0e8fa; align-items: start; }
   .score-row:nth-child(even) { background: #faf7fd; }
   .score-row.done { background: #f3eefa; }
-  .score-row .col-id { font-size: 10px; color: #8a8a8a; font-weight: 700; }
-  .score-row .col-text { font-size: 12.5px; line-height: 1.45; }
+  .score-row .col-id { font-size: 10px; color: #8a8a8a; font-weight: 700; padding-top: 10px; }
+  .score-row .col-text { font-size: 12.5px; line-height: 1.45; padding-top: 6px; }
+  .col-cell { display: flex; flex-direction: column; gap: 5px; align-items: center; }
+  .col-cell .col-llm { min-height: 18px; display: flex; justify-content: center; }
   .col-score { display: flex; gap: 4px; justify-content: center; }
   .col-score input[type=radio] { display: none; }
   .col-score label { font-size: 11px; padding: 3px 9px; border: 1px solid #cfc6d6; border-radius: 3px; cursor: pointer; user-select: none; background: #fff; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 28px; text-align: center; }
@@ -141,8 +168,48 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 
   <section class="outputs" id="outputs"></section>
 
+  <section class="summary-card">
+    <h3>サマリー <span class="sum-tc" id="sum-tc"></span></h3>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>copilot_png</th>
+          <th>copilot_pptx</th>
+          <th>copilot_docx</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Gemini judge avg (n_runs=3)</th>
+          <td id="s-llm-png">—</td>
+          <td id="s-llm-pptx">—</td>
+          <td id="s-llm-docx">—</td>
+        </tr>
+        <tr>
+          <th>Gemini agreement (mean per fact)</th>
+          <td id="s-agree-png">—</td>
+          <td id="s-agree-pptx">—</td>
+          <td id="s-agree-docx">—</td>
+        </tr>
+        <tr>
+          <th>あなたの採点 avg</th>
+          <td id="s-human-png">—</td>
+          <td id="s-human-pptx">—</td>
+          <td id="s-human-docx">—</td>
+        </tr>
+        <tr>
+          <th>Δ (あなた − Gemini)</th>
+          <td id="s-delta-png" class="delta">—</td>
+          <td id="s-delta-pptx" class="delta">—</td>
+          <td id="s-delta-docx" class="delta">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
   <section class="score-section">
-    <h3>Reasoning point × 3 format スコアリング</h3>
+    <h3>Reasoning point × 3 format スコアリング (LLM 判定を参考にあなたが最終判定)</h3>
     <div class="score-header">
       <div class="col-id">ID</div>
       <div class="col-text">Reasoning point</div>
@@ -171,7 +238,9 @@ const STORE_KEY = "phase4_human_scores_v1";
 const VERDICTS = ["present", "partial", "missing"];
 const VERDICT_SCORE = { present: 1.0, partial: 0.5, missing: 0.0 };
 const BUTTON_LABEL = { present: "1.0", partial: "0.5", missing: "0.0" };
+const VERDICT_CLASS = { present: "vp", partial: "vpa", missing: "vm" };
 const QUANTS = DATA.quants;
+const SHORT = q => q.replace("copilot_", "");
 
 let state = loadState();
 let currentTc = DATA.test_cases[0]?.id;
@@ -249,6 +318,36 @@ function computeAvg(q, t) {
   return vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
 }
 
+function llmVerdicts(q, t) { return DATA.runs[q]?.[t]?.llm_verdicts ?? {}; }
+function llmAvg(q, t)      { return DATA.runs[q]?.[t]?.llm_score_avg ?? null; }
+function llmAgreement(q, t) {
+  const vd = llmVerdicts(q, t);
+  const ags = Object.values(vd).map(x => x.agreement ?? 1.0);
+  return ags.length ? ags.reduce((a,b) => a+b, 0) / ags.length : null;
+}
+
+// Render a small colored pill showing the Gemini verdict + per-run agreement.
+// info shape (from {quant}_{tc}_scores.json via build_dataset):
+//   {verdict, verdicts:[...], agreement}  or missing => n/a badge
+function verdictBadge(info) {
+  if (!info || !info.verdict || !(info.verdict in VERDICT_SCORE)) {
+    return '<span class="j-badge vn">— <span class="j-score">n/a</span></span>';
+  }
+  const v = info.verdict;
+  const verdicts = info.verdicts || [v];
+  const agreement = typeof info.agreement === "number" ? info.agreement : 1.0;
+  const n = verdicts.length;
+  const agreeN = Math.round(agreement * n);
+  const cls = VERDICT_CLASS[v] || "vn";
+  const score = VERDICT_SCORE[v].toFixed(1);
+  let agreeTag = "";
+  if (n > 1) {
+    const stable = agreement >= 1.0;
+    agreeTag = ` <span class="j-agree${stable ? " stable" : ""}">${agreeN}/${n}</span>`;
+  }
+  return `<span class="j-badge ${cls}">${v} <span class="j-score">${score}</span>${agreeTag}</span>`;
+}
+
 function renderOutputs() {
   const host = document.getElementById("outputs");
   host.innerHTML = "";
@@ -279,7 +378,8 @@ function renderScoring() {
     if (verdicts.every(v => v)) row.classList.add("done");
     const scoreCells = QUANTS.map(q => {
       const cur = getVerdict(q, currentTc, f.id);
-      const cells = VERDICTS.map(v => {
+      const llmInfo = llmVerdicts(q, currentTc)[f.id] ?? null;
+      const buttons = VERDICTS.map(v => {
         const inputId = `v__${q}__${f.id}__${v}`;
         const name = `v__${q}__${f.id}`;
         return `
@@ -289,7 +389,12 @@ function renderScoring() {
           <label for="${inputId}" title="${v}">${BUTTON_LABEL[v]}</label>
         `;
       }).join("");
-      return `<div class="col-score">${cells}</div>`;
+      return `
+        <div class="col-cell">
+          <div class="col-llm">${verdictBadge(llmInfo)}</div>
+          <div class="col-score">${buttons}</div>
+        </div>
+      `;
     }).join("");
     row.innerHTML = `
       <div class="col-id">${escapeHtml(f.id)}</div>
@@ -301,6 +406,7 @@ function renderScoring() {
         setVerdict(input.dataset.quant, currentTc, input.dataset.fid, input.dataset.verdict);
         renderTabs();
         renderOutputs();   // update per-column avg
+        renderSummary();   // update Human avg + Δ in the summary card
         renderProgress();
         // update row "done" class without full re-render
         const ok = QUANTS.every(q => getVerdict(q, currentTc, input.dataset.fid));
@@ -315,8 +421,7 @@ function renderProgress() {
   // Footer metrics: per-quant avg + total progress
   for (const q of QUANTS) {
     const avg = computeAvg(q, currentTc);
-    const short = q.replace("copilot_", "");
-    const el = document.getElementById(`m-${short}`);
+    const el = document.getElementById(`m-${SHORT(q)}`);
     if (el) el.textContent = avg == null ? "—" : avg.toFixed(3);
   }
   const { done, total } = countDoneForTc(currentTc);
@@ -325,11 +430,38 @@ function renderProgress() {
     `${currentTc}: ${done}/${total}`;
 }
 
+function renderSummary() {
+  const tcEl = document.getElementById("sum-tc");
+  if (tcEl) tcEl.textContent = currentTc;
+  for (const q of QUANTS) {
+    const short = SHORT(q);
+    const llm = llmAvg(q, currentTc);
+    const agree = llmAgreement(q, currentTc);
+    const human = computeAvg(q, currentTc);
+    const setText = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+    setText(`s-llm-${short}`,   llm   == null ? "—" : llm.toFixed(3));
+    setText(`s-agree-${short}`, agree == null ? "—" : agree.toFixed(2));
+    setText(`s-human-${short}`, human == null ? "—" : human.toFixed(3));
+    const deltaEl = document.getElementById(`s-delta-${short}`);
+    if (!deltaEl) continue;
+    deltaEl.classList.remove("pos", "neg", "zero");
+    if (llm != null && human != null) {
+      const delta = human - llm;
+      const sign = delta > 0 ? "+" : "";
+      deltaEl.textContent = `${sign}${delta.toFixed(3)}`;
+      deltaEl.classList.add(delta > 0.001 ? "pos" : (delta < -0.001 ? "neg" : "zero"));
+    } else {
+      deltaEl.textContent = "—";
+    }
+  }
+}
+
 function render() {
   renderTabs();
   renderPrompt();
   renderImage();
   renderOutputs();
+  renderSummary();
   renderScoring();
   renderProgress();
 }
