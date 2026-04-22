@@ -1,0 +1,140 @@
+{
+  "case_id": "tc03_judge",
+  "quant": "copilot_png",
+  "model": "pasted-by-human",
+  "judge": "gemini-2.5-flash",
+  "test_type": "judgment",
+  "n_runs": 3,
+  "describe_seconds": null,
+  "judge_seconds": 10.413685430462161,
+  "n_facts": 9,
+  "score_avg": 0.7407407407407408,
+  "score_std": 0.03207501495497923,
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.7222222222222222,
+      "judge_seconds": 8.666979916393757
+    },
+    {
+      "run": 2,
+      "score_avg": 0.7777777777777778,
+      "judge_seconds": 11.453714417293668
+    },
+    {
+      "run": 3,
+      "score_avg": 0.7222222222222222,
+      "judge_seconds": 11.12036195769906
+    }
+  ],
+  "facts": [
+    {
+      "id": "j01",
+      "text": "VPC 外側: Route 53, CloudFront, S3, IAM, CloudWatch",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j02",
+      "text": "VPC 内側: ALB, NAT GW, ECS Fargate, ElastiCache, RDS",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j03",
+      "text": "第 1 層: Route 53 → CloudFront",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "j04",
+      "text": "第 2 層: ALB (Public Subnet)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j05",
+      "text": "第 3 層: ECS Fargate (Private Subnet)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j06",
+      "text": "第 4 層: RDS / ElastiCache (DB Subnet)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "partial",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "j07",
+      "text": "緑太線は ECS → RDS Primary (write)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "j08",
+      "text": "青緑/シアン太線は ECS → RDS Replica (read-only)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "j09",
+      "text": "凡例: 3 種類 (Public=青, Private App=黄, DB=緑)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

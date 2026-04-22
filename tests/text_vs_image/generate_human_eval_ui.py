@@ -116,15 +116,32 @@ def _load_case_stats(quality_dir: Path, quant: str) -> dict[str, dict]:
     return out
 
 
-def build_dataset(quality_dir: Path, cases_yaml: Path) -> dict:
+def build_dataset(
+    quality_dir: Path,
+    cases_yaml: Path,
+    extra_quants: list[str] = (),
+    only_quants: list[str] = (),
+    only_tcs: list[str] = (),
+) -> dict:
     cases_data = yaml.safe_load(cases_yaml.read_text(encoding="utf-8"))
     cases = {c["id"]: c for c in cases_data["test_cases"]}
-    quants = _discover_quants(quality_dir)
+    if only_quants:
+        quants = [q.strip() for q in only_quants if q.strip()]
+    else:
+        quants = _discover_quants(quality_dir)
+        for q in extra_quants:
+            q = q.strip()
+            if q and q not in quants:
+                quants.append(q)
     if not quants:
-        raise SystemExit(f"no *_scores.json files under {quality_dir}")
+        raise SystemExit(f"no *_scores.json files under {quality_dir} and no --extra-quants/--only-quants given")
+
+    only_tcs_set = {t.strip() for t in only_tcs if t.strip()}
 
     tcs: list[dict] = []
     for tc_id, case in sorted(cases.items()):
+        if only_tcs_set and tc_id not in only_tcs_set:
+            continue
         items = case.get("ground_truth_facts") or case.get("reasoning_points")
         if not items:
             continue  # neither extraction facts nor judgment reasoning points
@@ -561,9 +578,33 @@ def main() -> int:
     ap.add_argument("--quality-dir", default=str(DEFAULT_QUALITY_DIR))
     ap.add_argument("--cases-yaml", default=str(DEFAULT_CASES_YAML))
     ap.add_argument("--output", default=str(DEFAULT_OUTPUT))
+    ap.add_argument(
+        "--extra-quants",
+        default="",
+        help="Comma-separated quant labels to include even without *_scores.json "
+             "(e.g. copilot_png,copilot_pptx,copilot_docx for human-only scoring)",
+    )
+    ap.add_argument(
+        "--only-quants",
+        default="",
+        help="Comma-separated quant whitelist. If set, skips auto-discovery and "
+             "--extra-quants, using ONLY the given labels (e.g. copilot-only page)",
+    )
+    ap.add_argument(
+        "--only-tcs",
+        default="",
+        help="Comma-separated test case id whitelist. If set, UI shows only these "
+             "tabs (e.g. tc02_judge,tc03_judge to focus on judgment cases)",
+    )
     args = ap.parse_args()
 
-    dataset = build_dataset(Path(args.quality_dir), Path(args.cases_yaml))
+    extras = [q for q in args.extra_quants.split(",") if q.strip()]
+    only_q = [q for q in args.only_quants.split(",") if q.strip()]
+    only_t = [t for t in args.only_tcs.split(",") if t.strip()]
+    dataset = build_dataset(
+        Path(args.quality_dir), Path(args.cases_yaml),
+        extra_quants=extras, only_quants=only_q, only_tcs=only_t,
+    )
     html = build_html(dataset)
     out = Path(args.output)
     out.write_text(html, encoding="utf-8")

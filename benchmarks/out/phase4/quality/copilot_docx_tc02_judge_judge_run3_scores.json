@@ -1,0 +1,48 @@
+{
+  "case_id": "tc02_judge",
+  "quant": "copilot_docx",
+  "model": "pasted-by-human",
+  "judge": "gemini-2.5-flash",
+  "test_type": "judgment",
+  "run": 3,
+  "judge_seconds": 7.407584208063781,
+  "n_facts": 7,
+  "score_avg": 0.0,
+  "facts": [
+    {
+      "id": "j01",
+      "text": "変更 1 (Remember last search): 工数は Small or Medium",
+      "verdict": "missing"
+    },
+    {
+      "id": "j02",
+      "text": "変更 2 (ボタン色変更): 工数は Small",
+      "verdict": "missing"
+    },
+    {
+      "id": "j03",
+      "text": "変更 3 (CSV エクスポート): 工数は Medium or Large",
+      "verdict": "missing"
+    },
+    {
+      "id": "j04",
+      "text": "変更 4 (20 件表示): 工数は Small",
+      "verdict": "missing"
+    },
+    {
+      "id": "j05",
+      "text": "変更 3 はバックエンド変更が必要",
+      "verdict": "missing"
+    },
+    {
+      "id": "j06",
+      "text": "技術リスク最高は変更 3 (CSV エクスポート)",
+      "verdict": "missing"
+    },
+    {
+      "id": "j07",
+      "text": "4 つの変更は基本的に並列実装可能",
+      "verdict": "missing"
+    }
+  ]
+}

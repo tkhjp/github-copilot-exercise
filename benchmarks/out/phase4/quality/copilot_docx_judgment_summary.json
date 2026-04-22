@@ -1,0 +1,30 @@
+{
+  "quant": "copilot_docx",
+  "model": "pasted-by-human",
+  "judge": "gemini-2.5-flash",
+  "source": "judge-only (Copilot pasted)",
+  "n_runs": 3,
+  "cases": [
+    {
+      "case_id": "tc02_judge",
+      "quant": "copilot_docx",
+      "test_type": "judgment",
+      "n_facts": 7,
+      "n_runs": 3,
+      "score_avg": 0.0,
+      "score_std": 0.0,
+      "judge_seconds": 6.795789000267784
+    },
+    {
+      "case_id": "tc03_judge",
+      "quant": "copilot_docx",
+      "test_type": "judgment",
+      "n_facts": 9,
+      "n_runs": 3,
+      "score_avg": 0.0,
+      "score_std": 0.0,
+      "judge_seconds": 9.822682708191374
+    }
+  ],
+  "avg_score": 0.0
+}

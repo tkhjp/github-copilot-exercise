@@ -1,0 +1,30 @@
+{
+  "quant": "copilot_pptx",
+  "model": "pasted-by-human",
+  "judge": "gemini-2.5-flash",
+  "source": "judge-only (Copilot pasted)",
+  "n_runs": 3,
+  "cases": [
+    {
+      "case_id": "tc02_judge",
+      "quant": "copilot_pptx",
+      "test_type": "judgment",
+      "n_facts": 7,
+      "n_runs": 3,
+      "score_avg": 0.9285714285714285,
+      "score_std": 1.3597399555105182e-16,
+      "judge_seconds": 6.739403152527909
+    },
+    {
+      "case_id": "tc03_judge",
+      "quant": "copilot_pptx",
+      "test_type": "judgment",
+      "n_facts": 9,
+      "n_runs": 3,
+      "score_avg": 0.7592592592592592,
+      "score_std": 0.03207501495497923,
+      "judge_seconds": 9.795294986106455
+    }
+  ],
+  "avg_score": 0.8439153439153438
+}

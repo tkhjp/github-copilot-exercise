@@ -92,7 +92,7 @@ def main() -> int:
             if tc_id not in cases:
                 print(f"WARNING: unknown test case {tc_id} for {quant}", file=sys.stderr)
                 continue
-            facts = cases[tc_id]["ground_truth_facts"]
+            facts = cases[tc_id].get("ground_truth_facts") or cases[tc_id].get("reasoning_points") or []
             n, avg = _write_case_detail(quality_dir, quant, tc_id, facts, verdicts)
             human_cases.append({"case_id": tc_id, "quant": quant, "n_facts": n, "score_avg": avg})
             llm_avg = llm_scores.get(tc_id)

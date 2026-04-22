@@ -1,0 +1,58 @@
+{
+  "case_id": "tc03_judge",
+  "quant": "copilot_png",
+  "model": "pasted-by-human",
+  "judge": "gemini-2.5-flash",
+  "test_type": "judgment",
+  "run": 1,
+  "judge_seconds": 8.666979916393757,
+  "n_facts": 9,
+  "score_avg": 0.7222222222222222,
+  "facts": [
+    {
+      "id": "j01",
+      "text": "VPC 外側: Route 53, CloudFront, S3, IAM, CloudWatch",
+      "verdict": "present"
+    },
+    {
+      "id": "j02",
+      "text": "VPC 内側: ALB, NAT GW, ECS Fargate, ElastiCache, RDS",
+      "verdict": "present"
+    },
+    {
+      "id": "j03",
+      "text": "第 1 層: Route 53 → CloudFront",
+      "verdict": "partial"
+    },
+    {
+      "id": "j04",
+      "text": "第 2 層: ALB (Public Subnet)",
+      "verdict": "present"
+    },
+    {
+      "id": "j05",
+      "text": "第 3 層: ECS Fargate (Private Subnet)",
+      "verdict": "present"
+    },
+    {
+      "id": "j06",
+      "text": "第 4 層: RDS / ElastiCache (DB Subnet)",
+      "verdict": "missing"
+    },
+    {
+      "id": "j07",
+      "text": "緑太線は ECS → RDS Primary (write)",
+      "verdict": "present"
+    },
+    {
+      "id": "j08",
+      "text": "青緑/シアン太線は ECS → RDS Replica (read-only)",
+      "verdict": "missing"
+    },
+    {
+      "id": "j09",
+      "text": "凡例: 3 種類 (Public=青, Private App=黄, DB=緑)",
+      "verdict": "present"
+    }
+  ]
+}
