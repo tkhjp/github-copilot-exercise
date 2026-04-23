@@ -666,3 +666,304 @@ def render_png(pid: str, out_path: Path) -> None:
     if pid not in renderers:
         raise NotImplementedError(f"render_png not implemented for {pid}")
     renderers[pid](out_path)
+
+
+# -----------------------------------------------------------------------------
+# PPTX rendering (python-pptx)
+# -----------------------------------------------------------------------------
+from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
+from pptx.enum.text import PP_ALIGN
+from pptx.util import Emu, Pt
+
+
+def _px(n: float) -> Emu:
+    """Pixel → EMU mapping at 96 DPI so pixel layouts port over 1:1 from PIL."""
+    return Emu(int(n * 9525))
+
+
+def _hex_rgb(s: str) -> RGBColor:
+    return RGBColor.from_string(s.lstrip("#"))
+
+
+def _pptx_blank_slide(prs):
+    return prs.slides.add_slide(prs.slide_layouts[6])
+
+
+def _pptx_add_box(slide, x, y, w, h, *, fill=None, outline=None, outline_w=1.0,
+                  shape=MSO_SHAPE.RECTANGLE):
+    shp = slide.shapes.add_shape(shape, _px(x), _px(y), _px(w), _px(h))
+    if fill is None:
+        shp.fill.background()
+    else:
+        shp.fill.solid()
+        shp.fill.fore_color.rgb = _hex_rgb(fill)
+    if outline is None:
+        shp.line.fill.background()
+    else:
+        shp.line.color.rgb = _hex_rgb(outline)
+        shp.line.width = Pt(outline_w)
+    tf = shp.text_frame
+    tf.margin_left = tf.margin_right = Emu(0)
+    tf.margin_top = tf.margin_bottom = Emu(0)
+    return shp
+
+
+def _pptx_add_text(slide, x, y, w, h, text, *, size_pt=11, bold=False,
+                   color="#111827", align=PP_ALIGN.LEFT):
+    tb = slide.shapes.add_textbox(_px(x), _px(y), _px(w), _px(h))
+    tf = tb.text_frame
+    tf.margin_left = tf.margin_right = Emu(0)
+    tf.margin_top = tf.margin_bottom = Emu(0)
+    tf.word_wrap = True
+    for i, line in enumerate(text.split("\n")):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = align
+        run = p.add_run()
+        run.text = line
+        run.font.size = Pt(size_pt)
+        run.font.bold = bold
+        run.font.color.rgb = _hex_rgb(color)
+    return tb
+
+
+def _pptx_add_line(slide, x1, y1, x2, y2, *, color="#111827", width_pt=2.0):
+    ln = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,
+                                    _px(x1), _px(y1), _px(x2), _px(y2))
+    ln.line.color.rgb = _hex_rgb(color)
+    ln.line.width = Pt(width_pt)
+    return ln
+
+
+def _pptx_title(slide, title: str):
+    _pptx_add_text(slide, 32, 22, 1500, 40, title, size_pt=20, bold=True)
+    _pptx_add_line(slide, 32, 86, CANVAS_W - 32, 86, color=COLORS["grid"], width_pt=1.5)
+
+
+def _build_slide_p01(prs) -> None:
+    slide = _pptx_blank_slide(prs)
+    spec = SPEC["p01"]
+    layout = spec["layout"]
+    _pptx_title(slide, spec["title"])
+
+    # Screenshot card
+    card = (40, 110, 1000, 800)
+    _pptx_add_box(slide, card[0], card[1], card[2] - card[0], card[3] - card[1],
+                  fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+    _pptx_add_box(slide, card[0], card[1], card[2] - card[0], 32,
+                  fill=COLORS["header_bg"], outline=COLORS["header_bg"])
+    _pptx_add_text(slide, card[0] + 12, card[1] + 6, 400, 24,
+                   layout["app_title"], size_pt=12, bold=True, color=COLORS["header_text"])
+    _pptx_add_text(slide, card[2] - 220, card[1] + 8, 200, 24,
+                   layout["header_user"], size_pt=11, color=COLORS["header_text"], align=PP_ALIGN.RIGHT)
+
+    # Table
+    tbl_x1, tbl_y1 = card[0] + 24, card[1] + 60
+    col_widths = [190, 110, 110, 110, 140]
+    row_h = 42
+    hx = tbl_x1
+    for ci, header in enumerate(layout["table_header"]):
+        _pptx_add_box(slide, hx, tbl_y1, col_widths[ci], row_h,
+                      fill=COLORS["grid"], outline=COLORS["card_border"])
+        _pptx_add_text(slide, hx + 10, tbl_y1 + 12, col_widths[ci] - 20, row_h - 24,
+                       header, size_pt=11, bold=True)
+        hx += col_widths[ci]
+    for r, row in enumerate(layout["table_rows"]):
+        ry = tbl_y1 + row_h * (r + 1)
+        rx = tbl_x1
+        for ci, val in enumerate(row):
+            _pptx_add_box(slide, rx, ry, col_widths[ci], row_h,
+                          fill=COLORS["bg"], outline=COLORS["card_border"])
+            _pptx_add_text(slide, rx + 10, ry + 12, col_widths[ci] - 20, row_h - 24,
+                           val, size_pt=11)
+            rx += col_widths[ci]
+
+    # Buttons
+    btn_y = tbl_y1 + row_h * (len(layout["table_rows"]) + 1) + 24
+    bx = tbl_x1
+    for label in layout["buttons"]:
+        bw = len(label) * 16 + 24
+        _pptx_add_box(slide, bx, btn_y, bw, 32,
+                      fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
+        _pptx_add_text(slide, bx, btn_y + 7, bw, 22,
+                       label, size_pt=11, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+        bx += bw + 10
+
+    # 4 red callouts with labels
+    for i, (label, text) in enumerate(layout["callouts"]):
+        bx1 = 1040
+        by1 = 130 + i * 170
+        _pptx_add_box(slide, bx1, by1, 520, 110,
+                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=2.0,
+                      shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+        _pptx_add_text(slide, bx1 + 12, by1 + 12, 500, 24,
+                       label, size_pt=12, bold=True, color=COLORS["danger_text"])
+        _pptx_add_text(slide, bx1 + 12, by1 + 38, 500, 60,
+                       text, size_pt=11, color=COLORS["danger_text"])
+
+
+def _build_slide_p02(prs) -> None:
+    slide = _pptx_blank_slide(prs)
+    spec = SPEC["p02"]
+    layout = spec["layout"]
+    _pptx_title(slide, spec["title"])
+
+    gap = 40
+    card_w = (CANVAS_W - 3 * gap) // 2
+    for offset, side_key in [(gap, "before"), (2 * gap + card_w, "after")]:
+        card = (offset, 120, offset + card_w, 770)
+        s = layout[side_key]
+        _pptx_add_box(slide, card[0], card[1], card_w, card[3] - card[1],
+                      fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+        _pptx_add_box(slide, card[0], card[1], card_w, 32,
+                      fill=COLORS["header_bg"], outline=COLORS["header_bg"])
+        _pptx_add_text(slide, card[0] + 12, card[1] + 6, card_w - 24, 24,
+                       s["title"], size_pt=12, bold=True, color=COLORS["header_text"])
+        sx1 = card[0] + 24
+        sy = card[1] + 60
+        _pptx_add_box(slide, sx1, sy, card_w - 160, 36,
+                      fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=1.5)
+        _pptx_add_text(slide, sx1 + 10, sy + 10, card_w - 180, 20,
+                       s["search_placeholder"], size_pt=11, color=COLORS["muted"])
+        _pptx_add_box(slide, card[2] - 130, sy, 106, 36,
+                      fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
+        _pptx_add_text(slide, card[2] - 130, sy + 10, 106, 20,
+                       s["button"], size_pt=11, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+        fy = sy + 60
+        for _i in range(s["filter_rows"]):
+            _pptx_add_box(slide, sx1, fy, card_w - 48, 28,
+                          fill=COLORS["card_bg"], outline=COLORS["card_border"])
+            fy += 36
+        _pptx_add_text(slide, sx1, fy + 20, card_w - 48, 20,
+                       s["result_count_label"], size_pt=11)
+        _pptx_add_text(slide, sx1, fy + 60, card_w - 48, 24,
+                       s["pagination"], size_pt=12, bold=True)
+
+    # Diff labels at the bottom
+    for i, (label, text) in enumerate(layout["diffs"]):
+        y = CANVAS_H - 220 + i * 60
+        _pptx_add_box(slide, 40, y, 240, 44,
+                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5)
+        _pptx_add_text(slide, 50, y + 12, 220, 24,
+                       f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
+
+
+def _build_slide_p03(prs) -> None:
+    slide = _pptx_blank_slide(prs)
+    spec = SPEC["p03"]
+    layout = spec["layout"]
+    _pptx_title(slide, spec["title"])
+
+    steps = layout["steps"]
+    n = len(steps)
+    margin = 40
+    gap = 48
+    card_w = (CANVAS_W - 2 * margin - (n - 1) * gap) // n
+    card_h = 400
+    y1 = 230
+    for i, (label, step_title, step_desc) in enumerate(steps):
+        x1 = margin + i * (card_w + gap)
+        # Step label badge
+        _pptx_add_box(slide, x1 + card_w // 2 - 24, y1 - 40, 48, 32,
+                      fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
+        _pptx_add_text(slide, x1 + card_w // 2 - 24, y1 - 34, 48, 24,
+                       label, size_pt=14, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+        # Card
+        _pptx_add_box(slide, x1, y1, card_w, card_h,
+                      fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+        _pptx_add_box(slide, x1, y1, card_w, 32,
+                      fill=COLORS["header_bg"], outline=COLORS["header_bg"])
+        _pptx_add_text(slide, x1 + 12, y1 + 6, card_w - 24, 24,
+                       step_title, size_pt=12, bold=True, color=COLORS["header_text"])
+        _pptx_add_text(slide, x1 + 12, y1 + 48, card_w - 24, card_h - 60,
+                       step_desc, size_pt=11)
+        if i < n - 1:
+            _pptx_add_line(slide, x1 + card_w + 4, y1 + card_h // 2,
+                           x1 + card_w + gap - 4, y1 + card_h // 2,
+                           color=COLORS["text"], width_pt=3.0)
+
+
+def _build_slide_p04(prs) -> None:
+    slide = _pptx_blank_slide(prs)
+    spec = SPEC["p04"]
+    layout = spec["layout"]
+    _pptx_title(slide, spec["title"])
+
+    # Bar chart as labeled bars (native PPT elements, not image)
+    _pptx_add_box(slide, 40, 140, 600, 300,
+                  fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+    _pptx_add_text(slide, 56, 152, 500, 28,
+                   layout["bar_chart"]["title"], size_pt=12, bold=True)
+    bars = layout["bar_chart"]["data"]
+    max_v = max(v for _, v in bars)
+    chart_top, chart_bot = 200, 410
+    for i, (lbl, v) in enumerate(bars):
+        x = 80 + i * 160
+        h = int((v / max_v) * (chart_bot - chart_top - 20))
+        _pptx_add_box(slide, x, chart_bot - h, 80, h,
+                      fill=COLORS["primary"], outline=COLORS["primary"])
+        _pptx_add_text(slide, x, chart_bot - h - 22, 80, 20,
+                       str(v), size_pt=11, align=PP_ALIGN.CENTER)
+        _pptx_add_text(slide, x, chart_bot + 6, 80, 20,
+                       lbl, size_pt=11, align=PP_ALIGN.CENTER)
+
+    # Pie chart — approximate as labeled legend (python-pptx chart objects are heavier; legend-like text is sufficient for extraction test)
+    _pptx_add_box(slide, 800, 140, CANVAS_W - 840, 300,
+                  fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+    _pptx_add_text(slide, 816, 152, 500, 28,
+                   layout["pie_chart"]["title"], size_pt=12, bold=True)
+    palette = [COLORS["primary"], COLORS["success"], COLORS["warn"], COLORS["muted"]]
+    for i, (lbl, v) in enumerate(layout["pie_chart"]["data"]):
+        _pptx_add_box(slide, 816, 190 + i * 44, 24, 24,
+                      fill=palette[i % len(palette)], outline=palette[i % len(palette)])
+        _pptx_add_text(slide, 850, 194 + i * 44, 400, 28,
+                       f"{lbl}  {v}%", size_pt=13)
+
+    # 3 KPI cards
+    kpi_y = 470
+    kpi_w = (CANVAS_W - 2 * 40 - 2 * 20) // 3
+    for i, (kpi_label, kpi_val, kpi_sub) in enumerate(layout["kpi_cards"]):
+        kx1 = 40 + i * (kpi_w + 20)
+        _pptx_add_box(slide, kx1, kpi_y, kpi_w, 160,
+                      fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+        _pptx_add_text(slide, kx1 + 16, kpi_y + 16, kpi_w - 32, 20,
+                       kpi_label, size_pt=13, bold=True, color=COLORS["muted"])
+        _pptx_add_text(slide, kx1 + 16, kpi_y + 48, kpi_w - 32, 44,
+                       kpi_val, size_pt=26, bold=True)
+        _pptx_add_text(slide, kx1 + 16, kpi_y + 104, kpi_w - 32, 24,
+                       kpi_sub, size_pt=11, color=COLORS["success"])
+
+    # 3 annotation boxes
+    for i, (label, text) in enumerate(layout["annotations"]):
+        ay = 650 + i * 48
+        _pptx_add_box(slide, 40, ay, CANVAS_W - 80, 40,
+                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.0)
+        _pptx_add_text(slide, 52, ay + 10, CANVAS_W - 120, 24,
+                       f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
+
+
+def render_pptx(out_path: Path) -> None:
+    """Build a single 8-slide PPTX, one slide per pattern p01..p08."""
+    prs = Presentation()
+    prs.slide_width = _px(CANVAS_W)
+    prs.slide_height = _px(CANVAS_H)
+    builders = {
+        "p01": _build_slide_p01,
+        "p02": _build_slide_p02,
+        "p03": _build_slide_p03,
+        "p04": _build_slide_p04,
+        # p05-p08 added in Task 7.
+    }
+    for pid in ["p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"]:
+        builder = builders.get(pid)
+        if builder is None:
+            # Placeholder slide so ordering is preserved until Task 7 lands.
+            slide = _pptx_blank_slide(prs)
+            _pptx_title(slide, SPEC[pid]["title"])
+            _pptx_add_text(slide, 40, 150, CANVAS_W - 80, 40,
+                           f"(TODO: {pid} slide builder — implemented in a later task)",
+                           size_pt=14, color=COLORS["muted"])
+        else:
+            builder(prs)
+    prs.save(str(out_path))
