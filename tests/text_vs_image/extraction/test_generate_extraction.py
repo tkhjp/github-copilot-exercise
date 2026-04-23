@@ -14,18 +14,10 @@ import pytest
 from PIL import Image
 
 from tests.text_vs_image.extraction import generate_extraction as g
+from tests.text_vs_image.extraction.generate_extraction import PNG_FILENAMES
 
 
-EXPECTED_PNG_NAMES = [
-    "p01_ui_callouts.png",
-    "p02_before_after.png",
-    "p03_process_flow.png",
-    "p04_dashboard_annotated.png",
-    "p05_hierarchical_drilldown.png",
-    "p06_review_comments.png",
-    "p07_mixed_dashboard.png",
-    "p08_org_chart.png",
-]
+EXPECTED_PNG_NAMES = list(PNG_FILENAMES.values())
 
 CANVAS_W, CANVAS_H = 1600, 900  # All PNGs share the same aspect ratio so Copilot gets uniform framing.
 

@@ -12,16 +12,37 @@ from __future__ import annotations
 
 import argparse
 import math
+import sys
 import textwrap
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+
+# Allow both `python script.py` and `python -m tests.text_vs_image.extraction.generate_extraction`.
+# Without this bootstrap the absolute `from tests.text_vs_image...` import below requires the repo
+# root to already be on sys.path (via PYTHONPATH or pytest's pythonpath config).
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from tests.text_vs_image.extraction.extraction_spec import SPEC, emit_ground_truth_yaml
 
 
 ROOT = Path(__file__).resolve().parent
 CANVAS_W, CANVAS_H = 1600, 900
+
+# Canonical PNG filenames per pattern id. Consumed by main() and by the tests
+# (single source of truth — don't duplicate this list).
+PNG_FILENAMES = {
+    "p01": "p01_ui_callouts.png",
+    "p02": "p02_before_after.png",
+    "p03": "p03_process_flow.png",
+    "p04": "p04_dashboard_annotated.png",
+    "p05": "p05_hierarchical_drilldown.png",
+    "p06": "p06_review_comments.png",
+    "p07": "p07_mixed_dashboard.png",
+    "p08": "p08_org_chart.png",
+}
 
 # Shared visual palette (kept deliberately muted so callouts stand out).
 COLORS = {
@@ -1213,18 +1234,6 @@ def render_pptx(out_path: Path) -> None:
     prs.save(str(out_path))
 
 
-PNG_FILENAMES = {
-    "p01": "p01_ui_callouts.png",
-    "p02": "p02_before_after.png",
-    "p03": "p03_process_flow.png",
-    "p04": "p04_dashboard_annotated.png",
-    "p05": "p05_hierarchical_drilldown.png",
-    "p06": "p06_review_comments.png",
-    "p07": "p07_mixed_dashboard.png",
-    "p08": "p08_org_chart.png",
-}
-
-
 def main() -> int:
     ap = argparse.ArgumentParser(description="Generate extraction test corpus (PPTX + 8 PNG + GT YAML)")
     ap.add_argument("--out-dir", default=str(ROOT),
@@ -1236,15 +1245,21 @@ def main() -> int:
     for pid, fname in PNG_FILENAMES.items():
         path = out_dir / fname
         render_png(pid, path)
-        print(f"wrote {path} ({path.stat().st_size} bytes)")
+        size = path.stat().st_size
+        assert size > 10_000, f"{path} is suspiciously small ({size}B) — blank canvas?"
+        print(f"wrote {path} ({size} bytes)")
 
     pptx_path = out_dir / "extraction_test.pptx"
     render_pptx(pptx_path)
-    print(f"wrote {pptx_path} ({pptx_path.stat().st_size} bytes)")
+    pptx_size = pptx_path.stat().st_size
+    assert pptx_size > 20_000, f"{pptx_path} is suspiciously small ({pptx_size}B)"
+    print(f"wrote {pptx_path} ({pptx_size} bytes)")
 
     gt_path = out_dir / "ground_truth.yaml"
     emit_ground_truth_yaml(gt_path)
-    print(f"wrote {gt_path} ({gt_path.stat().st_size} bytes)")
+    gt_size = gt_path.stat().st_size
+    assert gt_size > 5_000, f"{gt_path} is suspiciously small ({gt_size}B)"
+    print(f"wrote {gt_path} ({gt_size} bytes)")
 
     return 0
 
