@@ -386,14 +386,275 @@ def render_p04(out_path: Path) -> None:
     img.save(out_path, "PNG")
 
 
+def render_p05(out_path: Path) -> None:
+    """P5: 階層ドリルダウン — 上: 5 モジュール全体図 / 下: 決済コア拡大 + 設定表."""
+    spec = SPEC["p05"]
+    layout = spec["layout"]
+    img = _new_canvas()
+    draw = ImageDraw.Draw(img)
+    body_y = _draw_slide_title(draw, spec["title"])
+
+    # Top band: 5 modules side by side. Highlighted one has a different border.
+    modules = layout["top_level_modules"]
+    highlighted = layout["highlighted_module"]
+    n = len(modules)
+    mod_y1 = body_y + 20
+    mod_y2 = mod_y1 + 120
+    mod_w = (CANVAS_W - 2 * 40 - (n - 1) * 20) // n
+    hi_idx = next(i for i, name in enumerate(modules) if name == highlighted)
+    for i, name in enumerate(modules):
+        mx1 = 40 + i * (mod_w + 20)
+        mx2 = mx1 + mod_w
+        is_hi = (name == highlighted)
+        draw.rectangle(
+            [mx1, mod_y1, mx2, mod_y2],
+            fill=COLORS["card_bg"],
+            outline=COLORS["danger"] if is_hi else COLORS["card_border"],
+            width=3 if is_hi else 2,
+        )
+        nw, _ = _tsize(draw, name, _bold_font(15))
+        draw.text((mx1 + (mod_w - nw) // 2, mod_y1 + 50), name,
+                  fill=COLORS["text"], font=_bold_font(15))
+
+    # Drilldown arrow from highlighted module to zoomed area below
+    hi_cx = 40 + hi_idx * (mod_w + 20) + mod_w // 2
+    _arrow(draw, (hi_cx, mod_y2 + 4), (CANVAS_W // 2, mod_y2 + 60),
+           color=COLORS["danger"], width=3, head=14)
+
+    # Zoomed submodules (left half, grid of 2x2)
+    zoom_y1 = mod_y2 + 80
+    zoom_y2 = zoom_y1 + 380
+    _draw_screenshot_card(draw, (40, zoom_y1, 700, zoom_y2),
+                          title=f"拡大: {highlighted}")
+    sub = layout["zoom_submodules"]
+    for i, name in enumerate(sub):
+        r, c = divmod(i, 2)
+        sx1 = 80 + c * 290
+        sy1 = zoom_y1 + 60 + r * 130
+        draw.rectangle([sx1, sy1, sx1 + 260, sy1 + 100],
+                       fill=COLORS["bg"], outline=COLORS["card_border"], width=2)
+        nw, _ = _tsize(draw, name, _bold_font(14))
+        draw.text((sx1 + (260 - nw) // 2, sy1 + 40), name,
+                  fill=COLORS["text"], font=_bold_font(14))
+
+    # Config table (right half)
+    tbl_x1, tbl_y1 = 740, zoom_y1
+    tbl_x2, tbl_y2 = CANVAS_W - 40, zoom_y2
+    _draw_screenshot_card(draw, (tbl_x1, tbl_y1, tbl_x2, tbl_y2), title="設定パラメータ")
+    cfg = layout["config_table"]
+    col_widths = [320, 200, 200]
+    hx = tbl_x1 + 12
+    hy = tbl_y1 + 60
+    # Header
+    for ci, col in enumerate(cfg["columns"]):
+        draw.rectangle([hx, hy, hx + col_widths[ci], hy + 36],
+                       fill=COLORS["grid"], outline=COLORS["card_border"])
+        draw.text((hx + 8, hy + 10), col, fill=COLORS["text"], font=_bold_font(14))
+        hx += col_widths[ci]
+    # Rows
+    for r, row in enumerate(cfg["rows"]):
+        rx = tbl_x1 + 12
+        ry = hy + 36 * (r + 1)
+        for ci, val in enumerate(row):
+            draw.rectangle([rx, ry, rx + col_widths[ci], ry + 36],
+                           fill=COLORS["bg"], outline=COLORS["card_border"])
+            draw.text((rx + 8, ry + 10), val, fill=COLORS["text"], font=_font(13))
+            rx += col_widths[ci]
+
+    img.save(out_path, "PNG")
+
+
+def render_p06(out_path: Path) -> None:
+    """P6: レビュー反映 (赤入れ) — モック 1 + 15 個の赤コメント + 指示線."""
+    spec = SPEC["p06"]
+    layout = spec["layout"]
+    img = _new_canvas()
+    draw = ImageDraw.Draw(img)
+    body_y = _draw_slide_title(draw, spec["title"])
+
+    # Left: mockup placeholder with 6 stacked sections (labels only, for the judge to read).
+    mock_x1, mock_y1 = 40, body_y + 10
+    mock_x2, mock_y2 = 780, body_y + 720
+    _draw_screenshot_card(draw, (mock_x1, mock_y1, mock_x2, mock_y2), title="ダッシュボード モックアップ")
+    sections = layout["mockup_sections"]
+    sec_h = (mock_y2 - mock_y1 - 32) // len(sections)
+    for i, sec in enumerate(sections):
+        sy1 = mock_y1 + 32 + i * sec_h
+        sy2 = sy1 + sec_h - 4
+        draw.rectangle([mock_x1 + 16, sy1, mock_x2 - 16, sy2],
+                       fill=COLORS["bg"], outline=COLORS["card_border"], width=1)
+        draw.text((mock_x1 + 28, sy1 + 12), sec, fill=COLORS["text"], font=_bold_font(14))
+
+    # Right: 15 review comment bubbles, two-column layout.
+    comments = layout["comments"]
+    comment_x1 = 800
+    comment_w = (CANVAS_W - comment_x1 - 40 - 10) // 2
+    for i, (label, text) in enumerate(comments):
+        col = i % 2
+        row = i // 2
+        cx1 = comment_x1 + col * (comment_w + 10)
+        cy1 = body_y + 20 + row * 90
+        draw.rectangle([cx1, cy1, cx1 + comment_w, cy1 + 78],
+                       fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
+        draw.text((cx1 + 10, cy1 + 8), label, fill=COLORS["danger_text"], font=_bold_font(13))
+        # Wrap text across up to 2 lines manually (approximate).
+        draw.text((cx1 + 10, cy1 + 32), text[:40], fill=COLORS["danger_text"], font=_font(12))
+        if len(text) > 40:
+            draw.text((cx1 + 10, cy1 + 52), text[40:80], fill=COLORS["danger_text"], font=_font(12))
+        # Thin leader line toward the mockup (approximate, aimed at section based on comment index).
+        target_section_idx = i % len(sections)
+        target_y = mock_y1 + 32 + target_section_idx * sec_h + sec_h // 2
+        _arrow(draw, (cx1, cy1 + 40), (mock_x2, target_y),
+               color=COLORS["danger"], width=1, head=6)
+
+    img.save(out_path, "PNG")
+
+
+def render_p07(out_path: Path) -> None:
+    """P7: 混合ダッシュボードページ — 表 + 棒グラフ + SS + コード + 箇条書き."""
+    spec = SPEC["p07"]
+    layout = spec["layout"]
+    img = _new_canvas()
+    draw = ImageDraw.Draw(img)
+    body_y = _draw_slide_title(draw, spec["title"])
+
+    # Top-left: table
+    tbl = layout["table"]
+    tx1, ty1 = 40, body_y + 20
+    tx2, ty2 = 820, body_y + 380
+    _draw_screenshot_card(draw, (tx1, ty1, tx2, ty2), title=tbl["title"])
+    col_widths = [140, 130, 130, 140, 140]
+    hx = tx1 + 12
+    hy = ty1 + 48
+    for ci, col in enumerate(tbl["columns"]):
+        draw.rectangle([hx, hy, hx + col_widths[ci], hy + 34],
+                       fill=COLORS["grid"], outline=COLORS["card_border"])
+        draw.text((hx + 8, hy + 8), col, fill=COLORS["text"], font=_bold_font(13))
+        hx += col_widths[ci]
+    for r, row in enumerate(tbl["rows"]):
+        rx = tx1 + 12
+        ry = hy + 34 * (r + 1)
+        for ci, val in enumerate(row):
+            draw.rectangle([rx, ry, rx + col_widths[ci], ry + 34],
+                           fill=COLORS["bg"], outline=COLORS["card_border"])
+            draw.text((rx + 8, ry + 8), val, fill=COLORS["text"], font=_font(12))
+            rx += col_widths[ci]
+
+    # Top-right: bar chart
+    bc = layout["bar_chart"]
+    bx1, by1 = 860, body_y + 20
+    bx2, by2 = CANVAS_W - 40, body_y + 380
+    _draw_screenshot_card(draw, (bx1, by1, bx2, by2), title=bc["title"])
+    bars = bc["data"]
+    max_v = max(v for _, v in bars)
+    chart_top = by1 + 60
+    chart_bot = by2 - 40
+    chart_left = bx1 + 40
+    chart_right = bx2 - 20
+    draw.line([(chart_left, chart_bot), (chart_right, chart_bot)], fill=COLORS["text"], width=2)
+    bar_area_w = chart_right - chart_left - 40
+    bar_w = bar_area_w // (len(bars) * 2)
+    for i, (lbl, v) in enumerate(bars):
+        x = chart_left + 20 + i * (bar_w * 2)
+        h = int((v / max_v) * (chart_bot - chart_top - 20))
+        draw.rectangle([x, chart_bot - h, x + bar_w, chart_bot], fill=COLORS["primary"])
+        draw.text((x, chart_bot - h - 18), str(v), fill=COLORS["text"], font=_font(12))
+        draw.text((x + bar_w // 4, chart_bot + 6), lbl, fill=COLORS["text"], font=_font(12))
+
+    # Bottom-left: screenshot caption placeholder
+    ssx1, ssy1 = 40, by2 + 20
+    ssx2, ssy2 = 440, ssy1 + 360
+    _draw_screenshot_card(draw, (ssx1, ssy1, ssx2, ssy2), title="スクリーンショット")
+    draw.rectangle([ssx1 + 20, ssy1 + 50, ssx2 - 20, ssy2 - 50],
+                   fill=COLORS["card_border"], outline=COLORS["card_border"])
+    draw.text((ssx1 + 20, ssy2 - 40), layout["screenshot_caption"],
+              fill=COLORS["text"], font=_bold_font(13))
+
+    # Bottom-center: code snippet
+    cx1, cy1 = 460, by2 + 20
+    cx2, cy2 = 960, ssy2
+    _draw_screenshot_card(draw, (cx1, cy1, cx2, cy2), title=layout["code_snippet"]["filename"])
+    draw.rectangle([cx1 + 12, cy1 + 48, cx2 - 12, cy2 - 12],
+                   fill="#1e1e1e", outline=COLORS["card_border"])
+    code_y = cy1 + 60
+    for line in layout["code_snippet"]["lines"]:
+        draw.text((cx1 + 20, code_y), line, fill="#d4d4d4", font=_mono_font(13))
+        code_y += 22
+
+    # Bottom-right: bullets
+    bux1, buy1 = 980, by2 + 20
+    bux2, buy2 = CANVAS_W - 40, ssy2
+    _draw_screenshot_card(draw, (bux1, buy1, bux2, buy2), title="主要メトリクス")
+    by = buy1 + 60
+    for b in layout["bullets"]:
+        draw.text((bux1 + 20, by), f"• {b}", fill=COLORS["text"], font=_font(14))
+        by += 36
+
+    img.save(out_path, "PNG")
+
+
+def render_p08(out_path: Path) -> None:
+    """P8: 組織図 + ノード SS 補足 — 3 階層 10 ノード."""
+    spec = SPEC["p08"]
+    layout = spec["layout"]
+    img = _new_canvas()
+    draw = ImageDraw.Draw(img)
+    body_y = _draw_slide_title(draw, spec["title"])
+
+    nodes = layout["nodes"]  # list of (id, level, name, role, parent)
+    # Group by level
+    by_level: dict[int, list[tuple]] = {}
+    for n in nodes:
+        by_level.setdefault(n[1], []).append(n)
+
+    # Level y-positions
+    level_ys = {1: body_y + 40, 2: body_y + 240, 3: body_y + 500}
+    node_w, node_h = 180, 120
+
+    # Draw nodes level by level, centered horizontally
+    node_positions: dict[str, tuple[int, int]] = {}  # id -> (cx, cy_top)
+    for lvl, items in sorted(by_level.items()):
+        total_w = len(items) * node_w + (len(items) - 1) * 40
+        start_x = (CANVAS_W - total_w) // 2
+        for i, (nid, _lvl, name, role, _parent) in enumerate(items):
+            nx1 = start_x + i * (node_w + 40)
+            ny1 = level_ys[lvl]
+            nx2 = nx1 + node_w
+            ny2 = ny1 + node_h
+            _draw_screenshot_card(draw, (nx1, ny1, nx2, ny2))
+            # Avatar placeholder (circle)
+            avatar_cx = nx1 + node_w // 2
+            avatar_cy = ny1 + 38
+            draw.ellipse([avatar_cx - 22, avatar_cy - 22, avatar_cx + 22, avatar_cy + 22],
+                         fill=COLORS["card_border"], outline=COLORS["card_border"])
+            # Name + role
+            nw, _ = _tsize(draw, name, _bold_font(14))
+            draw.text((nx1 + (node_w - nw) // 2, ny1 + 66), name,
+                      fill=COLORS["text"], font=_bold_font(14))
+            rw, _ = _tsize(draw, role, _font(12))
+            draw.text((nx1 + (node_w - rw) // 2, ny1 + 88), role,
+                      fill=COLORS["muted"], font=_font(12))
+            node_positions[nid] = (avatar_cx, ny1, ny2)
+
+    # Draw parent→child lines
+    for nid, lvl, name, role, parent in nodes:
+        if parent and parent in node_positions:
+            pcx, _py1, py2 = node_positions[parent]
+            ccx, cy1, _cy2 = node_positions[nid]
+            # Vertical line from parent bottom to child top
+            draw.line([(pcx, py2), (pcx, (py2 + cy1) // 2)], fill=COLORS["text"], width=2)
+            draw.line([(pcx, (py2 + cy1) // 2), (ccx, (py2 + cy1) // 2)], fill=COLORS["text"], width=2)
+            draw.line([(ccx, (py2 + cy1) // 2), (ccx, cy1)], fill=COLORS["text"], width=2)
+
+    img.save(out_path, "PNG")
+
+
 def render_png(pid: str, out_path: Path) -> None:
     """Dispatch table mapping pattern id → per-pattern renderer."""
     renderers = {
-        "p01": render_p01,
-        "p02": render_p02,
-        "p03": render_p03,
-        "p04": render_p04,
+        "p01": render_p01, "p02": render_p02, "p03": render_p03, "p04": render_p04,
+        "p05": render_p05, "p06": render_p06, "p07": render_p07, "p08": render_p08,
     }
     if pid not in renderers:
-        raise NotImplementedError(f"render_png not yet implemented for {pid}")
+        raise NotImplementedError(f"render_png not implemented for {pid}")
     renderers[pid](out_path)
