@@ -37,3 +37,38 @@ def test_load_ground_truth_returns_8_patterns(tmp_path: Path):
     gt = je.load_ground_truth(gt_path)
     assert set(gt.keys()) == {"p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"}
     assert all("facts" in v for v in gt.values())
+
+
+def test_hallucination_prompt_template_has_required_slots():
+    tmpl = je.JUDGE_PROMPT_HALLUCINATION
+    assert "{description}" in tmpl
+    assert "{facts_json}" in tmpl
+
+
+def test_split_pptx_response_heuristic_uses_slide_headers():
+    response = """
+## Slide 1
+Line A for p01.
+
+## Slide 2
+Line B for p02.
+
+## Slide 3
+Line C for p03.
+""".strip()
+    segments = je.split_pptx_response_heuristic(response, n_slides=8)
+    assert len(segments) == 8
+    assert "Line A for p01" in segments[0]
+    assert "Line B for p02" in segments[1]
+    assert "Line C for p03" in segments[2]
+    # Slides 4-8 have no header match; should be empty strings.
+    for i in range(3, 8):
+        assert segments[i] == "", f"slide {i+1} should be empty when no header present"
+
+
+def test_split_pptx_response_heuristic_no_headers_returns_whole_as_slide_1():
+    response = "Free-form text, no slide headers at all"
+    segments = je.split_pptx_response_heuristic(response, n_slides=8)
+    assert segments[0] == response
+    for i in range(1, 8):
+        assert segments[i] == ""

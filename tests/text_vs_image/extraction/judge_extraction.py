@@ -75,6 +75,92 @@ def load_ground_truth(gt_path: Path) -> dict[str, dict[str, Any]]:
     return yaml.safe_load(gt_path.read_text(encoding="utf-8"))
 
 
+JUDGE_PROMPT_HALLUCINATION = """以下の description（Copilot の出力）を読み、
+参照ドキュメントに存在しない情報（捏造）が含まれているか判定してください。
+
+## 判定対象の参照事実（ground truth）
+{facts_json}
+
+## Copilot の出力
+{description}
+
+## タスク
+1. Copilot の出力の中で、上の参照事実のどれにも該当せず、かつ事実として元の
+   ドキュメントに含まれていなかった可能性が高い具体的な記述を列挙してください。
+2. 一般的な要約・構造化・Markdown 整形・フォーマット装飾は hallucination とは
+   みなしません。事実の追加のみを対象とします。
+
+## 出力形式
+以下の JSON 形式で厳格に返してください。JSON 以外の説明文は禁止。
+
+{{
+  "hallucination_count": <int>,
+  "examples": ["...", "..."]
+}}
+
+"examples" には最大 10 件の具体的な捏造内容を原文で記載してください。
+"hallucination_count" は検出総数です（11 件以上ある場合は examples を 10 件に
+切り詰めても count はすべての件数）。"""
+
+
+def _judge_hallucination_once(
+    gemini: genai.Client,
+    judge_model: str,
+    response_text: str,
+    facts: list[dict[str, str]],
+) -> dict[str, Any]:
+    prompt = JUDGE_PROMPT_HALLUCINATION.format(
+        description=response_text,
+        facts_json=json.dumps(
+            [{"id": f["id"], "text": f["text"]} for f in facts],
+            ensure_ascii=False, indent=2,
+        ),
+    )
+    last_err: Exception | None = None
+    for _ in range(3):
+        try:
+            resp = gemini.models.generate_content(model=judge_model, contents=[prompt])
+            text = getattr(resp, "text", "") or ""
+            parsed = extract_json(text)
+            count = int(parsed.get("hallucination_count", 0))
+            examples = list(parsed.get("examples", []))[:10]
+            return {"count": count, "examples": examples}
+        except (ValueError, json.JSONDecodeError, KeyError, TypeError) as e:
+            last_err = e
+            time.sleep(1)
+    raise RuntimeError(f"hallucination judge failed after 3 retries: {last_err}")
+
+
+_SLIDE_HEADER_RE = re.compile(r"^##\s*(?:Slide|スライド|slide)\s*(\d+)", re.IGNORECASE | re.MULTILINE)
+
+
+def split_pptx_response_heuristic(response_text: str, n_slides: int = 8) -> list[str]:
+    """Split a Copilot PPTX response into per-slide segments.
+
+    Strategy:
+      1. If response contains `## Slide N` (or `スライド N`) markers, split on those.
+      2. Otherwise, put all text in segment 0 and leave the rest empty
+         (the caller can then fall back to a Gemini-based splitter, added later
+         if heuristic fails often in practice).
+
+    Returns a list of length `n_slides`, 0-indexed (segment[i] corresponds to
+    slide i+1).
+    """
+    segments = [""] * n_slides
+    matches = list(_SLIDE_HEADER_RE.finditer(response_text))
+    if not matches:
+        segments[0] = response_text.strip()
+        return segments
+    for i, m in enumerate(matches):
+        slide_num = int(m.group(1))
+        if not (1 <= slide_num <= n_slides):
+            continue
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(response_text)
+        segments[slide_num - 1] = response_text[start:end].strip()
+    return segments
+
+
 def _judge_recall_once(
     gemini: genai.Client,
     judge_model: str,
@@ -107,10 +193,7 @@ def judge_one(
     gt: dict[str, dict[str, Any]],
     n_runs: int,
 ) -> dict[str, Any]:
-    """Run recall judging `n_runs` times and aggregate into one scores object.
-
-    Does NOT yet compute hallucination — that lands in Task 10.
-    """
+    """Recall (n_runs) + hallucination (1 run — cheap, list rather than percentage)."""
     facts = gt[pid]["facts"]
     per_item_verdicts: dict[str, list[str]] = {f["id"]: [] for f in facts}
     runs_meta: list[dict[str, Any]] = []
@@ -130,6 +213,9 @@ def judge_one(
         runs_meta.append({"run": run_idx, "score_avg": run_avg, "judge_seconds": elapsed})
         print(f"    [run {run_idx}/{n_runs}] recall={run_avg:.3f} ({elapsed:.1f}s)", flush=True)
 
+    print(f"    [hallucination check]", flush=True)
+    hallu = _judge_hallucination_once(gemini, judge_model, response_text, facts)
+
     agg_avg = sum(r["score_avg"] for r in runs_meta) / len(runs_meta) if runs_meta else 0.0
     agg_std = _stdev([r["score_avg"] for r in runs_meta])
     facts_out: list[dict[str, Any]] = []
@@ -148,6 +234,8 @@ def judge_one(
         "n_facts": len(facts),
         "recall_avg": agg_avg,
         "recall_std": agg_std,
+        "hallucination_count": hallu["count"],
+        "hallucination_examples": hallu["examples"],
         "runs": runs_meta,
         "facts": facts_out,
     }
@@ -195,12 +283,58 @@ def main() -> int:
         out.write_text(json.dumps(scores, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"    → {out.name} recall={scores['recall_avg']:.3f}")
 
-    # PPTX judging (single response file covering all 8 slides)
-    # Splitting logic lands in Task 10; for now, if pptx_response.md exists, just
-    # punt with a placeholder scores file noting the pending split step.
+    # PPTX judging: one response file covering all 8 slides, split per-slide, then judge each.
     pptx_resp = prompt_dir / "pptx_response.md"
     if pptx_resp.exists():
-        print("[pptx] response exists but splitting deferred to Task 10 implementation")
+        print("[pptx] splitting per-slide and judging each segment...")
+        pptx_text = extract_output_section(pptx_resp)
+        segments = split_pptx_response_heuristic(pptx_text, n_slides=8)
+        pptx_scores: list[dict[str, Any]] = []
+        all_pids = ["p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"]
+        for i, pid in enumerate(all_pids):
+            if pid not in patterns:
+                continue
+            seg = segments[i]
+            print(f"[pptx/{pid}]  ({len(seg)} chars)")
+            if not seg.strip():
+                # Empty segment → judge treats as missing; skip hallucination.
+                facts = gt[pid]["facts"]
+                pptx_scores.append({
+                    "pattern_id": pid,
+                    "pattern_name": gt[pid]["pattern_name"],
+                    "n_runs": 0,
+                    "n_facts": len(facts),
+                    "recall_avg": 0.0,
+                    "recall_std": 0.0,
+                    "hallucination_count": 0,
+                    "hallucination_examples": [],
+                    "runs": [],
+                    "facts": [
+                        {"id": f["id"], "text": f["text"],
+                         "verdict": "missing", "verdicts": ["missing"],
+                         "verdict_mode": "missing", "agreement": 1.0}
+                        for f in facts
+                    ],
+                    "note": "pptx split heuristic found no text for this slide",
+                })
+                continue
+            scores = judge_one(gemini, args.judge_model, seg, pid, gt, args.n_runs)
+            pptx_scores.append(scores)
+            print(f"    → recall={scores['recall_avg']:.3f} hallu={scores['hallucination_count']}")
+        (scores_dir / "pptx_scores.json").write_text(
+            json.dumps(pptx_scores, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    # Summary
+    summary = {
+        "prompt_id": args.prompt_id,
+        "judge_model": args.judge_model,
+        "n_runs": args.n_runs,
+        "patterns_judged": patterns,
+    }
+    (scores_dir / "summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
     return 0
 
