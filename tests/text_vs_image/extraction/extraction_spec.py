@@ -395,3 +395,34 @@ SPEC: dict[str, dict[str, Any]] = {
         ],
     },
 }
+
+
+from pathlib import Path
+import yaml
+
+
+def emit_ground_truth_yaml(out_path: Path) -> None:
+    """Write the public-facing GT for every pattern to `out_path`.
+
+    The YAML schema matches what `judge_extraction.py` expects:
+      {pattern_id: {id, title, pattern_name, description, facts: [{id, text}, ...]}}
+
+    The `layout` field is intentionally excluded — it is an internal artifact
+    for the renderers and must not leak into the judge's ground truth (otherwise
+    the judge would reward verbatim reproduction of layout metadata, not the
+    content that a reader of the image would actually see).
+    """
+    public: dict[str, dict[str, Any]] = {}
+    for pid, data in SPEC.items():
+        public[pid] = {
+            "id": data["id"],
+            "title": data["title"],
+            "pattern_name": data["pattern_name"],
+            "description": data["description"],
+            "facts": [{"id": f["id"], "text": f["text"]} for f in data["facts"]],
+        }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        yaml.safe_dump(public, allow_unicode=True, sort_keys=False, width=120),
+        encoding="utf-8",
+    )

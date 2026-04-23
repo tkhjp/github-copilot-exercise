@@ -38,3 +38,30 @@ def test_total_fact_count_is_in_expected_range():
     # nothing catastrophic.
     total = sum(len(p["facts"]) for p in spec_mod.SPEC.values())
     assert 130 <= total <= 280, f"total facts {total} outside [130, 280]"
+
+
+import yaml
+from pathlib import Path
+
+
+def test_emit_ground_truth_yaml_round_trips(tmp_path: Path):
+    out = tmp_path / "gt.yaml"
+    spec_mod.emit_ground_truth_yaml(out)
+    loaded = yaml.safe_load(out.read_text(encoding="utf-8"))
+    assert isinstance(loaded, dict)
+    assert set(loaded.keys()) == {"p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"}
+    # Each pattern has id, title, pattern_name, facts
+    for pid, data in loaded.items():
+        assert data["id"] == pid
+        assert isinstance(data["facts"], list)
+        assert all({"id", "text"} <= set(f) for f in data["facts"])
+
+
+def test_emit_ground_truth_yaml_preserves_fact_order(tmp_path: Path):
+    out = tmp_path / "gt.yaml"
+    spec_mod.emit_ground_truth_yaml(out)
+    loaded = yaml.safe_load(out.read_text(encoding="utf-8"))
+    for pid, data in loaded.items():
+        spec_ids = [f["id"] for f in spec_mod.SPEC[pid]["facts"]]
+        yaml_ids = [f["id"] for f in data["facts"]]
+        assert spec_ids == yaml_ids
