@@ -30,7 +30,7 @@ EXPECTED_PNG_NAMES = [
 CANVAS_W, CANVAS_H = 1600, 900  # All PNGs share the same aspect ratio so Copilot gets uniform framing.
 
 
-@pytest.mark.parametrize("pid", ["p01"])  # Extended to p01-p08 after each renderer lands.
+@pytest.mark.parametrize("pid", ["p01", "p02", "p03", "p04"])  # Extended to p01-p08 after each renderer lands.
 def test_render_png_produces_valid_image(tmp_path: Path, pid: str):
     out_path = tmp_path / f"{pid}.png"
     g.render_png(pid, out_path)
