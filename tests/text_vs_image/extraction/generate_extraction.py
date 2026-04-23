@@ -10,6 +10,7 @@ and re-run this script.
 """
 from __future__ import annotations
 
+import argparse
 import math
 import textwrap
 from pathlib import Path
@@ -1210,3 +1211,43 @@ def render_pptx(out_path: Path) -> None:
     for pid in ["p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"]:
         builders[pid](prs)
     prs.save(str(out_path))
+
+
+PNG_FILENAMES = {
+    "p01": "p01_ui_callouts.png",
+    "p02": "p02_before_after.png",
+    "p03": "p03_process_flow.png",
+    "p04": "p04_dashboard_annotated.png",
+    "p05": "p05_hierarchical_drilldown.png",
+    "p06": "p06_review_comments.png",
+    "p07": "p07_mixed_dashboard.png",
+    "p08": "p08_org_chart.png",
+}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Generate extraction test corpus (PPTX + 8 PNG + GT YAML)")
+    ap.add_argument("--out-dir", default=str(ROOT),
+                    help="Where to write artifacts (default: alongside this script)")
+    args = ap.parse_args()
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for pid, fname in PNG_FILENAMES.items():
+        path = out_dir / fname
+        render_png(pid, path)
+        print(f"wrote {path} ({path.stat().st_size} bytes)")
+
+    pptx_path = out_dir / "extraction_test.pptx"
+    render_pptx(pptx_path)
+    print(f"wrote {pptx_path} ({pptx_path.stat().st_size} bytes)")
+
+    gt_path = out_dir / "ground_truth.yaml"
+    emit_ground_truth_yaml(gt_path)
+    print(f"wrote {gt_path} ({gt_path.stat().st_size} bytes)")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
