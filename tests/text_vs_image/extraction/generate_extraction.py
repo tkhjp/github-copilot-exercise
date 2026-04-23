@@ -489,6 +489,13 @@ def render_p06(out_path: Path) -> None:
     comments = layout["comments"]
     comment_x1 = 800
     comment_w = (CANVAS_W - comment_x1 - 40 - 10) // 2
+    # First comment per mockup section (one representative leader arrow per section, not 15).
+    section_anchor_first_i: dict[int, int] = {}
+    for i, _ in enumerate(comments):
+        sec_idx = i % len(sections)
+        section_anchor_first_i.setdefault(sec_idx, i)
+    anchor_is = set(section_anchor_first_i.values())
+
     for i, (label, text) in enumerate(comments):
         col = i % 2
         row = i // 2
@@ -497,15 +504,16 @@ def render_p06(out_path: Path) -> None:
         draw.rectangle([cx1, cy1, cx1 + comment_w, cy1 + 78],
                        fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
         draw.text((cx1 + 10, cy1 + 8), label, fill=COLORS["danger_text"], font=_bold_font(13))
-        # Wrap text across up to 2 lines manually (approximate).
-        draw.text((cx1 + 10, cy1 + 32), text[:40], fill=COLORS["danger_text"], font=_font(12))
-        if len(text) > 40:
-            draw.text((cx1 + 10, cy1 + 52), text[40:80], fill=COLORS["danger_text"], font=_font(12))
-        # Thin leader line toward the mockup (approximate, aimed at section based on comment index).
-        target_section_idx = i % len(sections)
-        target_y = mock_y1 + 32 + target_section_idx * sec_h + sec_h // 2
-        _arrow(draw, (cx1, cy1 + 40), (mock_x2, target_y),
-               color=COLORS["danger"], width=1, head=6)
+        # Wrap text to fit comment width (replaces manual text[:40]/text[40:80] slicing).
+        wrapped = textwrap.fill(text, width=18, max_lines=2, placeholder="…")
+        draw.text((cx1 + 10, cy1 + 32), wrapped, fill=COLORS["danger_text"], font=_font(12))
+        # Draw a leader arrow only for the first comment that maps to each section,
+        # keeping fact p06_f19 satisfied without spaghetti visuals.
+        if i in anchor_is:
+            target_section_idx = i % len(sections)
+            target_y = mock_y1 + 32 + target_section_idx * sec_h + sec_h // 2
+            _arrow(draw, (cx1, cy1 + 40), (mock_x2, target_y),
+                   color=COLORS["danger"], width=1, head=6)
 
     img.save(out_path, "PNG")
 
@@ -637,7 +645,7 @@ def render_p08(out_path: Path) -> None:
             node_positions[nid] = (avatar_cx, ny1, ny2)
 
     # Draw parent→child lines
-    for nid, lvl, name, role, parent in nodes:
+    for nid, _lvl, _name, _role, parent in nodes:
         if parent and parent in node_positions:
             pcx, _py1, py2 = node_positions[parent]
             ccx, cy1, _cy2 = node_positions[nid]
