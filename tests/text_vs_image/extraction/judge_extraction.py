@@ -278,6 +278,11 @@ def main() -> int:
             continue
         print(f"[png/{pid}]")
         response_text = extract_output_section(resp_path)
+        # Skip empty responses (forgot-to-paste case) — avoids burning Gemini quota on
+        # guaranteed-zero recall + hallucination calls.
+        if not response_text.strip():
+            print(f"SKIP {pid}: {resp_path.name} has empty ## Output body (paste the Copilot response)")
+            continue
         scores = judge_one(gemini, args.judge_model, response_text, pid, gt, args.n_runs)
         out = scores_dir / f"png_{pid}_scores.json"
         out.write_text(json.dumps(scores, ensure_ascii=False, indent=2), encoding="utf-8")

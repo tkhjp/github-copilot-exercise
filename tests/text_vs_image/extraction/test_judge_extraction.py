@@ -72,3 +72,42 @@ def test_split_pptx_response_heuristic_no_headers_returns_whole_as_slide_1():
     assert segments[0] == response
     for i in range(1, 8):
         assert segments[i] == ""
+
+
+def test_extract_output_section_empty_body_returns_empty_string(tmp_path: Path):
+    """A response file with `## Output` followed only by an HTML-comment placeholder
+    should extract to an empty string (caller can then skip judge calls)."""
+    p = tmp_path / "empty.md"
+    p.write_text("# x\n\n## Output\n\n<!-- paste here -->\n", encoding="utf-8")
+    assert je.extract_output_section(p) == ""
+
+
+def test_split_pptx_response_heuristic_oob_slide_number_is_ignored():
+    """`## Slide 9` (out of range for n_slides=8) should be silently ignored and
+    its content dropped, NOT crash or land in an unrelated segment."""
+    response = """
+## Slide 1
+Legit p01 content.
+
+## Slide 9
+Hallucinated slide — should be dropped.
+""".strip()
+    segments = je.split_pptx_response_heuristic(response, n_slides=8)
+    assert "Legit p01 content" in segments[0]
+    for i in range(1, 8):
+        assert "Hallucinated" not in segments[i]
+
+
+def test_split_pptx_response_heuristic_duplicate_header_last_wins():
+    """Duplicate `## Slide N` headers: the last match's content overwrites earlier —
+    documenting current behavior so future maintainers don't accidentally change it."""
+    response = """
+## Slide 1
+First p01 block.
+
+## Slide 1
+Second p01 block (replaces first).
+""".strip()
+    segments = je.split_pptx_response_heuristic(response, n_slides=8)
+    assert "Second p01 block" in segments[0]
+    assert "First p01 block" not in segments[0]

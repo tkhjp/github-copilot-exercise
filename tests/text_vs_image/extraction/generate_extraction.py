@@ -642,7 +642,7 @@ def render_p08(out_path: Path) -> None:
     node_w, node_h = 180, 120
 
     # Draw nodes level by level, centered horizontally
-    node_positions: dict[str, tuple[int, int]] = {}  # id -> (cx, cy_top)
+    node_positions: dict[str, tuple[int, int, int]] = {}  # id -> (cx, cy_top, cy_bottom)
     for lvl, items in sorted(by_level.items()):
         total_w = len(items) * node_w + (len(items) - 1) * 40
         start_x = (CANVAS_W - total_w) // 2
