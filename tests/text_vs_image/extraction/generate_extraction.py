@@ -10,10 +10,8 @@ and re-run this script.
 """
 from __future__ import annotations
 
-import argparse
 import math
 from pathlib import Path
-from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -116,14 +114,17 @@ def _draw_callout(
     text: str,
     target: tuple[int, int],
     font=None,
-    color=COLORS["danger"],
-    fill=COLORS["danger_bg"],
-    text_color=COLORS["danger_text"],
+    color=None,
+    fill=None,
+    text_color=None,
 ):
     """Red callout box with label (e.g. 'C1') + text + leader line to target point."""
     x1, y1, x2, y2 = box_rect
-    draw.rectangle([x1, y1, x2, y2], fill=fill, outline=color, width=2)
     f = font or _bold_font(13)
+    color = color or COLORS["danger"]
+    fill = fill or COLORS["danger_bg"]
+    text_color = text_color or COLORS["danger_text"]
+    draw.rectangle([x1, y1, x2, y2], fill=fill, outline=color, width=2)
     draw.text((x1 + 10, y1 + 8), f"{label} {text}", fill=text_color, font=f)
     cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
     _arrow(draw, (cx, cy), target, color=color, width=2, head=10)
@@ -162,16 +163,15 @@ def render_p01(out_path: Path) -> None:
 
     # Table (5 columns, 4 rows).
     tbl_x1, tbl_y1 = card[0] + 24, body_y + 60
-    tbl_x2 = card[2] - 24
     col_widths = [190, 110, 110, 110, 140]
     row_h = 42
     # Header row
     hx = tbl_x1
-    for header in layout["table_header"]:
-        draw.rectangle([hx, tbl_y1, hx + col_widths[layout["table_header"].index(header)], tbl_y1 + row_h],
+    for ci, header in enumerate(layout["table_header"]):
+        draw.rectangle([hx, tbl_y1, hx + col_widths[ci], tbl_y1 + row_h],
                        fill=COLORS["grid"], outline=COLORS["card_border"])
         draw.text((hx + 10, tbl_y1 + 12), header, fill=COLORS["text"], font=_bold_font(14))
-        hx += col_widths[layout["table_header"].index(header)]
+        hx += col_widths[ci]
     # Data rows
     for r, row in enumerate(layout["table_rows"]):
         ry = tbl_y1 + row_h * (r + 1)
