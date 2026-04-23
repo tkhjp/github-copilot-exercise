@@ -11,6 +11,7 @@ and re-run this script.
 from __future__ import annotations
 
 import math
+import textwrap
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -217,12 +218,14 @@ def render_p02(out_path: Path) -> None:
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"])
 
-    # Two screenshot cards side by side.
     gap = 40
     card_w = (CANVAS_W - 3 * gap) // 2
-    before = (gap, body_y + 10, gap + card_w, body_y + 660)
-    after = (2 * gap + card_w, body_y + 10, 2 * gap + 2 * card_w, body_y + 660)
+    card_bottom = body_y + 540  # shrunk from 660 so D1/D2/D3 labels fit cleanly below
+    before = (gap, body_y + 10, gap + card_w, card_bottom)
+    after = (2 * gap + card_w, body_y + 10, 2 * gap + 2 * card_w, card_bottom)
 
+    # Capture anchors while drawing so diff arrows land on actual element positions.
+    anchors: dict[str, dict[str, tuple[int, int]]] = {}
     for card, side_key in [(before, "before"), (after, "after")]:
         s = layout[side_key]
         _draw_screenshot_card(draw, card, title=s["title"])
@@ -237,29 +240,37 @@ def render_p02(out_path: Path) -> None:
         bw, _ = _tsize(draw, s["button"], _bold_font(13))
         draw.text((card[2] - 77 - bw // 2, sy + 10), s["button"],
                   fill=COLORS["header_text"], font=_bold_font(13))
-        # Filter rows (small boxes)
-        fy = sy + 60
+        # Filter rows
+        fy_start = sy + 60
+        fy = fy_start
         for _i in range(s["filter_rows"]):
             draw.rectangle([sx1, fy, card[2] - 24, fy + 28],
                            fill=COLORS["card_bg"], outline=COLORS["card_border"])
             fy += 36
         # Results label
-        draw.text((sx1, fy + 20), s["result_count_label"], fill=COLORS["text"], font=_font(13))
+        results_y = fy + 20
+        draw.text((sx1, results_y), s["result_count_label"], fill=COLORS["text"], font=_font(13))
         # Pagination
-        draw.text((sx1, fy + 60), s["pagination"], fill=COLORS["text"], font=_bold_font(14))
+        pagination_y = fy + 60
+        draw.text((sx1, pagination_y), s["pagination"], fill=COLORS["text"], font=_bold_font(14))
 
-    # 3 red diff arrows with labels D1..D3. Targets: placeholder (both sides), filter area, pagination.
+        # Save anchors for diff arrows (D1→placeholder, D2→filters, D3→pagination)
+        anchors[side_key] = {
+            "placeholder": (sx1 + 80, sy + 18),
+            "filters":     (sx1 + 80, fy_start + 14),
+            "pagination":  (sx1 + 80, pagination_y + 10),
+        }
+
+    # 3 red diff labels + dual arrows from label to both sides' corresponding anchors.
     diff_targets = [
-        ((before[0] + 80, body_y + 86), (after[0] + 80, body_y + 86)),
-        ((before[0] + 80, body_y + 140), (after[0] + 80, body_y + 180)),
-        ((before[0] + 200, body_y + 520), (after[0] + 300, body_y + 520)),
+        (anchors["before"]["placeholder"], anchors["after"]["placeholder"]),
+        (anchors["before"]["filters"],     anchors["after"]["filters"]),
+        (anchors["before"]["pagination"],  anchors["after"]["pagination"]),
     ]
     for i, (label, text) in enumerate(layout["diffs"]):
-        y = CANVAS_H - 220 + i * 60
-        # Label box below the cards
+        y = card_bottom + 30 + i * 60  # cleanly below cards now
         draw.rectangle([40, y, 280, y + 44], fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
         draw.text((50, y + 12), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(13))
-        # Short arrows from label to both before and after targets
         for target in diff_targets[i]:
             _arrow(draw, (280, y + 22), target, color=COLORS["danger"], width=2, head=10)
 
@@ -287,8 +298,9 @@ def render_p03(out_path: Path) -> None:
         x1 = margin + i * (card_w + gap)
         x2 = x1 + card_w
         _draw_screenshot_card(draw, (x1, y1, x2, y2), title=step_title)
-        # Body of card: wrap step_desc
-        draw.text((x1 + 12, y1 + 48), step_desc, fill=COLORS["text"], font=_font(13))
+        # Body of card: wrap step_desc to fit narrow card width
+        wrapped = textwrap.fill(step_desc, width=14)
+        draw.text((x1 + 12, y1 + 48), wrapped, fill=COLORS["text"], font=_font(13))
         # Step label above card
         draw.rectangle([x1 + card_w // 2 - 24, y1 - 40, x1 + card_w // 2 + 24, y1 - 8],
                        fill=COLORS["primary"], outline=COLORS["primary_dk"], width=2)
@@ -364,7 +376,7 @@ def render_p04(out_path: Path) -> None:
         draw.text((kx1 + 16, kpi_y1 + 48), kpi_val, fill=COLORS["text"], font=_bold_font(28))
         draw.text((kx1 + 16, kpi_y1 + 100), kpi_sub, fill=COLORS["success"], font=_font(13))
 
-    # 3 interpretive callouts on the right margin, each with a label (A1..A3)
+    # 3 interpretive callout rows across the bottom (A1..A3) — full-width red strips
     for i, (label, text) in enumerate(layout["annotations"]):
         ay = kpi_y2 + 20 + i * 44
         draw.rectangle([40, ay, CANVAS_W - 40, ay + 36],
