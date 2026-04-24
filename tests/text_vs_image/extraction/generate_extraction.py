@@ -161,9 +161,14 @@ def _draw_slide_title(draw: ImageDraw.ImageDraw, title: str, subtitle: str | Non
     """Draw the slide title bar; return y-offset where body content can start."""
     draw.text((32, 22), title, fill=COLORS["text"], font=_bold_font(26))
     if subtitle:
-        draw.text((32, 60), subtitle, fill=COLORS["muted"], font=_font(14))
+        draw.text((32, 60), subtitle, fill=COLORS["muted"], font=_font(13))
     draw.line([(32, 86), (CANVAS_W - 32, 86)], fill=COLORS["grid"], width=2)
     return 100  # body starts here
+
+
+def _draw_footer(draw: ImageDraw.ImageDraw, text: str) -> None:
+    """Small muted copyright/metadata line at the very bottom of the canvas."""
+    draw.text((32, CANVAS_H - 24), text, fill=COLORS["muted"], font=_font(11))
 
 
 # --- Per-pattern renderers (p01-p08). Each reads SPEC[pid]['layout'] and draws to an Image. ---
@@ -174,7 +179,7 @@ def render_p01(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # Screenshot card (left ~60% of canvas).
     card = (40, body_y + 10, 1000, body_y + 700)
@@ -229,6 +234,7 @@ def render_p01(out_path: Path) -> None:
         _draw_callout(draw, box_rect=(bx1, by1, bx1 + 520, by1 + 110),
                       label=label, text=text, target=targets[i])
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -238,7 +244,7 @@ def render_p02(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     gap = 40
     card_w = (CANVAS_W - 3 * gap) // 2
@@ -296,6 +302,7 @@ def render_p02(out_path: Path) -> None:
         for target in diff_targets[i]:
             _arrow(draw, (280, y + 22), target, color=COLORS["danger"], width=2, head=10)
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -305,7 +312,7 @@ def render_p03(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # 5 mini screenshots in a single row, connected by arrows.
     steps = layout["steps"]
@@ -335,6 +342,7 @@ def render_p03(out_path: Path) -> None:
                    (x2 + gap - 4, (y1 + y2) // 2),
                    color=COLORS["text"], width=3, head=14)
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -344,7 +352,7 @@ def render_p04(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # Bar chart (top-left)
     bx1, by1 = 40, body_y + 40
@@ -405,6 +413,7 @@ def render_p04(out_path: Path) -> None:
                        fill=COLORS["danger_bg"], outline=COLORS["danger"], width=1)
         draw.text((52, ay + 8), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(13))
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -414,7 +423,7 @@ def render_p05(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # Top band: 5 modules side by side. Highlighted one has a different border.
     modules = layout["top_level_modules"]
@@ -483,6 +492,7 @@ def render_p05(out_path: Path) -> None:
             draw.text((rx + 8, ry + 10), val, fill=COLORS["text"], font=_font(13))
             rx += col_widths[ci]
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -492,7 +502,7 @@ def render_p06(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # Left: mockup placeholder with 6 stacked sections (labels only, for the judge to read).
     mock_x1, mock_y1 = 40, body_y + 10
@@ -537,6 +547,7 @@ def render_p06(out_path: Path) -> None:
             _arrow(draw, (cx1, cy1 + 40), (mock_x2, target_y),
                    color=COLORS["danger"], width=1, head=6)
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -546,7 +557,7 @@ def render_p07(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     # Top-left: table
     tbl = layout["table"]
@@ -620,6 +631,7 @@ def render_p07(out_path: Path) -> None:
         draw.text((bux1 + 20, by), f"• {b}", fill=COLORS["text"], font=_font(14))
         by += 36
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -629,7 +641,7 @@ def render_p08(out_path: Path) -> None:
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
-    body_y = _draw_slide_title(draw, spec["title"])
+    body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
     nodes = layout["nodes"]  # list of (id, level, name, role, parent)
     # Group by level
@@ -676,6 +688,7 @@ def render_p08(out_path: Path) -> None:
             draw.line([(pcx, (py2 + cy1) // 2), (ccx, (py2 + cy1) // 2)], fill=COLORS["text"], width=2)
             draw.line([(ccx, (py2 + cy1) // 2), (ccx, cy1)], fill=COLORS["text"], width=2)
 
+    _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
@@ -758,16 +771,25 @@ def _pptx_add_line(slide, x1, y1, x2, y2, *, color="#111827", width_pt=2.0):
     return ln
 
 
-def _pptx_title(slide, title: str):
+def _pptx_title(slide, title: str, subtitle: str | None = None):
     _pptx_add_text(slide, 32, 22, 1500, 40, title, size_pt=20, bold=True)
+    if subtitle:
+        _pptx_add_text(slide, 32, 60, CANVAS_W - 64, 24, subtitle,
+                       size_pt=11, color=COLORS["muted"])
     _pptx_add_line(slide, 32, 86, CANVAS_W - 32, 86, color=COLORS["grid"], width_pt=1.5)
+
+
+def _pptx_footer(slide, text: str) -> None:
+    """Muted metadata line at the very bottom of the slide."""
+    _pptx_add_text(slide, 32, CANVAS_H - 24, CANVAS_W - 64, 20, text,
+                   size_pt=9, color=COLORS["muted"])
 
 
 def _build_slide_p01(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p01"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     # Screenshot card
     card = (40, 110, 1000, 800)
@@ -823,13 +845,14 @@ def _build_slide_p01(prs) -> None:
                        label, size_pt=12, bold=True, color=COLORS["danger_text"])
         _pptx_add_text(slide, bx1 + 12, by1 + 38, 500, 60,
                        text, size_pt=11, color=COLORS["danger_text"])
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p02(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p02"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     gap = 40
     card_w = (CANVAS_W - 3 * gap) // 2
@@ -869,13 +892,14 @@ def _build_slide_p02(prs) -> None:
                       fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5)
         _pptx_add_text(slide, 50, y + 12, 220, 24,
                        f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p03(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p03"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     steps = layout["steps"]
     n = len(steps)
@@ -904,13 +928,14 @@ def _build_slide_p03(prs) -> None:
             _pptx_add_line(slide, x1 + card_w + 4, y1 + card_h // 2,
                            x1 + card_w + gap - 4, y1 + card_h // 2,
                            color=COLORS["text"], width_pt=3.0)
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p04(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p04"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     # Bar chart as labeled bars (native PPT elements, not image)
     _pptx_add_box(slide, 40, 140, 600, 300,
@@ -963,13 +988,14 @@ def _build_slide_p04(prs) -> None:
                       fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.0)
         _pptx_add_text(slide, 52, ay + 10, CANVAS_W - 120, 24,
                        f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p05(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p05"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     modules = layout["top_level_modules"]
     highlighted = layout["highlighted_module"]
@@ -1035,13 +1061,14 @@ def _build_slide_p05(prs) -> None:
             _pptx_add_text(slide, rx + 8, ry + 8, col_widths[ci] - 16, 24,
                            val, size_pt=11)
             rx += col_widths[ci]
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p06(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p06"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     # Left: mockup with 6 sections
     _pptx_add_box(slide, 40, 110, 740, 720,
@@ -1074,13 +1101,14 @@ def _build_slide_p06(prs) -> None:
                        label, size_pt=12, bold=True, color=COLORS["danger_text"])
         _pptx_add_text(slide, cx1 + 10, cy1 + 32, comment_w - 20, 44,
                        text, size_pt=11, color=COLORS["danger_text"])
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p07(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p07"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     # Top-left: table
     tbl = layout["table"]
@@ -1170,13 +1198,14 @@ def _build_slide_p07(prs) -> None:
         _pptx_add_text(slide, 1000, by, CANVAS_W - 1060, 28,
                        f"• {b}", size_pt=12)
         by += 40
+    _pptx_footer(slide, layout['footer'])
 
 
 def _build_slide_p08(prs) -> None:
     slide = _pptx_blank_slide(prs)
     spec = SPEC["p08"]
     layout = spec["layout"]
-    _pptx_title(slide, spec["title"])
+    _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     nodes = layout["nodes"]
     by_level: dict[int, list[tuple]] = {}
@@ -1212,6 +1241,7 @@ def _build_slide_p08(prs) -> None:
             _pptx_add_line(slide, pcx, py2, pcx, mid_y, color=COLORS["text"], width_pt=1.75)
             _pptx_add_line(slide, pcx, mid_y, ccx, mid_y, color=COLORS["text"], width_pt=1.75)
             _pptx_add_line(slide, ccx, mid_y, ccx, cy1, color=COLORS["text"], width_pt=1.75)
+    _pptx_footer(slide, layout['footer'])
 
 
 def render_pptx(out_path: Path) -> None:

@@ -43,6 +43,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("C3", "エクスポートボタンをもっと右に寄せる"),
                 ("C4", "日付の曜日表示は不要 (括弧削除)"),
             ],
+            "subtitle": '勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042',
+            "footer": '© 2026 ACME Corp. / Confidential',
         },
         "facts": [
             {"id": "p01_f01", "text": "画面タイトルは「勤怠管理」"},
@@ -65,6 +67,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p01_f18", "text": "吹き出しは赤色、番号 C1〜C4"},
             {"id": "p01_f19", "text": "画面は 4 行分のデータを表示"},
             {"id": "p01_f20", "text": "日付は 2026-04-01 から 2026-04-04 の連続日付 (土日除く)"},
+            {"id": "p01_f21", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: 勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042"},
+            {"id": "p01_f22", "text": "スライド下部のフッター: © 2026 ACME Corp. / Confidential"},
         ],
     },
     "p02": {
@@ -94,6 +98,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("D2", "フィルタ行が 1 行 → 3 行に拡張"),
                 ("D3", "ページネーションに省略記号 (…) と最終ページ追加"),
             ],
+            "subtitle": 'TICKET-8421 | Review: 2026-03-15 | 鈴木 (UX Lead)',
+            "footer": 'Design Review Doc v1.2 / Internal',
         },
         "facts": [
             {"id": "p02_f01", "text": "左側は「Before (現行)」、右側は「After (改修後)」"},
@@ -113,6 +119,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p02_f15", "text": "差分矢印は Before/After 両側の対応要素を指している"},
             {"id": "p02_f16", "text": "両画面とも同じ結果件数 (12 件) を示している"},
             {"id": "p02_f17", "text": "スライドには Before と After の 2 つの画面が並んでいる"},
+            {"id": "p02_f18", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: TICKET-8421 | Review: 2026-03-15 | 鈴木 (UX Lead)"},
+            {"id": "p02_f19", "text": "スライド下部のフッター: Design Review Doc v1.2 / Internal"},
         ],
     },
     "p03": {
@@ -128,6 +136,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("S4", "決済", "クレジットカード / PayPay / コンビニ"),
                 ("S5", "完了", "注文番号 ORD-2026-04-13579"),
             ],
+            "subtitle": 'UI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10',
+            "footer": 'User Research Team / Page 1 of 1',
         },
         "facts": [
             {"id": "p03_f01", "text": "5 画面の操作フローを示している"},
@@ -146,6 +156,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p03_f14", "text": "各画面間は番号付き矢印 S1→S2→S3→S4→S5 で連結"},
             {"id": "p03_f15", "text": "矢印は左から右への単方向"},
             {"id": "p03_f16", "text": "ステップ番号は S1 から S5 まで"},
+            {"id": "p03_f17", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: UI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10"},
+            {"id": "p03_f18", "text": "スライド下部のフッター: User Research Team / Page 1 of 1"},
         ],
     },
     "p04": {
@@ -172,6 +184,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("A2", "東京集中 (45%) が課題"),
                 ("A3", "解約率改善はサポート体制強化の効果"),
             ],
+            "subtitle": 'Period: 2026 Q1 | Data as of 2026-03-31 23:59 JST | 次回更新: 翌営業日',
+            "footer": 'Finance Team / Monthly Report / 2026-04 Issue',
         },
         "facts": [
             {"id": "p04_f01", "text": "棒グラフのタイトルは「月別売上 (百万円)」"},
@@ -192,6 +206,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p04_f16", "text": "注釈は 3 個 (A1-A3)"},
             {"id": "p04_f17", "text": "棒グラフ・円グラフ・KPI カードの 3 ブロック構成"},
             {"id": "p04_f18", "text": "KPI カードは 3 枚"},
+            {"id": "p04_f19", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Period: 2026 Q1 | Data as of 2026-03-31 23:59 JST | 次回更新: 翌営業日"},
+            {"id": "p04_f20", "text": "スライド下部のフッター: Finance Team / Monthly Report / 2026-04 Issue"},
         ],
     },
     "p05": {
@@ -223,6 +239,8 @@ SPEC: dict[str, dict[str, Any]] = {
                     ["log_retention", "30d", "180d"],
                 ],
             },
+            "subtitle": 'env: production-apac | Owner: Platform Team | Last audit: 2026-03-15',
+            "footer": 'Platform Docs / Last modified: 2026-04-15',
         },
         "facts": [
             {"id": "p05_f01", "text": "上段のシステム全体図にモジュールが 5 つ配置されている"},
@@ -240,6 +258,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p05_f13", "text": "上段の 5 モジュール中、拡大対象は決済コアのみ"},
             {"id": "p05_f14", "text": "すべての推奨値は現行値より大きい方向への変更"},
             {"id": "p05_f15", "text": "階層は 2 段 (全体 → 特定モジュール)"},
+            {"id": "p05_f16", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: env: production-apac | Owner: Platform Team | Last audit: 2026-03-15"},
+            {"id": "p05_f17", "text": "スライド下部のフッター: Platform Docs / Last modified: 2026-04-15"},
         ],
     },
     "p06": {
@@ -273,6 +293,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("R14", "モバイル対応のブレークポイント要確認"),
                 ("R15", "ダークモード対応は別 issue で"),
             ],
+            "subtitle": 'PR #2847 | Figma: 1920x1080 | Weekly Design Review 2026-04-10 15:00',
+            "footer": 'Design System Team / Draft v0.7',
         },
         "facts": [
             {"id": "p06_f01", "text": "モックアップにはヘッダー / サイドナビ / KPI カード / 売上推移グラフ / 最新取引テーブル / フッターの 6 セクション"},
@@ -294,6 +316,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p06_f17", "text": "R15: ダークモード対応は別 issue で"},
             {"id": "p06_f18", "text": "コメントは赤色の番号付き吹き出しで表示"},
             {"id": "p06_f19", "text": "指示線が対象要素と各コメントを結んでいる"},
+            {"id": "p06_f20", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: PR #2847 | Figma: 1920x1080 | Weekly Design Review 2026-04-10 15:00"},
+            {"id": "p06_f21", "text": "スライド下部のフッター: Design System Team / Draft v0.7"},
         ],
     },
     "p07": {
@@ -331,6 +355,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 "エラー率 0.4% (先月比 -0.1pt)",
                 "スパイクは水曜 14 時台",
             ],
+            "subtitle": 'Period: 2026 Q1 | Total: 365M JPY | Code: Python 3.13',
+            "footer": 'Analytics Dashboard / Confidential',
         },
         "facts": [
             {"id": "p07_f01", "text": "地域別実績表の列は 地域 / 売上 / 成長率 / 顧客数 / 担当"},
@@ -354,6 +380,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p07_f19", "text": "箇条書き: エラー率 0.4% (先月比 -0.1pt)"},
             {"id": "p07_f20", "text": "箇条書き: スパイクは水曜 14 時台"},
             {"id": "p07_f21", "text": "1 枚に表・棒グラフ・スクショ・コード・箇条書きの 5 種要素"},
+            {"id": "p07_f22", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Period: 2026 Q1 | Total: 365M JPY | Code: Python 3.13"},
+            {"id": "p07_f23", "text": "スライド下部のフッター: Analytics Dashboard / Confidential"},
         ],
     },
     "p08": {
@@ -375,6 +403,8 @@ SPEC: dict[str, dict[str, Any]] = {
                 ("N09", 3, "吉田 竹子", "Finance Head", "N04"),
                 ("N10", 3, "井上 柳子", "Legal Head", "N04"),
             ],
+            "subtitle": 'Effective: 2026-04-01 | Source: HRIS 2026-03-31 | ※ 2020 年以降の社員のみ表示',
+            "footer": 'HR Org Chart / Effective 2026-04-01',
         },
         "facts": [
             {"id": "p08_f01", "text": "組織図は 3 階層"},
@@ -392,6 +422,8 @@ SPEC: dict[str, dict[str, Any]] = {
             {"id": "p08_f13", "text": "第 2 階層の 3 名は全員 CEO 直下"},
             {"id": "p08_f14", "text": "ノード間は線 (組織構造線) で結ばれている"},
             {"id": "p08_f15", "text": "役職 Dev Manager / Infra Manager / Sales Head / Ops Head / Finance Head / Legal Head の 6 種が第 3 階層"},
+            {"id": "p08_f16", "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Effective: 2026-04-01 | Source: HRIS 2026-03-31 | ※ 2020 年以降の社員のみ表示"},
+            {"id": "p08_f17", "text": "スライド下部のフッター: HR Org Chart / Effective 2026-04-01"},
         ],
     },
 }

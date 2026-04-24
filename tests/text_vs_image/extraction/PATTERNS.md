@@ -6,7 +6,13 @@
 - 対応する成果物: [extraction_test.pptx](extraction_test.pptx) (8 slides) / `p01_*.png` 〜 `p08_*.png`
 - GT: [ground_truth.yaml](ground_truth.yaml)
 
-**総 fact 数**: 141 (P1=20, P2=17, P3=16, P4=18, P5=15, P6=19, P7=21, P8=15)
+**総 fact 数**: 157 (P1=22, P2=19, P3=18, P4=20, P5=17, P6=21, P7=23, P8=17)
+
+各スライドには共通で以下のメタ情報が含まれる (v2 で追加):
+- **Subtitle** (タイトル直下の小さい muted テキスト): ticket 番号 / バージョン / 実施日 / 担当者など
+- **Footer** (スライド最下部の小さい muted テキスト): 所属チーム / 機密区分 / 文書バージョンなど
+
+これらは「OCR で拾いやすいが、粗いプロンプトだと省略されがちな詳細」として機能する — 完全性 (completeness) を測るための意図的な "見落とし狙い" 要素。
 
 ---
 
@@ -210,5 +216,5 @@
 ## Snapshot に関する注記
 
 - 現在の spec は **verbatim 抽出** テスト用に設計されている — スライド上に書かれているテキストを漏れなく書き起こす能力を評価
-- 141 facts は当初 spec 2.2 で「~225」を目標にしていたが、実装段階で signal-to-noise を優先して絞り込んだ
-- **現状の制約**: スライドのブロックテキストが GT fact とほぼ 1:1 対応しているため、プロンプトの質で差が出にくい (ceiling effect)。改善作業中 (v2 で subtitle / footer の "見落とし狙い" 要素を追加予定、branch の次の commit で適用)
+- 157 facts (初期 141 + v2 subtitle/footer 追加 16)
+- **v2 更新**: 全 8 スライドに subtitle (タイトル直下) と footer (スライド最下部) を追加。各 slide に 2 つずつ "見落としやすいけど書いてある詳細" を仕込むことで、粗いプロンプト (summary バイアス) と詳細指示プロンプトを区別できるようにした (ceiling effect 緩和)
