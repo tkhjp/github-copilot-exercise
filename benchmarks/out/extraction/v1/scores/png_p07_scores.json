@@ -1,0 +1,308 @@
+{
+  "pattern_id": "p07",
+  "pattern_name": "mixed_dashboard",
+  "n_runs": 3,
+  "n_facts": 23,
+  "recall_avg": 0.9202898550724637,
+  "recall_std": 0.033207070253303224,
+  "hallucination_count": 2,
+  "hallucination_examples": [
+    "(Push notification settings screen)",
+    "    return False"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.9565217391304348,
+      "judge_seconds": 9.133207125589252
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8913043478260869,
+      "judge_seconds": 13.047828207723796
+    },
+    {
+      "run": 3,
+      "score_avg": 0.9130434782608695,
+      "judge_seconds": 12.352955665439367
+    }
+  ],
+  "facts": [
+    {
+      "id": "p07_f01",
+      "text": "地域別実績表の列は 地域 / 売上 / 成長率 / 顧客数 / 担当",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f02",
+      "text": "東京: 売上 164M、成長率 +12%、顧客数 1,240、担当 佐藤",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f03",
+      "text": "大阪: 売上 103M、成長率 +8%、顧客数 820、担当 鈴木",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f04",
+      "text": "名古屋: 売上 62M、成長率 +5%、顧客数 510、担当 高橋",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f05",
+      "text": "福岡: 売上 36M、成長率 +15%、顧客数 310、担当 田中",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f06",
+      "text": "棒グラフのタイトルは「Weekly active users」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.3333333333333333
+    },
+    {
+      "id": "p07_f07",
+      "text": "W1: 3200",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f08",
+      "text": "W2: 3450",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f09",
+      "text": "W3: 3100",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f10",
+      "text": "W4: 3680",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f11",
+      "text": "スクリーンショットのキャプションは「プッシュ通知設定画面」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f12",
+      "text": "コード片のファイル名は notify.py",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f13",
+      "text": "関数名は send_push",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f14",
+      "text": "関数引数は user_id: str, msg: str",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f15",
+      "text": "戻り値型は bool",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f16",
+      "text": "_is_opted_in チェックがある",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f17",
+      "text": "_provider.send を呼び出している",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f18",
+      "text": "箇条書き: API レイテンシ p95 は 240ms",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f19",
+      "text": "箇条書き: エラー率 0.4% (先月比 -0.1pt)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f20",
+      "text": "箇条書き: スパイクは水曜 14 時台",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f21",
+      "text": "1 枚に表・棒グラフ・スクショ・コード・箇条書きの 5 種要素",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f22",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Period: 2026 Q1 | Total: 365M JPY | Code: Python 3.13",
+      "verdict": "partial",
+      "verdicts": [
+        "present",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p07_f23",
+      "text": "スライド下部のフッター: Analytics Dashboard / Confidential",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    }
+  ]
+}

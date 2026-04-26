@@ -1,0 +1,303 @@
+{
+  "pattern_id": "p01",
+  "pattern_name": "ui_callouts",
+  "n_runs": 3,
+  "n_facts": 22,
+  "recall_avg": 0.9469696969696969,
+  "recall_std": 0.013121597027037002,
+  "hallucination_count": 9,
+  "hallucination_examples": [
+    "勤怠アプリ画面レビュー",
+    "2026-04-02 (木)　出勤 08:58",
+    "2026-04-02 (木)　退勤 19:40",
+    "2026-04-03 (金)　出勤 09:15",
+    "2026-04-03 (金)　退勤 17:50",
+    "2026-04-04 (月)　出勤 09:00",
+    "2026-04-04 (月)　退勤 18:00",
+    "2026-04-04 (月)　実働 08:00",
+    "（既知削除）"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.9545454545454546,
+      "judge_seconds": 12.330370957963169
+    },
+    {
+      "run": 2,
+      "score_avg": 0.9545454545454546,
+      "judge_seconds": 9.597186124883592
+    },
+    {
+      "run": 3,
+      "score_avg": 0.9318181818181818,
+      "judge_seconds": 11.193954790942371
+    }
+  ],
+  "facts": [
+    {
+      "id": "p01_f01",
+      "text": "画面タイトルは「勤怠管理」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f02",
+      "text": "ログインユーザー表示は「田中 太郎 さん」",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f03",
+      "text": "テーブルの列は 日付 / 出勤 / 退勤 / 実働 / ステータス",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f04",
+      "text": "2026-04-01 (水) の出勤は 09:02",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f05",
+      "text": "2026-04-01 (水) の退勤は 18:15",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f06",
+      "text": "2026-04-01 (水) の実働は 08:13",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f07",
+      "text": "2026-04-01 (水) のステータスは「承認済」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f08",
+      "text": "2026-04-02 (木) の実働は 09:42",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f09",
+      "text": "2026-04-02 (木) のステータスは「承認待」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f10",
+      "text": "2026-04-03 (金) のステータスは「要修正」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f11",
+      "text": "2026-04-03 (金) の実働は 07:35",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f12",
+      "text": "2026-04-04 (月) のステータスは「承認済」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f13",
+      "text": "ボタンは エクスポート / 新規追加 / 編集 / 削除 の 4 つ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f14",
+      "text": "変更要求 1: 承認待の行に目立つ色を付ける",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f15",
+      "text": "変更要求 2: 実働が 8 時間未満の行に警告アイコン",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f16",
+      "text": "変更要求 3: エクスポートボタンをもっと右に寄せる",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f17",
+      "text": "変更要求 4: 日付の曜日表示 (括弧付き) は不要",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f18",
+      "text": "吹き出しは赤色、番号 C1〜C4",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "missing"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p01_f19",
+      "text": "画面は 4 行分のデータを表示",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f20",
+      "text": "日付は 2026-04-01 から 2026-04-04 の連続日付 (土日除く)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f21",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: 勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f22",
+      "text": "スライド下部のフッター: © 2026 ACME Corp. / Confidential",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

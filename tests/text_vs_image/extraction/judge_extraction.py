@@ -161,6 +161,35 @@ def split_pptx_response_heuristic(response_text: str, n_slides: int = 8) -> list
     return segments
 
 
+def _normalize_verdicts(raw: dict, facts: list[dict[str, str]]) -> dict[str, str]:
+    """Map Gemini-returned verdicts back to canonical fact ids.
+
+    The reused JUDGE_PROMPT_EXTRACTION (from phase4_quality_eval) shows an
+    output example with short `f01` style ids — designed for the original
+    Phase 4 cases whose ids were already that short. Our extraction patterns
+    use `p04_f01` style ids; Gemini sometimes strips the `p04_` prefix to
+    match the example.
+
+    Handles two cases:
+    - exact id match (`p04_f01`): kept as-is
+    - suffix-only match (`f01` → `p04_f01`): remapped using a suffix table
+
+    Unknown keys are dropped silently; missing canonical ids are NOT filled
+    (caller treats their absence as `missing`, which is correct).
+    """
+    suffix_to_full = {f["id"].split("_", 1)[-1]: f["id"] for f in facts}
+    valid_ids = {f["id"] for f in facts}
+    out: dict[str, str] = {}
+    for k, v in raw.items():
+        if not isinstance(k, str) or not isinstance(v, str):
+            continue
+        if k in valid_ids:
+            out[k] = v
+        elif k in suffix_to_full:
+            out[suffix_to_full[k]] = v
+    return out
+
+
 def _judge_recall_once(
     gemini: genai.Client,
     judge_model: str,
@@ -178,7 +207,8 @@ def _judge_recall_once(
         try:
             resp = gemini.models.generate_content(model=judge_model, contents=[prompt])
             text = getattr(resp, "text", "") or ""
-            return extract_json(text)
+            raw = extract_json(text)
+            return _normalize_verdicts(raw, facts)
         except (ValueError, json.JSONDecodeError) as e:
             last_err = e
             time.sleep(1)

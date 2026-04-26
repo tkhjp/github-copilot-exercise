@@ -1,0 +1,235 @@
+{
+  "pattern_id": "p05",
+  "pattern_name": "hierarchical_drilldown",
+  "n_runs": 3,
+  "n_facts": 17,
+  "recall_avg": 0.892156862745098,
+  "recall_std": 0.016980890270283114,
+  "hallucination_count": 1,
+  "hallucination_examples": [
+    "決済システム"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8823529411764706,
+      "judge_seconds": 10.976557458750904
+    },
+    {
+      "run": 2,
+      "score_avg": 0.9117647058823529,
+      "judge_seconds": 10.866860374808311
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8823529411764706,
+      "judge_seconds": 16.977562541142106
+    }
+  ],
+  "facts": [
+    {
+      "id": "p05_f01",
+      "text": "上段のシステム全体図にモジュールが 5 つ配置されている",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f02",
+      "text": "モジュール: 認証 / 商品カタログ / 決済コア / 通知 / 分析",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f03",
+      "text": "下段で決済コアモジュールが拡大表示されている",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p05_f04",
+      "text": "決済コアのサブモジュールは 4 つ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f05",
+      "text": "サブモジュール: PG アダプタ / 手数料計算 / リトライ制御 / ログ/監査",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f06",
+      "text": "設定パラメータ表の列は パラメータ / 現行値 / 推奨値",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f07",
+      "text": "retry_max は現行 3、推奨 5",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f08",
+      "text": "timeout_sec は現行 10、推奨 15",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f09",
+      "text": "idempotency_key_ttl は現行 24h、推奨 72h",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f10",
+      "text": "log_retention は現行 30d、推奨 180d",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f11",
+      "text": "設定パラメータ表は 4 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f12",
+      "text": "上段から下段への拡大関係 (ドリルダウン) が矢印で示されている",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f13",
+      "text": "上段の 5 モジュール中、拡大対象は決済コアのみ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f14",
+      "text": "すべての推奨値は現行値より大きい方向への変更",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f15",
+      "text": "階層は 2 段 (全体 → 特定モジュール)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f16",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: env: production-apac | Owner: Platform Team | Last audit: 2026-03-15",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p05_f17",
+      "text": "スライド下部のフッター: Platform Docs / Last modified: 2026-04-15",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    }
+  ]
+}

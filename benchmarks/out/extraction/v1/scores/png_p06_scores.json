@@ -1,0 +1,285 @@
+{
+  "pattern_id": "p06",
+  "pattern_name": "review_comments",
+  "n_runs": 3,
+  "n_facts": 21,
+  "recall_avg": 0.9206349206349206,
+  "recall_std": 0.013746434980705392,
+  "hallucination_count": 3,
+  "hallucination_examples": [
+    "ヘッダー（ロゴ＋通知）",
+    "サイドナビ（5項目）",
+    "フッター（リンク）"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.9047619047619048,
+      "judge_seconds": 9.724217209033668
+    },
+    {
+      "run": 2,
+      "score_avg": 0.9285714285714286,
+      "judge_seconds": 12.177373290993273
+    },
+    {
+      "run": 3,
+      "score_avg": 0.9285714285714286,
+      "judge_seconds": 11.168312332592905
+    }
+  ],
+  "facts": [
+    {
+      "id": "p06_f01",
+      "text": "モックアップにはヘッダー / サイドナビ / KPI カード / 売上推移グラフ / 最新取引テーブル / フッターの 6 セクション",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f02",
+      "text": "赤コメントは 15 個 (R01-R15)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f03",
+      "text": "R01: ロゴは左寄せではなく中央",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f04",
+      "text": "R02: 通知アイコンに未読バッジ追加",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f05",
+      "text": "R03: サイドナビの配色を背景色から白背景に",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f06",
+      "text": "R04: KPI カードは 4 枚ではなく 3 枚に減らす",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f07",
+      "text": "R05: KPI カードのフォントサイズを大きく",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f08",
+      "text": "R06: グラフに前年比の点線を追加",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f09",
+      "text": "R07: グラフの凡例を右上から下に移動",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f10",
+      "text": "R08: テーブルのゼブラストライプを薄く",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f11",
+      "text": "R09: テーブルヘッダーは sticky に",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f12",
+      "text": "R10: 取引金額の桁区切りカンマ必須",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f13",
+      "text": "R11: 金額のマイナスは赤字",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f14",
+      "text": "R12: フッターのリンクは 3 つまで",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f15",
+      "text": "R13: 全体的にマージンを 16px → 24px",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f16",
+      "text": "R14: モバイル対応のブレークポイント要確認",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f17",
+      "text": "R15: ダークモード対応は別 issue で",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f18",
+      "text": "コメントは赤色の番号付き吹き出しで表示",
+      "verdict": "partial",
+      "verdicts": [
+        "missing",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p06_f19",
+      "text": "指示線が対象要素と各コメントを結んでいる",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f20",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: PR #2847 | Figma: 1920x1080 | Weekly Design Review 2026-04-10 15:00",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f21",
+      "text": "スライド下部のフッター: Design System Team / Draft v0.7",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

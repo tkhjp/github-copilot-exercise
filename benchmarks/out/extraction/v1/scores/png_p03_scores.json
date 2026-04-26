@@ -1,0 +1,245 @@
+{
+  "pattern_id": "p03",
+  "pattern_name": "process_flow",
+  "n_runs": 3,
+  "n_facts": 18,
+  "recall_avg": 0.8333333333333334,
+  "recall_std": 0.02777777777777779,
+  "hallucination_count": 0,
+  "hallucination_examples": [],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8055555555555556,
+      "judge_seconds": 11.678231292404234
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8333333333333334,
+      "judge_seconds": 17.852477500215173
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8611111111111112,
+      "judge_seconds": 16.74813750013709
+    }
+  ],
+  "facts": [
+    {
+      "id": "p03_f01",
+      "text": "5 画面の操作フローを示している",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f02",
+      "text": "Step 1: ログイン画面",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f03",
+      "text": "Step 1 の入力項目は「メール + パスワード」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f04",
+      "text": "Step 2: 商品選択画面",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f05",
+      "text": "Step 2 にカテゴリ絞込がある",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f06",
+      "text": "Step 2 には 3 商品のサムネイルが表示されている",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f07",
+      "text": "Step 3: カート画面",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f08",
+      "text": "カート内は 2 商品",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f09",
+      "text": "カートの小計は ¥8,300",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f10",
+      "text": "Step 4: 決済画面",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f11",
+      "text": "決済方法はクレジットカード / PayPay / コンビニの 3 種",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f12",
+      "text": "Step 5: 完了画面",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f13",
+      "text": "注文番号は ORD-2026-04-13579",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f14",
+      "text": "各画面間は番号付き矢印 S1→S2→S3→S4→S5 で連結",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f15",
+      "text": "矢印は左から右への単方向",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f16",
+      "text": "ステップ番号は S1 から S5 まで",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f17",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: UI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10",
+      "verdict": "present",
+      "verdicts": [
+        "partial",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f18",
+      "text": "スライド下部のフッター: User Research Team / Page 1 of 1",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    }
+  ]
+}

@@ -1,0 +1,2135 @@
+[
+  {
+    "pattern_id": "p01",
+    "pattern_name": "ui_callouts",
+    "n_runs": 3,
+    "n_facts": 22,
+    "recall_avg": 0.9696969696969697,
+    "recall_std": 0.013121597027036937,
+    "hallucination_count": 7,
+    "hallucination_examples": [
+      "2026-04-02 (木) の出勤時刻: 08:58",
+      "2026-04-02 (木) の退勤時刻: 19:40",
+      "2026-04-03 (金) の出勤時刻: 09:15",
+      "2026-04-03 (金) の退勤時刻: 17:50",
+      "2026-04-04 (月) の出勤時刻: 09:00",
+      "2026-04-04 (月) の退勤時刻: 18:00",
+      "2026-04-04 (月) の実働時間: 08:00"
+    ],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.9772727272727273,
+        "judge_seconds": 12.06575412582606
+      },
+      {
+        "run": 2,
+        "score_avg": 0.9772727272727273,
+        "judge_seconds": 10.661466917023063
+      },
+      {
+        "run": 3,
+        "score_avg": 0.9545454545454546,
+        "judge_seconds": 11.538506624288857
+      }
+    ],
+    "facts": [
+      {
+        "id": "p01_f01",
+        "text": "画面タイトルは「勤怠管理」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f02",
+        "text": "ログインユーザー表示は「田中 太郎 さん」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f03",
+        "text": "テーブルの列は 日付 / 出勤 / 退勤 / 実働 / ステータス",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f04",
+        "text": "2026-04-01 (水) の出勤は 09:02",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f05",
+        "text": "2026-04-01 (水) の退勤は 18:15",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f06",
+        "text": "2026-04-01 (水) の実働は 08:13",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f07",
+        "text": "2026-04-01 (水) のステータスは「承認済」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f08",
+        "text": "2026-04-02 (木) の実働は 09:42",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f09",
+        "text": "2026-04-02 (木) のステータスは「承認待」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f10",
+        "text": "2026-04-03 (金) のステータスは「要修正」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f11",
+        "text": "2026-04-03 (金) の実働は 07:35",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f12",
+        "text": "2026-04-04 (月) のステータスは「承認済」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f13",
+        "text": "ボタンは エクスポート / 新規追加 / 編集 / 削除 の 4 つ",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f14",
+        "text": "変更要求 1: 承認待の行に目立つ色を付ける",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f15",
+        "text": "変更要求 2: 実働が 8 時間未満の行に警告アイコン",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f16",
+        "text": "変更要求 3: エクスポートボタンをもっと右に寄せる",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f17",
+        "text": "変更要求 4: 日付の曜日表示 (括弧付き) は不要",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f18",
+        "text": "吹き出しは赤色、番号 C1〜C4",
+        "verdict": "partial",
+        "verdicts": [
+          "partial",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f19",
+        "text": "画面は 4 行分のデータを表示",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f20",
+        "text": "日付は 2026-04-01 から 2026-04-04 の連続日付 (土日除く)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p01_f21",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: 勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "partial"
+        ],
+        "verdict_mode": "present",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p01_f22",
+        "text": "スライド下部のフッター: © 2026 ACME Corp. / Confidential",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p02",
+    "pattern_name": "before_after",
+    "n_runs": 3,
+    "n_facts": 19,
+    "recall_avg": 0.850877192982456,
+    "recall_std": 0.06077371254627639,
+    "hallucination_count": 0,
+    "hallucination_examples": [],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.9210526315789473,
+        "judge_seconds": 17.441164416261017
+      },
+      {
+        "run": 2,
+        "score_avg": 0.8157894736842105,
+        "judge_seconds": 13.410634791478515
+      },
+      {
+        "run": 3,
+        "score_avg": 0.8157894736842105,
+        "judge_seconds": 22.558128082193434
+      }
+    ],
+    "facts": [
+      {
+        "id": "p02_f01",
+        "text": "左側は「Before (現行)」、右側は「After (改修後)」",
+        "verdict": "partial",
+        "verdicts": [
+          "present",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p02_f02",
+        "text": "Before の検索プレースホルダーは「キーワード入力」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f03",
+        "text": "After の検索プレースホルダーは「キーワードまたは商品コード」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f04",
+        "text": "両方に「検索」ボタンがある",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f05",
+        "text": "Before のフィルタは 1 行",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f06",
+        "text": "After のフィルタは 3 行",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f07",
+        "text": "Before の結果表示は「結果: 12 件」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f08",
+        "text": "After の結果表示は「結果: 12 件 / 並び順: 関連度順」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f09",
+        "text": "Before のページネーションは < 1 2 3 >",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f10",
+        "text": "After のページネーションは < 1 2 3 4 5 … 20 >",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f11",
+        "text": "差分 D1: プレースホルダーに「商品コード」追加",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f12",
+        "text": "差分 D2: フィルタ 1 行 → 3 行",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f13",
+        "text": "差分 D3: ページネーションに省略記号と最終ページ",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f14",
+        "text": "差分矢印は赤色、番号 D1〜D3",
+        "verdict": "partial",
+        "verdicts": [
+          "partial",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f15",
+        "text": "差分矢印は Before/After 両側の対応要素を指している",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f16",
+        "text": "両画面とも同じ結果件数 (12 件) を示している",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p02_f17",
+        "text": "スライドには Before と After の 2 つの画面が並んでいる",
+        "verdict": "partial",
+        "verdicts": [
+          "present",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p02_f18",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: TICKET-8421 | Review: 2026-03-15 | 鈴木 (UX Lead)",
+        "verdict": "partial",
+        "verdicts": [
+          "present",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p02_f19",
+        "text": "スライド下部のフッター: Design Review Doc v1.2 / Internal",
+        "verdict": "partial",
+        "verdicts": [
+          "present",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 0.6666666666666666
+      }
+    ]
+  },
+  {
+    "pattern_id": "p03",
+    "pattern_name": "process_flow",
+    "n_runs": 3,
+    "n_facts": 18,
+    "recall_avg": 0.8888888888888888,
+    "recall_std": 0.0,
+    "hallucination_count": 0,
+    "hallucination_examples": [],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.8888888888888888,
+        "judge_seconds": 8.798276958987117
+      },
+      {
+        "run": 2,
+        "score_avg": 0.8888888888888888,
+        "judge_seconds": 11.539228208363056
+      },
+      {
+        "run": 3,
+        "score_avg": 0.8888888888888888,
+        "judge_seconds": 9.53734412509948
+      }
+    ],
+    "facts": [
+      {
+        "id": "p03_f01",
+        "text": "5 画面の操作フローを示している",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f02",
+        "text": "Step 1: ログイン画面",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f03",
+        "text": "Step 1 の入力項目は「メール + パスワード」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f04",
+        "text": "Step 2: 商品選択画面",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f05",
+        "text": "Step 2 にカテゴリ絞込がある",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f06",
+        "text": "Step 2 には 3 商品のサムネイルが表示されている",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f07",
+        "text": "Step 3: カート画面",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f08",
+        "text": "カート内は 2 商品",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f09",
+        "text": "カートの小計は ¥8,300",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f10",
+        "text": "Step 4: 決済画面",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f11",
+        "text": "決済方法はクレジットカード / PayPay / コンビニの 3 種",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f12",
+        "text": "Step 5: 完了画面",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f13",
+        "text": "注文番号は ORD-2026-04-13579",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f14",
+        "text": "各画面間は番号付き矢印 S1→S2→S3→S4→S5 で連結",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f15",
+        "text": "矢印は左から右への単方向",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f16",
+        "text": "ステップ番号は S1 から S5 まで",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f17",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: UI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p03_f18",
+        "text": "スライド下部のフッター: User Research Team / Page 1 of 1",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p04",
+    "pattern_name": "dashboard_annotated",
+    "n_runs": 3,
+    "n_facts": 20,
+    "recall_avg": 1.0,
+    "recall_std": 0.0,
+    "hallucination_count": 1,
+    "hallucination_examples": [
+      "2026 Q1 売上ダッシュボード (注釈付き)"
+    ],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 1.0,
+        "judge_seconds": 9.95480762515217
+      },
+      {
+        "run": 2,
+        "score_avg": 1.0,
+        "judge_seconds": 7.207405500113964
+      },
+      {
+        "run": 3,
+        "score_avg": 1.0,
+        "judge_seconds": 9.57472399994731
+      }
+    ],
+    "facts": [
+      {
+        "id": "p04_f01",
+        "text": "棒グラフのタイトルは「月別売上 (百万円)」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f02",
+        "text": "Jan の売上は 120 (百万円)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f03",
+        "text": "Feb の売上は 85 (百万円)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f04",
+        "text": "Mar の売上は 160 (百万円)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f05",
+        "text": "円グラフのタイトルは「地域別売上構成」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f06",
+        "text": "東京が 45%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f07",
+        "text": "大阪が 28%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f08",
+        "text": "名古屋が 17%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f09",
+        "text": "その他が 10%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f10",
+        "text": "KPI: 売上合計 365 MJPY、前年比 +12%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f11",
+        "text": "KPI: 新規顧客数 2,140、前年比 +8%",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f12",
+        "text": "KPI: 解約率 3.2%、前年比 -0.5pt",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f13",
+        "text": "注釈 A1: Feb が底、Mar で V 字回復",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f14",
+        "text": "注釈 A2: 東京集中 (45%) が課題",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f15",
+        "text": "注釈 A3: 解約率改善はサポート体制強化の効果",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f16",
+        "text": "注釈は 3 個 (A1-A3)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f17",
+        "text": "棒グラフ・円グラフ・KPI カードの 3 ブロック構成",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f18",
+        "text": "KPI カードは 3 枚",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f19",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Period: 2026 Q1 | Data as of 2026-03-31 23:59 JST | 次回更新: 翌営業日",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p04_f20",
+        "text": "スライド下部のフッター: Finance Team / Monthly Report / 2026-04 Issue",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p05",
+    "pattern_name": "hierarchical_drilldown",
+    "n_runs": 3,
+    "n_facts": 17,
+    "recall_avg": 0.9411764705882352,
+    "recall_std": 1.3597399555105182e-16,
+    "hallucination_count": 0,
+    "hallucination_examples": [],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.9411764705882353,
+        "judge_seconds": 9.627190750092268
+      },
+      {
+        "run": 2,
+        "score_avg": 0.9411764705882353,
+        "judge_seconds": 9.272590583190322
+      },
+      {
+        "run": 3,
+        "score_avg": 0.9411764705882353,
+        "judge_seconds": 7.139456417411566
+      }
+    ],
+    "facts": [
+      {
+        "id": "p05_f01",
+        "text": "上段のシステム全体図にモジュールが 5 つ配置されている",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f02",
+        "text": "モジュール: 認証 / 商品カタログ / 決済コア / 通知 / 分析",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f03",
+        "text": "下段で決済コアモジュールが拡大表示されている",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f04",
+        "text": "決済コアのサブモジュールは 4 つ",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f05",
+        "text": "サブモジュール: PG アダプタ / 手数料計算 / リトライ制御 / ログ/監査",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f06",
+        "text": "設定パラメータ表の列は パラメータ / 現行値 / 推奨値",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f07",
+        "text": "retry_max は現行 3、推奨 5",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f08",
+        "text": "timeout_sec は現行 10、推奨 15",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f09",
+        "text": "idempotency_key_ttl は現行 24h、推奨 72h",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f10",
+        "text": "log_retention は現行 30d、推奨 180d",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f11",
+        "text": "設定パラメータ表は 4 行",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f12",
+        "text": "上段から下段への拡大関係 (ドリルダウン) が矢印で示されている",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f13",
+        "text": "上段の 5 モジュール中、拡大対象は決済コアのみ",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f14",
+        "text": "すべての推奨値は現行値より大きい方向への変更",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f15",
+        "text": "階層は 2 段 (全体 → 特定モジュール)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f16",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: env: production-apac | Owner: Platform Team | Last audit: 2026-03-15",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p05_f17",
+        "text": "スライド下部のフッター: Platform Docs / Last modified: 2026-04-15",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p06",
+    "pattern_name": "review_comments",
+    "n_runs": 3,
+    "n_facts": 21,
+    "recall_avg": 0.8968253968253969,
+    "recall_std": 0.027492869961410784,
+    "hallucination_count": 1,
+    "hallucination_examples": [
+      "サイドナビ (5 項目)"
+    ],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.9285714285714286,
+        "judge_seconds": 11.518589416518807
+      },
+      {
+        "run": 2,
+        "score_avg": 0.8809523809523809,
+        "judge_seconds": 13.743309582583606
+      },
+      {
+        "run": 3,
+        "score_avg": 0.8809523809523809,
+        "judge_seconds": 12.390634540468454
+      }
+    ],
+    "facts": [
+      {
+        "id": "p06_f01",
+        "text": "モックアップにはヘッダー / サイドナビ / KPI カード / 売上推移グラフ / 最新取引テーブル / フッターの 6 セクション",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f02",
+        "text": "赤コメントは 15 個 (R01-R15)",
+        "verdict": "partial",
+        "verdicts": [
+          "present",
+          "partial",
+          "partial"
+        ],
+        "verdict_mode": "partial",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p06_f03",
+        "text": "R01: ロゴは左寄せではなく中央",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f04",
+        "text": "R02: 通知アイコンに未読バッジ追加",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f05",
+        "text": "R03: サイドナビの配色を背景色から白背景に",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f06",
+        "text": "R04: KPI カードは 4 枚ではなく 3 枚に減らす",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f07",
+        "text": "R05: KPI カードのフォントサイズを大きく",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f08",
+        "text": "R06: グラフに前年比の点線を追加",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f09",
+        "text": "R07: グラフの凡例を右上から下に移動",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f10",
+        "text": "R08: テーブルのゼブラストライプを薄く",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f11",
+        "text": "R09: テーブルヘッダーは sticky に",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f12",
+        "text": "R10: 取引金額の桁区切りカンマ必須",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f13",
+        "text": "R11: 金額のマイナスは赤字",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f14",
+        "text": "R12: フッターのリンクは 3 つまで",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f15",
+        "text": "R13: 全体的にマージンを 16px → 24px",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f16",
+        "text": "R14: モバイル対応のブレークポイント要確認",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f17",
+        "text": "R15: ダークモード対応は別 issue で",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f18",
+        "text": "コメントは赤色の番号付き吹き出しで表示",
+        "verdict": "missing",
+        "verdicts": [
+          "partial",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p06_f19",
+        "text": "指示線が対象要素と各コメントを結んでいる",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f20",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: PR #2847 | Figma: 1920x1080 | Weekly Design Review 2026-04-10 15:00",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p06_f21",
+        "text": "スライド下部のフッター: Design System Team / Draft v0.7",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p07",
+    "pattern_name": "mixed_dashboard",
+    "n_runs": 3,
+    "n_facts": 23,
+    "recall_avg": 1.0,
+    "recall_std": 0.0,
+    "hallucination_count": 4,
+    "hallucination_examples": [
+      "混合ダッシュボードページ",
+      "if not _is_opted_in(user_id):",
+      "return False",
+      "return _provider.send(user_id, msg)"
+    ],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 1.0,
+        "judge_seconds": 9.171927540563047
+      },
+      {
+        "run": 2,
+        "score_avg": 1.0,
+        "judge_seconds": 8.697120083495975
+      },
+      {
+        "run": 3,
+        "score_avg": 1.0,
+        "judge_seconds": 9.227461875416338
+      }
+    ],
+    "facts": [
+      {
+        "id": "p07_f01",
+        "text": "地域別実績表の列は 地域 / 売上 / 成長率 / 顧客数 / 担当",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f02",
+        "text": "東京: 売上 164M、成長率 +12%、顧客数 1,240、担当 佐藤",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f03",
+        "text": "大阪: 売上 103M、成長率 +8%、顧客数 820、担当 鈴木",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f04",
+        "text": "名古屋: 売上 62M、成長率 +5%、顧客数 510、担当 高橋",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f05",
+        "text": "福岡: 売上 36M、成長率 +15%、顧客数 310、担当 田中",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f06",
+        "text": "棒グラフのタイトルは「Weekly active users」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f07",
+        "text": "W1: 3200",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f08",
+        "text": "W2: 3450",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f09",
+        "text": "W3: 3100",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f10",
+        "text": "W4: 3680",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f11",
+        "text": "スクリーンショットのキャプションは「プッシュ通知設定画面」",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f12",
+        "text": "コード片のファイル名は notify.py",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f13",
+        "text": "関数名は send_push",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f14",
+        "text": "関数引数は user_id: str, msg: str",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f15",
+        "text": "戻り値型は bool",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f16",
+        "text": "_is_opted_in チェックがある",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f17",
+        "text": "_provider.send を呼び出している",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f18",
+        "text": "箇条書き: API レイテンシ p95 は 240ms",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f19",
+        "text": "箇条書き: エラー率 0.4% (先月比 -0.1pt)",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f20",
+        "text": "箇条書き: スパイクは水曜 14 時台",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f21",
+        "text": "1 枚に表・棒グラフ・スクショ・コード・箇条書きの 5 種要素",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f22",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Period: 2026 Q1 | Total: 365M JPY | Code: Python 3.13",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p07_f23",
+        "text": "スライド下部のフッター: Analytics Dashboard / Confidential",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  },
+  {
+    "pattern_id": "p08",
+    "pattern_name": "org_chart",
+    "n_runs": 3,
+    "n_facts": 17,
+    "recall_avg": 0.6568627450980392,
+    "recall_std": 0.0449272126956455,
+    "hallucination_count": 0,
+    "hallucination_examples": [],
+    "runs": [
+      {
+        "run": 1,
+        "score_avg": 0.6176470588235294,
+        "judge_seconds": 10.873518249951303
+      },
+      {
+        "run": 2,
+        "score_avg": 0.7058823529411765,
+        "judge_seconds": 12.027780500240624
+      },
+      {
+        "run": 3,
+        "score_avg": 0.6470588235294118,
+        "judge_seconds": 10.527201750315726
+      }
+    ],
+    "facts": [
+      {
+        "id": "p08_f01",
+        "text": "組織図は 3 階層",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f02",
+        "text": "全ノード数は 10",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f03",
+        "text": "第 1 階層: 山本 一郎 / CEO (1 名)",
+        "verdict": "present",
+        "verdicts": [
+          "partial",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f04",
+        "text": "第 2 階層は 3 名: CTO / COO / CFO",
+        "verdict": "present",
+        "verdicts": [
+          "partial",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f05",
+        "text": "CTO は 中村 次郎",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f06",
+        "text": "COO は 小林 三郎",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f07",
+        "text": "CFO は 加藤 四郎",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f08",
+        "text": "第 3 階層は 6 名",
+        "verdict": "present",
+        "verdicts": [
+          "partial",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f09",
+        "text": "CTO 配下: 伊藤 花子 (Dev Manager)、渡辺 梅子 (Infra Manager)",
+        "verdict": "missing",
+        "verdicts": [
+          "partial",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f10",
+        "text": "COO 配下: 山田 桜子 (Sales Head)、佐々木 松子 (Ops Head)",
+        "verdict": "missing",
+        "verdicts": [
+          "partial",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f11",
+        "text": "CFO 配下: 吉田 竹子 (Finance Head)、井上 柳子 (Legal Head)",
+        "verdict": "missing",
+        "verdicts": [
+          "partial",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f12",
+        "text": "各ノードには顔写真風のサムネイルが付いている",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f13",
+        "text": "第 2 階層の 3 名は全員 CEO 直下",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "present",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f14",
+        "text": "ノード間は線 (組織構造線) で結ばれている",
+        "verdict": "missing",
+        "verdicts": [
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "verdict_mode": "missing",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f15",
+        "text": "役職 Dev Manager / Infra Manager / Sales Head / Ops Head / Finance Head / Legal Head の 6 種が第 3 階層",
+        "verdict": "present",
+        "verdicts": [
+          "partial",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 0.6666666666666666
+      },
+      {
+        "id": "p08_f16",
+        "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Effective: 2026-04-01 | Source: HRIS 2026-03-31 | ※ 2020 年以降の社員のみ表示",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      },
+      {
+        "id": "p08_f17",
+        "text": "スライド下部のフッター: HR Org Chart / Effective 2026-04-01",
+        "verdict": "present",
+        "verdicts": [
+          "present",
+          "present",
+          "present"
+        ],
+        "verdict_mode": "present",
+        "agreement": 1.0
+      }
+    ]
+  }
+]

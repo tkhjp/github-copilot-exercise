@@ -1,0 +1,240 @@
+{
+  "pattern_id": "p08",
+  "pattern_name": "org_chart",
+  "n_runs": 3,
+  "n_facts": 17,
+  "recall_avg": 0.8431372549019608,
+  "recall_std": 0.016980890270283114,
+  "hallucination_count": 6,
+  "hallucination_examples": [
+    "Slide 1（※画像は1枚のため便宜上スライド番号を付与）",
+    "（3階層10ノード）",
+    "（右下に小さく記載）",
+    "（左下の注記）",
+    "階層構造（図中の記載テキスト）",
+    "必要であれば、この組織図をテキスト形式の表に再構成したり、別フォーマットに変換したりもできます。"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8529411764705882,
+      "judge_seconds": 12.950692958198488
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8529411764705882,
+      "judge_seconds": 11.618922624737024
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8235294117647058,
+      "judge_seconds": 9.8327019168064
+    }
+  ],
+  "facts": [
+    {
+      "id": "p08_f01",
+      "text": "組織図は 3 階層",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f02",
+      "text": "全ノード数は 10",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f03",
+      "text": "第 1 階層: 山本 一郎 / CEO (1 名)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f04",
+      "text": "第 2 階層は 3 名: CTO / COO / CFO",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f05",
+      "text": "CTO は 中村 次郎",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f06",
+      "text": "COO は 小林 三郎",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f07",
+      "text": "CFO は 加藤 四郎",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f08",
+      "text": "第 3 階層は 6 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f09",
+      "text": "CTO 配下: 伊藤 花子 (Dev Manager)、渡辺 梅子 (Infra Manager)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f10",
+      "text": "COO 配下: 山田 桜子 (Sales Head)、佐々木 松子 (Ops Head)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f11",
+      "text": "CFO 配下: 吉田 竹子 (Finance Head)、井上 柳子 (Legal Head)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f12",
+      "text": "各ノードには顔写真風のサムネイルが付いている",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f13",
+      "text": "第 2 階層の 3 名は全員 CEO 直下",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f14",
+      "text": "ノード間は線 (組織構造線) で結ばれている",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f15",
+      "text": "役職 Dev Manager / Infra Manager / Sales Head / Ops Head / Finance Head / Legal Head の 6 種が第 3 階層",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f16",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: Effective: 2026-04-01 | Source: HRIS 2026-03-31 | ※ 2020 年以降の社員のみ表示",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f17",
+      "text": "スライド下部のフッター: HR Org Chart / Effective 2026-04-01",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    }
+  ]
+}

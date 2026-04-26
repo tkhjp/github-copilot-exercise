@@ -1,0 +1,266 @@
+{
+  "pattern_id": "p02",
+  "pattern_name": "before_after",
+  "n_runs": 3,
+  "n_facts": 19,
+  "recall_avg": 0.9210526315789473,
+  "recall_std": 0.0,
+  "hallucination_count": 8,
+  "hallucination_examples": [
+    "勤怠アプリ画面レビュー\n勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042.",
+    "Slide 1\n勤怠アプリ画面レビュー\n勤怠管理 v3.2 - 田中太郎 | Screen-ID: TS-042\n勤怠管理\n田中 太郎 さん\n日付\n出勤\n退勤\n実働\nステータス\n2026-04-01 (水)\n09:02\n18:15\n08:13\n承認済",
+    "Slide 3\n購入フロー 5 画面操作手順\nUI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10\nS1\nログイン\nメール + パスワード",
+    "Slide 4\n2026 Q1 売上ダッシュボード (注釈付き)\nPeriod: 2026 Q1 | Data as of 2026-03-31 23:59 JST | 次回更新: 翌営業日\n月別売上 (百万円)\n120\nJan\n85\nFeb\n160\nMar",
+    "Slide 5\n決済システム 階層ドリルダウン\nenv: production-apac | Owner: Platform Team | Last audit: 2026-03-15\n認証\n商品カタログ\n決済コア\n通知\n分析\n拡大: 決済コア",
+    "Slide 6\nダッシュボード デザインレビュー (赤入れ)\nPR #2847 | Figma: 1920x1080 | Weekly Design Review 2026-04-10 15:00\nダッシュボード モックアップ\nヘッダー (ロゴ + 通知)\nサイドナビ (5 項目)",
+    "Slide 7\n混合ダッシュボードページ\nPeriod: 2026 Q1 | Total: 365M JPY | Code: Python 3.13\n地域別実績\n地域\n売上\n成長率\n顧客数\n担当\n東京\n164M\n+12%\n1,240\n佐藤",
+    "Slide 8\n組織図 (3 階層 10 ノード)\nEffective: 2026-04-01 | Source: HRIS 2026-03-31 | ※ 2020 年以降の社員のみ表示\n山本 一郎\nCEO\n中村 次郎\nCTO\n小林 三郎\nCOO"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.9210526315789473,
+      "judge_seconds": 11.138233916833997
+    },
+    {
+      "run": 2,
+      "score_avg": 0.9210526315789473,
+      "judge_seconds": 8.261089875362813
+    },
+    {
+      "run": 3,
+      "score_avg": 0.9210526315789473,
+      "judge_seconds": 8.773772958666086
+    }
+  ],
+  "facts": [
+    {
+      "id": "p02_f01",
+      "text": "左側は「Before (現行)」、右側は「After (改修後)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f02",
+      "text": "Before の検索プレースホルダーは「キーワード入力」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f03",
+      "text": "After の検索プレースホルダーは「キーワードまたは商品コード」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f04",
+      "text": "両方に「検索」ボタンがある",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f05",
+      "text": "Before のフィルタは 1 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f06",
+      "text": "After のフィルタは 3 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f07",
+      "text": "Before の結果表示は「結果: 12 件」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f08",
+      "text": "After の結果表示は「結果: 12 件 / 並び順: 関連度順」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f09",
+      "text": "Before のページネーションは < 1 2 3 >",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f10",
+      "text": "After のページネーションは < 1 2 3 4 5 … 20 >",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f11",
+      "text": "差分 D1: プレースホルダーに「商品コード」追加",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f12",
+      "text": "差分 D2: フィルタ 1 行 → 3 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f13",
+      "text": "差分 D3: ページネーションに省略記号と最終ページ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f14",
+      "text": "差分矢印は赤色、番号 D1〜D3",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f15",
+      "text": "差分矢印は Before/After 両側の対応要素を指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f16",
+      "text": "両画面とも同じ結果件数 (12 件) を示している",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f17",
+      "text": "スライドには Before と After の 2 つの画面が並んでいる",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f18",
+      "text": "スライド上部 (タイトル直下) の小さいメタ情報行: TICKET-8421 | Review: 2026-03-15 | 鈴木 (UX Lead)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f19",
+      "text": "スライド下部のフッター: Design Review Doc v1.2 / Internal",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}
