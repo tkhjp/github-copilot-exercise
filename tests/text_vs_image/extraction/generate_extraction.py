@@ -181,165 +181,269 @@ def render_p01(out_path: Path) -> None:
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # Screenshot card (left ~60% of canvas).
-    card = (40, body_y + 10, 1000, body_y + 700)
+    # Screenshot card (left ~60% of canvas) — taller for v2 to fit 8 rows + tabs + summary.
+    card = (40, body_y + 10, 1000, body_y + 720)
     _draw_screenshot_card(draw, card, title=layout["app_title"])
-    # Header inside card: user name (right-aligned inside header bar).
+    # Header inside card: user name + 3 right-side icons.
+    hdr_y = body_y + 18
+    # Right-side icons (drawn from right edge inwards: ⏻ 設定 通知)
+    icons = layout["header_right_icons"]
+    icon_x = card[2] - 14
+    for icon, badge in reversed(icons):
+        iw, _ = _tsize(draw, icon, _bold_font(15))
+        icon_x -= (iw + 18)
+        draw.text((icon_x, hdr_y - 1), icon, fill=COLORS["header_text"], font=_bold_font(15))
+        if badge:
+            # Red notification badge
+            bx = icon_x + iw + 2
+            by = hdr_y - 5
+            draw.ellipse([bx, by, bx + 18, by + 18], fill=COLORS["danger"])
+            draw.text((bx + 5, by + 1), badge, fill=COLORS["header_text"], font=_bold_font(11))
+    # User name (left of icons)
     hdr_user_w, _ = _tsize(draw, layout["header_user"], _font(13))
-    draw.text((card[2] - hdr_user_w - 14, body_y + 18), layout["header_user"],
+    draw.text((icon_x - hdr_user_w - 18, hdr_y), layout["header_user"],
               fill=COLORS["header_text"], font=_font(13))
 
-    # Table (5 columns, 4 rows).
-    tbl_x1, tbl_y1 = card[0] + 24, body_y + 60
-    col_widths = [190, 110, 110, 110, 140]
-    row_h = 42
+    # Tab bar (just below dark header)
+    tab_y = body_y + 50
+    tab_x = card[0] + 16
+    tabs = layout["tab_bar"]["tabs"]
+    active = layout["tab_bar"]["active"]
+    for tab in tabs:
+        tw, _ = _tsize(draw, tab, _bold_font(13))
+        tab_w = tw + 24
+        is_active = (tab == active)
+        if is_active:
+            draw.rectangle([tab_x, tab_y, tab_x + tab_w, tab_y + 30],
+                           fill=COLORS["primary"], outline=COLORS["primary_dk"], width=1)
+            draw.text((tab_x + 12, tab_y + 7), tab, fill=COLORS["header_text"], font=_bold_font(13))
+        else:
+            draw.text((tab_x + 12, tab_y + 7), tab, fill=COLORS["muted"], font=_font(13))
+        tab_x += tab_w + 8
+    # Filter dropdown (right side of tab bar)
+    flt_text = f"{layout['filter_label']} {layout['filter_default']}"
+    fw, _ = _tsize(draw, flt_text, _font(12))
+    flt_x = card[2] - fw - 28
+    draw.rectangle([flt_x - 6, tab_y + 2, card[2] - 16, tab_y + 28],
+                   fill=COLORS["card_bg"], outline=COLORS["card_border"])
+    draw.text((flt_x, tab_y + 8), flt_text, fill=COLORS["text"], font=_font(12))
+
+    # Table (7 columns, 8 rows + summary)
+    tbl_x1, tbl_y1 = card[0] + 16, body_y + 92
+    col_widths = [150, 70, 70, 70, 70, 100, 280]  # 日付/出勤/退勤/実働/残業/ステータス/備考 = 810
+    row_h = 32
     # Header row
     hx = tbl_x1
     for ci, header in enumerate(layout["table_header"]):
         draw.rectangle([hx, tbl_y1, hx + col_widths[ci], tbl_y1 + row_h],
                        fill=COLORS["grid"], outline=COLORS["card_border"])
-        draw.text((hx + 10, tbl_y1 + 12), header, fill=COLORS["text"], font=_bold_font(14))
+        draw.text((hx + 8, tbl_y1 + 8), header, fill=COLORS["text"], font=_bold_font(12))
         hx += col_widths[ci]
     # Data rows
     for r, row in enumerate(layout["table_rows"]):
         ry = tbl_y1 + row_h * (r + 1)
         rx = tbl_x1
+        bg = COLORS["bg"] if r % 2 == 0 else COLORS["card_bg"]
         for ci, val in enumerate(row):
             draw.rectangle([rx, ry, rx + col_widths[ci], ry + row_h],
-                           fill=COLORS["bg"], outline=COLORS["card_border"])
-            draw.text((rx + 10, ry + 12), val, fill=COLORS["text"], font=_font(13))
+                           fill=bg, outline=COLORS["card_border"])
+            draw.text((rx + 8, ry + 8), val, fill=COLORS["text"], font=_font(11))
             rx += col_widths[ci]
-    # Action buttons
-    btn_y = tbl_y1 + row_h * (len(layout["table_rows"]) + 1) + 24
+    # Summary row (highlighted)
+    sum_y = tbl_y1 + row_h * (len(layout["table_rows"]) + 1)
+    rx = tbl_x1
+    for ci, val in enumerate(layout["summary_row"]):
+        draw.rectangle([rx, sum_y, rx + col_widths[ci], sum_y + row_h],
+                       fill=COLORS["grid"], outline=COLORS["card_border"], width=1)
+        draw.text((rx + 8, sum_y + 8), val, fill=COLORS["text"], font=_bold_font(11))
+        rx += col_widths[ci]
+
+    # Action buttons (below table)
+    btn_y = sum_y + row_h + 20
     bx = tbl_x1
     for label in layout["buttons"]:
-        w, _ = _tsize(draw, label, _bold_font(13))
-        bw = w + 24
-        draw.rectangle([bx, btn_y, bx + bw, btn_y + 32],
+        w, _ = _tsize(draw, label, _bold_font(12))
+        bw = w + 22
+        draw.rectangle([bx, btn_y, bx + bw, btn_y + 30],
                        fill=COLORS["primary"], outline=COLORS["primary_dk"], width=2)
-        draw.text((bx + 12, btn_y + 7), label, fill=COLORS["header_text"], font=_bold_font(13))
-        bx += bw + 10
+        draw.text((bx + 11, btn_y + 7), label, fill=COLORS["header_text"], font=_bold_font(12))
+        bx += bw + 8
 
-    # 4 red callouts on the right ~35% of canvas, each pointing at a region in the card.
-    # Target coordinates are approximate anchors inside the card for each callout.
-    targets = [
-        (tbl_x1 + 600, tbl_y1 + row_h * 2 + row_h // 2),  # C1: row 2 (承認待)
-        (tbl_x1 + 480, tbl_y1 + row_h * 3 + row_h // 2),  # C2: row 3 (要修正)
-        (tbl_x1 + 80, btn_y + 16),                        # C3: エクスポートボタン
-        (tbl_x1 + 90, tbl_y1 + 12),                       # C4: 日付列ヘッダ
+    # 6 vague callouts on the right side, each pointing at a target inside the card.
+    # Targets are spatially anchored to specific elements (NOT spelled out in callout text).
+    callout_targets = [
+        (tbl_x1 + 600, tbl_y1 + row_h * 2 + row_h // 2),   # C1 → 承認待 行 (4/2 = row index 1)
+        (tbl_x1 + 280, tbl_y1 + row_h * 7 + row_h // 2),   # C2 → 短実働 行 (4/9 = row index 6, 要修正)
+        (tbl_x1 + 60, btn_y + 14),                          # C3 → エクスポートボタン
+        (tbl_x1 + 60, tbl_y1 + 14),                         # C4 → 日付列ヘッダ
+        (tbl_x1 + 540, tbl_y1 + 14),                        # C5 → ステータス列ヘッダ (列名ソート)
+        (card[0] + 80, tab_y + 14),                         # C6 → 「今月」タブ
     ]
+    callout_h = 80
+    callout_w = 500
     for i, (label, text) in enumerate(layout["callouts"]):
         bx1 = 1040
-        by1 = body_y + 20 + i * 170
-        _draw_callout(draw, box_rect=(bx1, by1, bx1 + 520, by1 + 110),
-                      label=label, text=text, target=targets[i])
+        by1 = body_y + 20 + i * (callout_h + 16)
+        _draw_callout(draw, box_rect=(bx1, by1, bx1 + callout_w, by1 + callout_h),
+                      label=label, text=text, target=callout_targets[i])
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
 def render_p02(out_path: Path) -> None:
-    """P2: Before/After 比較 — 2 つの検索画面 SS を左右並べて差分矢印 3 本."""
+    """P2 v2: Before/After 検索画面 — 詳細フィルタ + 結果行 + メニュー + フッター + 5 vague diff arrows."""
     spec = SPEC["p02"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    gap = 40
+    gap = 30
     card_w = (CANVAS_W - 3 * gap) // 2
-    card_bottom = body_y + 540  # shrunk from 660 so D1/D2/D3 labels fit cleanly below
-    before = (gap, body_y + 10, gap + card_w, card_bottom)
-    after = (2 * gap + card_w, body_y + 10, 2 * gap + 2 * card_w, card_bottom)
+    card_top = body_y + 10
+    card_bottom = CANVAS_H - 130  # leave 130 px below for 5 diff labels + footer
+    before = (gap, card_top, gap + card_w, card_bottom)
+    after = (2 * gap + card_w, card_top, 2 * gap + 2 * card_w, card_bottom)
 
-    # Capture anchors while drawing so diff arrows land on actual element positions.
     anchors: dict[str, dict[str, tuple[int, int]]] = {}
     for card, side_key in [(before, "before"), (after, "after")]:
         s = layout[side_key]
         _draw_screenshot_card(draw, card, title=s["title"])
-        # Search bar
-        sx1, sy = card[0] + 24, card[1] + 60
-        draw.rectangle([sx1, sy, card[2] - 140, sy + 36],
-                       fill=COLORS["bg"], outline=COLORS["card_border"], width=2)
-        draw.text((sx1 + 10, sy + 10), s["search_placeholder"], fill=COLORS["muted"], font=_font(13))
-        # Search button
-        draw.rectangle([card[2] - 130, sy, card[2] - 24, sy + 36],
-                       fill=COLORS["primary"], outline=COLORS["primary_dk"], width=2)
-        bw, _ = _tsize(draw, s["button"], _bold_font(13))
-        draw.text((card[2] - 77 - bw // 2, sy + 10), s["button"],
-                  fill=COLORS["header_text"], font=_bold_font(13))
-        # Filter rows
-        fy_start = sy + 60
-        fy = fy_start
-        for _i in range(s["filter_rows"]):
-            draw.rectangle([sx1, fy, card[2] - 24, fy + 28],
-                           fill=COLORS["card_bg"], outline=COLORS["card_border"])
-            fy += 36
-        # Results label
-        results_y = fy + 20
-        draw.text((sx1, results_y), s["result_count_label"], fill=COLORS["text"], font=_font(13))
-        # Pagination
-        pagination_y = fy + 60
-        draw.text((sx1, pagination_y), s["pagination"], fill=COLORS["text"], font=_bold_font(14))
+        cx1 = card[0] + 12
 
-        # Save anchors for diff arrows (D1→placeholder, D2→filters, D3→pagination)
+        # Header menu bar
+        menu_y = card[1] + 38
+        menu_text = " | ".join(s["header_menu"])
+        draw.rectangle([cx1, menu_y, card[2] - 12, menu_y + 22],
+                       fill=COLORS["card_bg"], outline=COLORS["card_border"])
+        draw.text((cx1 + 6, menu_y + 4), menu_text, fill=COLORS["text"], font=_font(11))
+
+        # Search bar + button
+        sy = menu_y + 32
+        draw.rectangle([cx1, sy, card[2] - 100, sy + 30],
+                       fill=COLORS["bg"], outline=COLORS["card_border"], width=2)
+        draw.text((cx1 + 8, sy + 8), s["search_placeholder"], fill=COLORS["muted"], font=_font(11))
+        draw.rectangle([card[2] - 90, sy, card[2] - 12, sy + 30],
+                       fill=COLORS["primary"], outline=COLORS["primary_dk"], width=2)
+        draw.text((card[2] - 84, sy + 7), s["button"], fill=COLORS["header_text"], font=_bold_font(11))
+
+        # Sort dropdown (After only)
+        sort_y = sy + 38
+        if s["sort_dropdown"]:
+            draw.rectangle([cx1, sort_y, card[2] - 12, sort_y + 24],
+                           fill=COLORS["card_bg"], outline=COLORS["card_border"])
+            draw.text((cx1 + 6, sort_y + 5), s["sort_dropdown"], fill=COLORS["text"], font=_font(10))
+
+        # Filter section
+        flt_y = sort_y + (28 if s["sort_dropdown"] else 0)
+        draw.text((cx1, flt_y), "Filters:", fill=COLORS["text"], font=_bold_font(11))
+        flt_y += 18
+        flt_y_start = flt_y
+        for cat in s["filter_categories"]:
+            indent = 16 if cat.startswith("  ") else 0
+            draw.rectangle([cx1 + indent + 2, flt_y + 2, cx1 + indent + 14, flt_y + 14],
+                           outline=COLORS["card_border"])
+            draw.text((cx1 + indent + 18, flt_y), cat.strip(), fill=COLORS["text"], font=_font(10))
+            flt_y += 18
+        draw.text((cx1, flt_y + 4), s["filter_price_range"], fill=COLORS["text"], font=_font(10))
+        flt_y += 22
+        if s["filter_brands"]:
+            draw.text((cx1, flt_y), s["filter_brands"], fill=COLORS["text"], font=_font(10))
+            flt_y += 20
+        if s["filter_stock"]:
+            draw.text((cx1, flt_y), s["filter_stock"], fill=COLORS["text"], font=_font(10))
+            flt_y += 20
+
+        # Results label + 3 result rows
+        res_y = flt_y + 8
+        draw.text((cx1, res_y), s["result_count_label"], fill=COLORS["text"], font=_bold_font(11))
+        res_y += 22
+        for name, price, meta in s["result_rows"]:
+            draw.rectangle([cx1, res_y, card[2] - 12, res_y + 36],
+                           fill=COLORS["card_bg"], outline=COLORS["card_border"])
+            draw.text((cx1 + 6, res_y + 4), name[:46], fill=COLORS["text"], font=_font(10))
+            draw.text((cx1 + 6, res_y + 20), f"{price}  /  {meta}", fill=COLORS["muted"], font=_font(9))
+            res_y += 40
+
+        # Pagination
+        pag_y = res_y + 8
+        draw.text((cx1, pag_y), s["pagination"], fill=COLORS["text"], font=_bold_font(11))
+
+        # Footer links
+        foot_y = card[3] - 28
+        draw.text((cx1, foot_y), "  |  ".join(s["footer_links"]), fill=COLORS["muted"], font=_font(9))
+
         anchors[side_key] = {
-            "placeholder": (sx1 + 80, sy + 18),
-            "filters":     (sx1 + 80, fy_start + 14),
-            "pagination":  (sx1 + 80, pagination_y + 10),
+            "placeholder": (cx1 + 80, sy + 14),
+            "filters":     (cx1 + 80, flt_y_start + 30),
+            "sort":        (cx1 + 80, sort_y + 12),
+            "menu":        (cx1 + 80, menu_y + 12),
+            "pagination":  (cx1 + 80, pag_y + 8),
         }
 
-    # 3 red diff labels + dual arrows from label to both sides' corresponding anchors.
+    # 5 vague diff labels + dual arrows
     diff_targets = [
         (anchors["before"]["placeholder"], anchors["after"]["placeholder"]),
         (anchors["before"]["filters"],     anchors["after"]["filters"]),
+        (anchors["before"]["sort"],        anchors["after"]["sort"]),
+        (anchors["before"]["menu"],        anchors["after"]["menu"]),
         (anchors["before"]["pagination"],  anchors["after"]["pagination"]),
     ]
+    diff_y_start = card_bottom + 8
+    diff_w = 280
+    diff_h = 28
     for i, (label, text) in enumerate(layout["diffs"]):
-        y = card_bottom + 30 + i * 60  # cleanly below cards now
-        draw.rectangle([40, y, 280, y + 44], fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
-        draw.text((50, y + 12), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(13))
+        col = i % 2
+        row = i // 2
+        x = 40 + col * (diff_w + 16)
+        y = diff_y_start + row * (diff_h + 4)
+        draw.rectangle([x, y, x + diff_w, y + diff_h], fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
+        draw.text((x + 8, y + 7), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(11))
         for target in diff_targets[i]:
-            _arrow(draw, (280, y + 22), target, color=COLORS["danger"], width=2, head=10)
+            _arrow(draw, (x + diff_w, y + diff_h // 2), target, color=COLORS["danger"], width=1, head=8)
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
 def render_p03(out_path: Path) -> None:
-    """P3: 工程フロー型 — 5 画面 SS を番号付き矢印で連結."""
+    """P3 v2: 5 画面操作手順 — 各 step に詳細 UI 要素を縦積み + 番号付き矢印."""
     spec = SPEC["p03"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # 5 mini screenshots in a single row, connected by arrows.
     steps = layout["steps"]
     n = len(steps)
-    margin = 40
-    gap = 48
+    margin = 30
+    gap = 32
     card_w = (CANVAS_W - 2 * margin - (n - 1) * gap) // n
-    card_h = 400
-    y1 = body_y + 120
+    card_h = 600
+    y1 = body_y + 50
     y2 = y1 + card_h
-    for i, (label, step_title, step_desc) in enumerate(steps):
+
+    for i, step in enumerate(steps):
         x1 = margin + i * (card_w + gap)
         x2 = x1 + card_w
-        _draw_screenshot_card(draw, (x1, y1, x2, y2), title=step_title)
-        # Body of card: wrap step_desc to fit narrow card width
-        wrapped = textwrap.fill(step_desc, width=14)
-        draw.text((x1 + 12, y1 + 48), wrapped, fill=COLORS["text"], font=_font(13))
-        # Step label above card
-        draw.rectangle([x1 + card_w // 2 - 24, y1 - 40, x1 + card_w // 2 + 24, y1 - 8],
+        _draw_screenshot_card(draw, (x1, y1, x2, y2), title=step["title"])
+        # Step label badge above card
+        draw.rectangle([x1 + card_w // 2 - 24, y1 - 36, x1 + card_w // 2 + 24, y1 - 8],
                        fill=COLORS["primary"], outline=COLORS["primary_dk"], width=2)
-        lw, _ = _tsize(draw, label, _bold_font(16))
-        draw.text((x1 + card_w // 2 - lw // 2, y1 - 33), label,
-                  fill=COLORS["header_text"], font=_bold_font(16))
+        lw, _ = _tsize(draw, step["label"], _bold_font(14))
+        draw.text((x1 + card_w // 2 - lw // 2, y1 - 30), step["label"],
+                  fill=COLORS["header_text"], font=_bold_font(14))
+
+        # Body lines (vertical stack inside card)
+        line_y = y1 + 48
+        for line in step["lines"]:
+            draw.text((x1 + 10, line_y), line, fill=COLORS["text"], font=_font(11))
+            line_y += 22
         # Arrow to next card
         if i < n - 1:
-            _arrow(draw, (x2 + 4, (y1 + y2) // 2),
-                   (x2 + gap - 4, (y1 + y2) // 2),
+            arrow_y = (y1 + y2) // 2
+            _arrow(draw, (x2 + 4, arrow_y), (x2 + gap - 4, arrow_y),
                    color=COLORS["text"], width=3, head=14)
 
     _draw_footer(draw, layout["footer"])
@@ -347,166 +451,202 @@ def render_p03(out_path: Path) -> None:
 
 
 def render_p04(out_path: Path) -> None:
-    """P4: ダッシュボード + 解釈注釈 — 棒 + 円 + KPI 3 + 吹き出し 3."""
+    """P4 v2: 通年ダッシュボード — 棒 12 か月 + 円 8 セグ + KPI 7 + 注釈 5 (vague)."""
     spec = SPEC["p04"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # Bar chart (top-left)
-    bx1, by1 = 40, body_y + 40
-    bx2, by2 = 640, by1 + 300
+    # Bar chart (top-left): 12 months
+    bx1, by1 = 30, body_y + 20
+    bx2, by2 = 900, by1 + 240
     _draw_screenshot_card(draw, (bx1, by1, bx2, by2), title=layout["bar_chart"]["title"])
     bars = layout["bar_chart"]["data"]
     max_v = max(v for _, v in bars)
-    chart_top = by1 + 60
-    chart_bot = by2 - 40
+    chart_top = by1 + 50
+    chart_bot = by2 - 32
     chart_left = bx1 + 40
-    chart_right = bx2 - 20
+    chart_right = bx2 - 16
     draw.line([(chart_left, chart_bot), (chart_right, chart_bot)], fill=COLORS["text"], width=2)
     draw.line([(chart_left, chart_top), (chart_left, chart_bot)], fill=COLORS["text"], width=2)
-    bar_area_w = chart_right - chart_left - 40
-    bar_w = bar_area_w // (len(bars) * 2)
+    bar_area_w = chart_right - chart_left - 20
+    bar_w = bar_area_w // len(bars) - 6
     for i, (lbl, v) in enumerate(bars):
-        x = chart_left + 20 + i * (bar_w * 2)
-        h = int((v / max_v) * (chart_bot - chart_top - 20))
+        x = chart_left + 12 + i * (bar_w + 6)
+        h = int((v / max_v) * (chart_bot - chart_top - 14))
         draw.rectangle([x, chart_bot - h, x + bar_w, chart_bot], fill=COLORS["primary"])
-        draw.text((x, chart_bot - h - 18), str(v), fill=COLORS["text"], font=_font(12))
-        draw.text((x + bar_w // 4, chart_bot + 6), lbl, fill=COLORS["text"], font=_font(12))
+        draw.text((x - 1, chart_bot - h - 16), str(v), fill=COLORS["text"], font=_font(9))
+        draw.text((x + 2, chart_bot + 4), lbl, fill=COLORS["text"], font=_font(9))
 
-    # Pie chart (top-right) — rendered as wedges
-    cx, cy, r = 1080, by1 + 160, 100
+    # Pie chart (top-right) — 8 wedges
+    cx, cy, r = 1300, by1 + 130, 90
     pie = layout["pie_chart"]
-    _draw_screenshot_card(draw, (800, by1, CANVAS_W - 40, by2), title=pie["title"])
+    _draw_screenshot_card(draw, (920, by1, CANVAS_W - 30, by2), title=pie["title"])
     total = sum(v for _, v in pie["data"])
     start_angle = -90
-    palette = [COLORS["primary"], COLORS["success"], COLORS["warn"], COLORS["muted"]]
+    palette = [COLORS["primary"], COLORS["success"], COLORS["warn"], COLORS["muted"],
+               COLORS["danger"], COLORS["primary_dk"], COLORS["card_border"], "#7c3aed"]
     for i, (label, v) in enumerate(pie["data"]):
         sweep = (v / total) * 360
         draw.pieslice([cx - r, cy - r, cx + r, cy + r],
                       start=start_angle, end=start_angle + sweep,
                       fill=palette[i % len(palette)], outline=COLORS["bg"], width=2)
-        # Label with % outside the wedge
         mid = math.radians(start_angle + sweep / 2)
-        lx = cx + int((r + 30) * math.cos(mid))
-        ly = cy + int((r + 30) * math.sin(mid))
-        draw.text((lx - 20, ly - 8), f"{label} {v}%", fill=COLORS["text"], font=_font(12))
+        lx = cx + int((r + 24) * math.cos(mid))
+        ly = cy + int((r + 24) * math.sin(mid))
+        draw.text((lx - 18, ly - 6), f"{label} {v}%", fill=COLORS["text"], font=_font(10))
         start_angle += sweep
 
-    # KPI cards (3 cards across bottom)
-    kpi_y1 = by2 + 30
-    kpi_y2 = kpi_y1 + 160
-    kpi_w = (CANVAS_W - 2 * 40 - 2 * 20) // 3
-    for i, (kpi_label, kpi_val, kpi_sub) in enumerate(layout["kpi_cards"]):
-        kx1 = 40 + i * (kpi_w + 20)
-        kx2 = kx1 + kpi_w
-        _draw_screenshot_card(draw, (kx1, kpi_y1, kx2, kpi_y2))
-        draw.text((kx1 + 16, kpi_y1 + 16), kpi_label, fill=COLORS["muted"], font=_bold_font(14))
-        draw.text((kx1 + 16, kpi_y1 + 48), kpi_val, fill=COLORS["text"], font=_bold_font(28))
-        draw.text((kx1 + 16, kpi_y1 + 100), kpi_sub, fill=COLORS["success"], font=_font(13))
+    # KPI cards: 7 cards in 2 rows (4 + 3)
+    kpi_y1 = by2 + 16
+    kpi_h = 110
+    kpis = layout["kpi_cards"]
+    cards_per_row = 4
+    row_gap = 12
+    col_gap = 12
+    kpi_w = (CANVAS_W - 2 * 30 - (cards_per_row - 1) * col_gap) // cards_per_row
+    for i, (kpi_label, kpi_val, kpi_sub) in enumerate(kpis):
+        col = i % cards_per_row
+        row = i // cards_per_row
+        kx1 = 30 + col * (kpi_w + col_gap)
+        ky = kpi_y1 + row * (kpi_h + row_gap)
+        _draw_screenshot_card(draw, (kx1, ky, kx1 + kpi_w, ky + kpi_h))
+        draw.text((kx1 + 12, ky + 10), kpi_label, fill=COLORS["muted"], font=_bold_font(11))
+        draw.text((kx1 + 12, ky + 32), kpi_val, fill=COLORS["text"], font=_bold_font(20))
+        draw.text((kx1 + 12, ky + 70), kpi_sub, fill=COLORS["success"], font=_font(10))
 
-    # 3 interpretive callout rows across the bottom (A1..A3) — full-width red strips
+    # 5 vague annotation rows below KPI grid
+    ann_y = kpi_y1 + (kpi_h + row_gap) * 2 + 10
     for i, (label, text) in enumerate(layout["annotations"]):
-        ay = kpi_y2 + 20 + i * 44
-        draw.rectangle([40, ay, CANVAS_W - 40, ay + 36],
+        ay = ann_y + i * 30
+        draw.rectangle([30, ay, CANVAS_W - 30, ay + 24],
                        fill=COLORS["danger_bg"], outline=COLORS["danger"], width=1)
-        draw.text((52, ay + 8), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(13))
+        draw.text((40, ay + 5), f"{label} {text}", fill=COLORS["danger_text"], font=_bold_font(11))
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
 def render_p05(out_path: Path) -> None:
-    """P5: 階層ドリルダウン — 上: 5 モジュール全体図 / 下: 決済コア拡大 + 設定表."""
+    """P5 v2: 階層ドリルダウン — 上 10 モジュール / 下 8 サブモジュール + 設定 12 行 + 2 vague callouts."""
     spec = SPEC["p05"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # Top band: 5 modules side by side. Highlighted one has a different border.
+    # Top band: 10 modules in 2 rows of 5
     modules = layout["top_level_modules"]
     highlighted = layout["highlighted_module"]
-    n = len(modules)
-    mod_y1 = body_y + 20
-    mod_y2 = mod_y1 + 120
-    mod_w = (CANVAS_W - 2 * 40 - (n - 1) * 20) // n
-    hi_idx = next(i for i, name in enumerate(modules) if name == highlighted)
+    cols = 5
+    rows = 2
+    mod_band_top = body_y + 16
+    mod_w = (CANVAS_W - 2 * 30 - (cols - 1) * 12) // cols
+    mod_h = 56
+    row_gap = 8
+    hi_pos = None
     for i, name in enumerate(modules):
-        mx1 = 40 + i * (mod_w + 20)
-        mx2 = mx1 + mod_w
+        r = i // cols
+        c = i % cols
+        mx1 = 30 + c * (mod_w + 12)
+        my1 = mod_band_top + r * (mod_h + row_gap)
         is_hi = (name == highlighted)
+        if is_hi:
+            hi_pos = (mx1 + mod_w // 2, my1 + mod_h)
         draw.rectangle(
-            [mx1, mod_y1, mx2, mod_y2],
+            [mx1, my1, mx1 + mod_w, my1 + mod_h],
             fill=COLORS["card_bg"],
             outline=COLORS["danger"] if is_hi else COLORS["card_border"],
-            width=3 if is_hi else 2,
+            width=3 if is_hi else 1,
         )
-        nw, _ = _tsize(draw, name, _bold_font(15))
-        draw.text((mx1 + (mod_w - nw) // 2, mod_y1 + 50), name,
-                  fill=COLORS["text"], font=_bold_font(15))
+        nw, _ = _tsize(draw, name, _bold_font(13))
+        draw.text((mx1 + (mod_w - nw) // 2, my1 + 19), name,
+                  fill=COLORS["text"], font=_bold_font(13))
+    mod_band_bot = mod_band_top + 2 * mod_h + row_gap
 
-    # Drilldown arrow from highlighted module to zoomed area below
-    hi_cx = 40 + hi_idx * (mod_w + 20) + mod_w // 2
-    _arrow(draw, (hi_cx, mod_y2 + 4), (CANVAS_W // 2, mod_y2 + 60),
-           color=COLORS["danger"], width=3, head=14)
+    # Drilldown arrow from highlighted module to zoom area
+    zoom_y1 = mod_band_bot + 30
+    zoom_y2 = zoom_y1 + 480
+    if hi_pos:
+        _arrow(draw, hi_pos, (CANVAS_W // 2, zoom_y1 - 4),
+               color=COLORS["danger"], width=3, head=12)
 
-    # Zoomed submodules (left half, grid of 2x2)
-    zoom_y1 = mod_y2 + 80
-    zoom_y2 = zoom_y1 + 380
-    _draw_screenshot_card(draw, (40, zoom_y1, 700, zoom_y2),
-                          title=f"拡大: {highlighted}")
+    # Zoomed submodules (left half: 8 sub-modules in 4x2 grid)
+    sub_card_x2 = 700
+    _draw_screenshot_card(draw, (30, zoom_y1, sub_card_x2, zoom_y2),
+                          title=f"拡大: {highlighted} のサブモジュール")
     sub = layout["zoom_submodules"]
+    sub_cols = 2
+    sub_rows = 4
+    sub_w = (sub_card_x2 - 30 - 60) // sub_cols
+    sub_h = 90
     for i, name in enumerate(sub):
-        r, c = divmod(i, 2)
-        sx1 = 80 + c * 290
-        sy1 = zoom_y1 + 60 + r * 130
-        draw.rectangle([sx1, sy1, sx1 + 260, sy1 + 100],
-                       fill=COLORS["bg"], outline=COLORS["card_border"], width=2)
-        nw, _ = _tsize(draw, name, _bold_font(14))
-        draw.text((sx1 + (260 - nw) // 2, sy1 + 40), name,
-                  fill=COLORS["text"], font=_bold_font(14))
+        r = i // sub_cols
+        c = i % sub_cols
+        sx1 = 50 + c * (sub_w + 20)
+        sy1 = zoom_y1 + 50 + r * (sub_h + 10)
+        draw.rectangle([sx1, sy1, sx1 + sub_w, sy1 + sub_h],
+                       fill=COLORS["bg"], outline=COLORS["card_border"], width=1)
+        nw, _ = _tsize(draw, name, _bold_font(13))
+        draw.text((sx1 + (sub_w - nw) // 2, sy1 + sub_h // 2 - 8), name,
+                  fill=COLORS["text"], font=_bold_font(13))
 
-    # Config table (right half)
-    tbl_x1, tbl_y1 = 740, zoom_y1
-    tbl_x2, tbl_y2 = CANVAS_W - 40, zoom_y2
-    _draw_screenshot_card(draw, (tbl_x1, tbl_y1, tbl_x2, tbl_y2), title="設定パラメータ")
+    # Config table (right half) — 12 rows × 4 cols
+    tbl_x1, tbl_y1 = 720, zoom_y1
+    tbl_x2 = CANVAS_W - 30
+    _draw_screenshot_card(draw, (tbl_x1, tbl_y1, tbl_x2, zoom_y2), title="設定パラメータ (12 項目)")
     cfg = layout["config_table"]
-    col_widths = [320, 200, 200]
+    col_widths = [340, 100, 110, 110]  # = 660
     hx = tbl_x1 + 12
-    hy = tbl_y1 + 60
-    # Header
+    hy = tbl_y1 + 40
+    row_h = 32
     for ci, col in enumerate(cfg["columns"]):
-        draw.rectangle([hx, hy, hx + col_widths[ci], hy + 36],
+        draw.rectangle([hx, hy, hx + col_widths[ci], hy + row_h],
                        fill=COLORS["grid"], outline=COLORS["card_border"])
-        draw.text((hx + 8, hy + 10), col, fill=COLORS["text"], font=_bold_font(14))
+        draw.text((hx + 6, hy + 8), col, fill=COLORS["text"], font=_bold_font(11))
         hx += col_widths[ci]
-    # Rows
     for r, row in enumerate(cfg["rows"]):
         rx = tbl_x1 + 12
-        ry = hy + 36 * (r + 1)
+        ry = hy + row_h * (r + 1)
+        bg = COLORS["bg"] if r % 2 == 0 else COLORS["card_bg"]
         for ci, val in enumerate(row):
-            draw.rectangle([rx, ry, rx + col_widths[ci], ry + 36],
-                           fill=COLORS["bg"], outline=COLORS["card_border"])
-            draw.text((rx + 8, ry + 10), val, fill=COLORS["text"], font=_font(13))
+            draw.rectangle([rx, ry, rx + col_widths[ci], ry + row_h],
+                           fill=bg, outline=COLORS["card_border"])
+            draw.text((rx + 6, ry + 8), val, fill=COLORS["text"], font=_font(10))
             rx += col_widths[ci]
+
+    # 2 vague callouts (below zoom area)
+    callouts = layout["callouts"]
+    callout_targets = [
+        (CANVAS_W // 2, zoom_y1 - 30),                   # M1 → drilldown arrow
+        (tbl_x1 + 200, hy + row_h * 6),                  # M2 → middle of config table
+    ]
+    cy_start = zoom_y2 + 14
+    for i, (label, text) in enumerate(callouts):
+        x = 30 + i * 600
+        draw.rectangle([x, cy_start, x + 280, cy_start + 28],
+                       fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
+        draw.text((x + 10, cy_start + 7), f"{label} {text}",
+                  fill=COLORS["danger_text"], font=_bold_font(11))
+        _arrow(draw, (x + 280, cy_start + 14), callout_targets[i],
+               color=COLORS["danger"], width=1, head=8)
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
 def render_p06(out_path: Path) -> None:
-    """P6: レビュー反映 (赤入れ) — モック 1 + 15 個の赤コメント + 指示線."""
+    """P6 v2: レビュー反映 (赤入れ) — モック 1 + 8 セクション + 25 個の短い赤コメント + 指示線."""
     spec = SPEC["p06"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # Left: mockup placeholder with 6 stacked sections (labels only, for the judge to read).
+    # Left: mockup placeholder with 8 stacked sections.
     mock_x1, mock_y1 = 40, body_y + 10
-    mock_x2, mock_y2 = 780, body_y + 720
+    mock_x2, mock_y2 = 720, body_y + 720
     _draw_screenshot_card(draw, (mock_x1, mock_y1, mock_x2, mock_y2), title="ダッシュボード モックアップ")
     sections = layout["mockup_sections"]
     sec_h = (mock_y2 - mock_y1 - 32) // len(sections)
@@ -515,36 +655,33 @@ def render_p06(out_path: Path) -> None:
         sy2 = sy1 + sec_h - 4
         draw.rectangle([mock_x1 + 16, sy1, mock_x2 - 16, sy2],
                        fill=COLORS["bg"], outline=COLORS["card_border"], width=1)
-        draw.text((mock_x1 + 28, sy1 + 12), sec, fill=COLORS["text"], font=_bold_font(14))
+        draw.text((mock_x1 + 28, sy1 + 10), sec, fill=COLORS["text"], font=_bold_font(13))
 
-    # Right: 15 review comment bubbles, two-column layout.
+    # Right: 25 short review comment bubbles, three-column compact layout.
     comments = layout["comments"]
-    comment_x1 = 800
-    comment_w = (CANVAS_W - comment_x1 - 40 - 10) // 2
-    # First comment per mockup section (one representative leader arrow per section, not 15).
-    section_anchor_first_i: dict[int, int] = {}
-    for i, _ in enumerate(comments):
-        sec_idx = i % len(sections)
-        section_anchor_first_i.setdefault(sec_idx, i)
-    anchor_is = set(section_anchor_first_i.values())
-
+    comment_x1 = 740
+    cols = 3
+    comment_w = (CANVAS_W - comment_x1 - 30 - (cols - 1) * 8) // cols
+    bubble_h = 70
+    row_gap = 8
+    # Map every comment to its target section so each bubble has a leader arrow.
+    # Bubbles wrap row-major; mod len(sections) gives a deterministic distribution.
     for i, (label, text) in enumerate(comments):
-        col = i % 2
-        row = i // 2
-        cx1 = comment_x1 + col * (comment_w + 10)
-        cy1 = body_y + 20 + row * 90
-        draw.rectangle([cx1, cy1, cx1 + comment_w, cy1 + 78],
+        col = i % cols
+        row = i // cols
+        cx1 = comment_x1 + col * (comment_w + 8)
+        cy1 = body_y + 20 + row * (bubble_h + row_gap)
+        cy2 = cy1 + bubble_h
+        draw.rectangle([cx1, cy1, cx1 + comment_w, cy2],
                        fill=COLORS["danger_bg"], outline=COLORS["danger"], width=2)
-        draw.text((cx1 + 10, cy1 + 8), label, fill=COLORS["danger_text"], font=_bold_font(13))
-        # Wrap text to fit comment width (replaces manual text[:40]/text[40:80] slicing).
-        wrapped = textwrap.fill(text, width=18, max_lines=2, placeholder="…")
-        draw.text((cx1 + 10, cy1 + 32), wrapped, fill=COLORS["danger_text"], font=_font(12))
-        # Draw a leader arrow only for the first comment that maps to each section,
-        # keeping fact p06_f19 satisfied without spaghetti visuals.
-        if i in anchor_is:
-            target_section_idx = i % len(sections)
+        draw.text((cx1 + 8, cy1 + 6), label, fill=COLORS["danger_text"], font=_bold_font(12))
+        wrapped = textwrap.fill(text, width=14, max_lines=2, placeholder="…")
+        draw.text((cx1 + 8, cy1 + 26), wrapped, fill=COLORS["danger_text"], font=_font(11))
+        # Leader arrow from leftmost-column bubble to its target section.
+        if col == 0:
+            target_section_idx = (i // cols) % len(sections)
             target_y = mock_y1 + 32 + target_section_idx * sec_h + sec_h // 2
-            _arrow(draw, (cx1, cy1 + 40), (mock_x2, target_y),
+            _arrow(draw, (cx1, cy1 + bubble_h // 2), (mock_x2, target_y),
                    color=COLORS["danger"], width=1, head=6)
 
     _draw_footer(draw, layout["footer"])
@@ -552,141 +689,189 @@ def render_p06(out_path: Path) -> None:
 
 
 def render_p07(out_path: Path) -> None:
-    """P7: 混合ダッシュボードページ — 表 + 棒グラフ + SS + コード + 箇条書き."""
+    """P7 v2: 混合ダッシュボードページ — 9 列×8 行 表 + 8 週棒グラフ + SS + 16 行コード + 8 箇条書き."""
     spec = SPEC["p07"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    # Top-left: table
+    # Top-left: 9-col 8-row table
     tbl = layout["table"]
-    tx1, ty1 = 40, body_y + 20
-    tx2, ty2 = 820, body_y + 380
+    tx1, ty1 = 40, body_y + 10
+    tx2, ty2 = 1080, body_y + 380
     _draw_screenshot_card(draw, (tx1, ty1, tx2, ty2), title=tbl["title"])
-    col_widths = [140, 130, 130, 140, 140]
-    hx = tx1 + 12
-    hy = ty1 + 48
+    col_widths = [70, 90, 80, 80, 80, 80, 70, 90, 90]
+    hx = tx1 + 8
+    hy = ty1 + 44
+    row_h = 32
     for ci, col in enumerate(tbl["columns"]):
-        draw.rectangle([hx, hy, hx + col_widths[ci], hy + 34],
+        draw.rectangle([hx, hy, hx + col_widths[ci], hy + row_h],
                        fill=COLORS["grid"], outline=COLORS["card_border"])
-        draw.text((hx + 8, hy + 8), col, fill=COLORS["text"], font=_bold_font(13))
+        draw.text((hx + 6, hy + 8), col, fill=COLORS["text"], font=_bold_font(11))
         hx += col_widths[ci]
     for r, row in enumerate(tbl["rows"]):
-        rx = tx1 + 12
-        ry = hy + 34 * (r + 1)
+        rx = tx1 + 8
+        ry = hy + row_h * (r + 1)
         for ci, val in enumerate(row):
-            draw.rectangle([rx, ry, rx + col_widths[ci], ry + 34],
+            draw.rectangle([rx, ry, rx + col_widths[ci], ry + row_h],
                            fill=COLORS["bg"], outline=COLORS["card_border"])
-            draw.text((rx + 8, ry + 8), val, fill=COLORS["text"], font=_font(12))
+            draw.text((rx + 6, ry + 8), val, fill=COLORS["text"], font=_font(11))
             rx += col_widths[ci]
 
-    # Top-right: bar chart
+    # Top-right: bar chart (8 weeks)
     bc = layout["bar_chart"]
-    bx1, by1 = 860, body_y + 20
+    bx1, by1 = 1100, body_y + 10
     bx2, by2 = CANVAS_W - 40, body_y + 380
     _draw_screenshot_card(draw, (bx1, by1, bx2, by2), title=bc["title"])
     bars = bc["data"]
     max_v = max(v for _, v in bars)
     chart_top = by1 + 60
     chart_bot = by2 - 40
-    chart_left = bx1 + 40
-    chart_right = bx2 - 20
+    chart_left = bx1 + 30
+    chart_right = bx2 - 15
     draw.line([(chart_left, chart_bot), (chart_right, chart_bot)], fill=COLORS["text"], width=2)
-    bar_area_w = chart_right - chart_left - 40
-    bar_w = bar_area_w // (len(bars) * 2)
+    bar_area_w = chart_right - chart_left - 20
+    slot_w = bar_area_w // len(bars)
+    bar_w = max(int(slot_w * 0.6), 12)
     for i, (lbl, v) in enumerate(bars):
-        x = chart_left + 20 + i * (bar_w * 2)
-        h = int((v / max_v) * (chart_bot - chart_top - 20))
+        x = chart_left + 10 + i * slot_w + (slot_w - bar_w) // 2
+        h = int((v / max_v) * (chart_bot - chart_top - 24))
         draw.rectangle([x, chart_bot - h, x + bar_w, chart_bot], fill=COLORS["primary"])
-        draw.text((x, chart_bot - h - 18), str(v), fill=COLORS["text"], font=_font(12))
-        draw.text((x + bar_w // 4, chart_bot + 6), lbl, fill=COLORS["text"], font=_font(12))
+        draw.text((x - 4, chart_bot - h - 16), str(v), fill=COLORS["text"], font=_font(10))
+        draw.text((x + 4, chart_bot + 4), lbl, fill=COLORS["text"], font=_font(11))
 
     # Bottom-left: screenshot caption placeholder
-    ssx1, ssy1 = 40, by2 + 20
-    ssx2, ssy2 = 440, ssy1 + 360
+    ssx1, ssy1 = 40, by2 + 16
+    ssx2, ssy2 = 380, ssy1 + 380
     _draw_screenshot_card(draw, (ssx1, ssy1, ssx2, ssy2), title="スクリーンショット")
-    draw.rectangle([ssx1 + 20, ssy1 + 50, ssx2 - 20, ssy2 - 50],
+    draw.rectangle([ssx1 + 16, ssy1 + 50, ssx2 - 16, ssy2 - 60],
                    fill=COLORS["card_border"], outline=COLORS["card_border"])
-    draw.text((ssx1 + 20, ssy2 - 40), layout["screenshot_caption"],
-              fill=COLORS["text"], font=_bold_font(13))
+    cap = textwrap.fill(layout["screenshot_caption"], width=22, max_lines=3, placeholder="…")
+    draw.multiline_text((ssx1 + 16, ssy2 - 52), cap,
+                        fill=COLORS["text"], font=_bold_font(12), spacing=2)
 
-    # Bottom-center: code snippet
-    cx1, cy1 = 460, by2 + 20
-    cx2, cy2 = 960, ssy2
+    # Bottom-center: 16-line code snippet
+    cx1, cy1 = 400, by2 + 16
+    cx2, cy2 = 920, ssy2
     _draw_screenshot_card(draw, (cx1, cy1, cx2, cy2), title=layout["code_snippet"]["filename"])
-    draw.rectangle([cx1 + 12, cy1 + 48, cx2 - 12, cy2 - 12],
+    draw.rectangle([cx1 + 8, cy1 + 44, cx2 - 8, cy2 - 8],
                    fill="#1e1e1e", outline=COLORS["card_border"])
-    code_y = cy1 + 60
+    code_y = cy1 + 50
     for line in layout["code_snippet"]["lines"]:
-        draw.text((cx1 + 20, code_y), line, fill="#d4d4d4", font=_mono_font(13))
-        code_y += 22
+        draw.text((cx1 + 14, code_y), line, fill="#d4d4d4", font=_mono_font(11))
+        code_y += 19
 
-    # Bottom-right: bullets
-    bux1, buy1 = 980, by2 + 20
+    # Bottom-right: 8 bullets
+    bux1, buy1 = 940, by2 + 16
     bux2, buy2 = CANVAS_W - 40, ssy2
     _draw_screenshot_card(draw, (bux1, buy1, bux2, buy2), title="主要メトリクス")
-    by = buy1 + 60
+    by = buy1 + 50
     for b in layout["bullets"]:
-        draw.text((bux1 + 20, by), f"• {b}", fill=COLORS["text"], font=_font(14))
-        by += 36
+        wrapped = textwrap.fill(f"• {b}", width=24, max_lines=2, placeholder="…")
+        draw.multiline_text((bux1 + 14, by), wrapped, fill=COLORS["text"], font=_font(12), spacing=2)
+        by += 38
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
 
 
+def _draw_dashed_line(draw, p1, p2, color, width=2, dash=8):
+    """Draw a dashed straight line by stamping segments along the path."""
+    x1, y1 = p1
+    x2, y2 = p2
+    dx = x2 - x1
+    dy = y2 - y1
+    length = max(1, int((dx * dx + dy * dy) ** 0.5))
+    n = length // (dash * 2)
+    if n == 0:
+        draw.line([p1, p2], fill=color, width=width)
+        return
+    for i in range(n + 1):
+        t1 = (i * 2) / (2 * (n + 1))
+        t2 = (i * 2 + 1) / (2 * (n + 1))
+        sx = x1 + dx * t1
+        sy = y1 + dy * t1
+        ex = x1 + dx * t2
+        ey = y1 + dy * t2
+        draw.line([(sx, sy), (ex, ey)], fill=color, width=width)
+
+
 def render_p08(out_path: Path) -> None:
-    """P8: 組織図 + ノード SS 補足 — 3 階層 10 ノード."""
+    """P8 v2: 組織図 — 4 階層 20 ノード + 部門色 + 兼務点線."""
     spec = SPEC["p08"]
     layout = spec["layout"]
     img = _new_canvas()
     draw = ImageDraw.Draw(img)
     body_y = _draw_slide_title(draw, spec["title"], subtitle=layout["subtitle"])
 
-    nodes = layout["nodes"]  # list of (id, level, name, role, parent)
-    # Group by level
+    nodes = layout["nodes"]  # list of (id, level, name, role, parent, joined, headcount, dept_key)
+    depts = layout["departments"]
     by_level: dict[int, list[tuple]] = {}
     for n in nodes:
         by_level.setdefault(n[1], []).append(n)
 
-    # Level y-positions
-    level_ys = {1: body_y + 40, 2: body_y + 240, 3: body_y + 500}
-    node_w, node_h = 180, 120
+    # Level y-positions for 4 layers
+    level_ys = {1: body_y + 10, 2: body_y + 170, 3: body_y + 360, 4: body_y + 580}
+    node_w, node_h = 150, 130
+    node_positions: dict[str, tuple[int, int, int]] = {}
 
-    # Draw nodes level by level, centered horizontally
-    node_positions: dict[str, tuple[int, int, int]] = {}  # id -> (cx, cy_top, cy_bottom)
     for lvl, items in sorted(by_level.items()):
-        total_w = len(items) * node_w + (len(items) - 1) * 40
-        start_x = (CANVAS_W - total_w) // 2
-        for i, (nid, _lvl, name, role, _parent) in enumerate(items):
-            nx1 = start_x + i * (node_w + 40)
+        total_w = len(items) * node_w + (len(items) - 1) * 18
+        start_x = max(20, (CANVAS_W - total_w) // 2)
+        for i, (nid, _lvl, name, role, _parent, joined, headcount, dept_key) in enumerate(items):
+            nx1 = start_x + i * (node_w + 18)
             ny1 = level_ys[lvl]
             nx2 = nx1 + node_w
             ny2 = ny1 + node_h
+            _, dept_color = depts[dept_key]
+            # Card body
             _draw_screenshot_card(draw, (nx1, ny1, nx2, ny2))
-            # Avatar placeholder (circle)
+            # Department color band on top
+            draw.rectangle([nx1 + 1, ny1 + 1, nx2 - 1, ny1 + 8], fill=dept_color, outline=dept_color)
+            # Avatar placeholder
             avatar_cx = nx1 + node_w // 2
-            avatar_cy = ny1 + 38
-            draw.ellipse([avatar_cx - 22, avatar_cy - 22, avatar_cx + 22, avatar_cy + 22],
+            avatar_cy = ny1 + 30
+            draw.ellipse([avatar_cx - 16, avatar_cy - 16, avatar_cx + 16, avatar_cy + 16],
                          fill=COLORS["card_border"], outline=COLORS["card_border"])
-            # Name + role
-            nw, _ = _tsize(draw, name, _bold_font(14))
-            draw.text((nx1 + (node_w - nw) // 2, ny1 + 66), name,
-                      fill=COLORS["text"], font=_bold_font(14))
-            rw, _ = _tsize(draw, role, _font(12))
-            draw.text((nx1 + (node_w - rw) // 2, ny1 + 88), role,
-                      fill=COLORS["muted"], font=_font(12))
+            # Name
+            nw, _ = _tsize(draw, name, _bold_font(12))
+            draw.text((nx1 + (node_w - nw) // 2, ny1 + 50), name,
+                      fill=COLORS["text"], font=_bold_font(12))
+            # Role
+            role_disp = role if len(role) <= 20 else role[:18] + "…"
+            rw, _ = _tsize(draw, role_disp, _font(10))
+            draw.text((nx1 + (node_w - rw) // 2, ny1 + 70), role_disp,
+                      fill=COLORS["muted"], font=_font(10))
+            # Joined / headcount
+            meta = f"{joined} 入社 / 配下 {headcount}"
+            mw, _ = _tsize(draw, meta, _font(10))
+            draw.text((nx1 + (node_w - mw) // 2, ny1 + 90), meta,
+                      fill=COLORS["muted"], font=_font(10))
+            # Department label
+            dept_label = depts[dept_key][0]
+            dw, _ = _tsize(draw, dept_label, _bold_font(10))
+            draw.text((nx1 + (node_w - dw) // 2, ny1 + 108), dept_label,
+                      fill=dept_color, font=_bold_font(10))
             node_positions[nid] = (avatar_cx, ny1, ny2)
 
-    # Draw parent→child lines
-    for nid, _lvl, _name, _role, parent in nodes:
+    # Draw parent→child solid lines
+    for nid, _lvl, _name, _role, parent, *_rest in nodes:
         if parent and parent in node_positions:
             pcx, _py1, py2 = node_positions[parent]
             ccx, cy1, _cy2 = node_positions[nid]
-            # Vertical line from parent bottom to child top
-            draw.line([(pcx, py2), (pcx, (py2 + cy1) // 2)], fill=COLORS["text"], width=2)
-            draw.line([(pcx, (py2 + cy1) // 2), (ccx, (py2 + cy1) // 2)], fill=COLORS["text"], width=2)
-            draw.line([(ccx, (py2 + cy1) // 2), (ccx, cy1)], fill=COLORS["text"], width=2)
+            mid_y = (py2 + cy1) // 2
+            draw.line([(pcx, py2), (pcx, mid_y)], fill=COLORS["text"], width=2)
+            draw.line([(pcx, mid_y), (ccx, mid_y)], fill=COLORS["text"], width=2)
+            draw.line([(ccx, mid_y), (ccx, cy1)], fill=COLORS["text"], width=2)
+
+    # Dotted matrix reporting lines
+    for from_id, to_id, _note in layout.get("dotted_links", []):
+        if from_id in node_positions and to_id in node_positions:
+            fcx, fy_top, fy_bot = node_positions[from_id]
+            tcx, ty_top, ty_bot = node_positions[to_id]
+            _draw_dashed_line(draw, (fcx, fy_top), (tcx, ty_bot),
+                              color=COLORS["danger"], width=2, dash=6)
 
     _draw_footer(draw, layout["footer"])
     img.save(out_path, "PNG")
@@ -791,60 +976,99 @@ def _build_slide_p01(prs) -> None:
     layout = spec["layout"]
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
-    # Screenshot card
-    card = (40, 110, 1000, 800)
+    # Screenshot card (taller for v2)
+    card = (40, 110, 1000, 820)
     _pptx_add_box(slide, card[0], card[1], card[2] - card[0], card[3] - card[1],
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
     _pptx_add_box(slide, card[0], card[1], card[2] - card[0], 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, card[0] + 12, card[1] + 6, 400, 24,
+    _pptx_add_text(slide, card[0] + 12, card[1] + 6, 300, 24,
                    layout["app_title"], size_pt=12, bold=True, color=COLORS["header_text"])
-    _pptx_add_text(slide, card[2] - 220, card[1] + 8, 200, 24,
-                   layout["header_user"], size_pt=11, color=COLORS["header_text"], align=PP_ALIGN.RIGHT)
 
-    # Table
-    tbl_x1, tbl_y1 = card[0] + 24, card[1] + 60
-    col_widths = [190, 110, 110, 110, 140]
-    row_h = 42
+    # Right-side icons + user (text-only, no image; pptx text is what Copilot reads)
+    icons_text = " ".join([f"{ic}{f'({bd})' if bd else ''}" for ic, bd in layout["header_right_icons"]])
+    _pptx_add_text(slide, card[2] - 360, card[1] + 8, 340, 24,
+                   f"{layout['header_user']}    {icons_text}",
+                   size_pt=11, color=COLORS["header_text"], align=PP_ALIGN.RIGHT)
+
+    # Tab bar
+    tab_y = card[1] + 40
+    tab_x = card[0] + 16
+    tabs = layout["tab_bar"]["tabs"]
+    active = layout["tab_bar"]["active"]
+    for tab in tabs:
+        tab_w = len(tab) * 14 + 24
+        if tab == active:
+            _pptx_add_box(slide, tab_x, tab_y, tab_w, 30,
+                          fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.0)
+            _pptx_add_text(slide, tab_x, tab_y + 7, tab_w, 22,
+                           tab, size_pt=11, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+        else:
+            _pptx_add_text(slide, tab_x, tab_y + 7, tab_w, 22,
+                           tab, size_pt=11, color=COLORS["muted"], align=PP_ALIGN.CENTER)
+        tab_x += tab_w + 8
+
+    # Filter dropdown
+    flt_text = f"{layout['filter_label']} {layout['filter_default']}"
+    _pptx_add_box(slide, card[2] - 180, tab_y + 2, 158, 26,
+                  fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=0.75)
+    _pptx_add_text(slide, card[2] - 174, tab_y + 7, 148, 20,
+                   flt_text, size_pt=10, color=COLORS["text"])
+
+    # Table (7 cols, 8 rows + summary)
+    tbl_x1, tbl_y1 = card[0] + 16, card[1] + 82
+    col_widths = [150, 70, 70, 70, 70, 100, 280]
+    row_h = 32
     hx = tbl_x1
     for ci, header in enumerate(layout["table_header"]):
         _pptx_add_box(slide, hx, tbl_y1, col_widths[ci], row_h,
-                      fill=COLORS["grid"], outline=COLORS["card_border"])
-        _pptx_add_text(slide, hx + 10, tbl_y1 + 12, col_widths[ci] - 20, row_h - 24,
-                       header, size_pt=11, bold=True)
+                      fill=COLORS["grid"], outline=COLORS["card_border"], outline_w=0.5)
+        _pptx_add_text(slide, hx + 6, tbl_y1 + 8, col_widths[ci] - 12, 20,
+                       header, size_pt=10, bold=True)
         hx += col_widths[ci]
     for r, row in enumerate(layout["table_rows"]):
         ry = tbl_y1 + row_h * (r + 1)
         rx = tbl_x1
+        bg = COLORS["bg"] if r % 2 == 0 else COLORS["card_bg"]
         for ci, val in enumerate(row):
             _pptx_add_box(slide, rx, ry, col_widths[ci], row_h,
-                          fill=COLORS["bg"], outline=COLORS["card_border"])
-            _pptx_add_text(slide, rx + 10, ry + 12, col_widths[ci] - 20, row_h - 24,
-                           val, size_pt=11)
+                          fill=bg, outline=COLORS["card_border"], outline_w=0.5)
+            _pptx_add_text(slide, rx + 6, ry + 8, col_widths[ci] - 12, 20,
+                           val, size_pt=9)
             rx += col_widths[ci]
+    sum_y = tbl_y1 + row_h * (len(layout["table_rows"]) + 1)
+    rx = tbl_x1
+    for ci, val in enumerate(layout["summary_row"]):
+        _pptx_add_box(slide, rx, sum_y, col_widths[ci], row_h,
+                      fill=COLORS["grid"], outline=COLORS["card_border"], outline_w=0.5)
+        _pptx_add_text(slide, rx + 6, sum_y + 8, col_widths[ci] - 12, 20,
+                       val, size_pt=9, bold=True)
+        rx += col_widths[ci]
 
     # Buttons
-    btn_y = tbl_y1 + row_h * (len(layout["table_rows"]) + 1) + 24
+    btn_y = sum_y + row_h + 20
     bx = tbl_x1
     for label in layout["buttons"]:
-        bw = len(label) * 16 + 24
-        _pptx_add_box(slide, bx, btn_y, bw, 32,
+        bw = len(label) * 14 + 22
+        _pptx_add_box(slide, bx, btn_y, bw, 30,
                       fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
         _pptx_add_text(slide, bx, btn_y + 7, bw, 22,
                        label, size_pt=11, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
-        bx += bw + 10
+        bx += bw + 8
 
-    # 4 red callouts with labels
+    # 6 vague callouts on right
+    callout_w = 500
+    callout_h = 80
     for i, (label, text) in enumerate(layout["callouts"]):
         bx1 = 1040
-        by1 = 130 + i * 170
-        _pptx_add_box(slide, bx1, by1, 520, 110,
-                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=2.0,
+        by1 = 130 + i * (callout_h + 16)
+        _pptx_add_box(slide, bx1, by1, callout_w, callout_h,
+                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5,
                       shape=MSO_SHAPE.ROUNDED_RECTANGLE)
-        _pptx_add_text(slide, bx1 + 12, by1 + 12, 500, 24,
+        _pptx_add_text(slide, bx1 + 12, by1 + 8, callout_w - 24, 24,
                        label, size_pt=12, bold=True, color=COLORS["danger_text"])
-        _pptx_add_text(slide, bx1 + 12, by1 + 38, 500, 60,
-                       text, size_pt=11, color=COLORS["danger_text"])
+        _pptx_add_text(slide, bx1 + 12, by1 + 36, callout_w - 24, 36,
+                       text, size_pt=12, color=COLORS["danger_text"])
     _pptx_footer(slide, layout['footer'])
 
 
@@ -854,10 +1078,12 @@ def _build_slide_p02(prs) -> None:
     layout = spec["layout"]
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
-    gap = 40
+    gap = 30
     card_w = (CANVAS_W - 3 * gap) // 2
+    card_top = 110
+    card_bottom = CANVAS_H - 130
     for offset, side_key in [(gap, "before"), (2 * gap + card_w, "after")]:
-        card = (offset, 120, offset + card_w, 770)
+        card = (offset, card_top, offset + card_w, card_bottom)
         s = layout[side_key]
         _pptx_add_box(slide, card[0], card[1], card_w, card[3] - card[1],
                       fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
@@ -865,32 +1091,86 @@ def _build_slide_p02(prs) -> None:
                       fill=COLORS["header_bg"], outline=COLORS["header_bg"])
         _pptx_add_text(slide, card[0] + 12, card[1] + 6, card_w - 24, 24,
                        s["title"], size_pt=12, bold=True, color=COLORS["header_text"])
-        sx1 = card[0] + 24
-        sy = card[1] + 60
-        _pptx_add_box(slide, sx1, sy, card_w - 160, 36,
-                      fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=1.5)
-        _pptx_add_text(slide, sx1 + 10, sy + 10, card_w - 180, 20,
-                       s["search_placeholder"], size_pt=11, color=COLORS["muted"])
-        _pptx_add_box(slide, card[2] - 130, sy, 106, 36,
-                      fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
-        _pptx_add_text(slide, card[2] - 130, sy + 10, 106, 20,
-                       s["button"], size_pt=11, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
-        fy = sy + 60
-        for _i in range(s["filter_rows"]):
-            _pptx_add_box(slide, sx1, fy, card_w - 48, 28,
-                          fill=COLORS["card_bg"], outline=COLORS["card_border"])
-            fy += 36
-        _pptx_add_text(slide, sx1, fy + 20, card_w - 48, 20,
-                       s["result_count_label"], size_pt=11)
-        _pptx_add_text(slide, sx1, fy + 60, card_w - 48, 24,
-                       s["pagination"], size_pt=12, bold=True)
+        cx1 = card[0] + 12
 
-    # Diff labels at the bottom
+        # Header menu
+        menu_y = card[1] + 38
+        _pptx_add_box(slide, cx1, menu_y, card_w - 24, 22,
+                      fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=0.5)
+        _pptx_add_text(slide, cx1 + 6, menu_y + 4, card_w - 36, 20,
+                       " | ".join(s["header_menu"]), size_pt=10)
+
+        # Search bar + button
+        sy = menu_y + 32
+        _pptx_add_box(slide, cx1, sy, card_w - 100, 30,
+                      fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=1.0)
+        _pptx_add_text(slide, cx1 + 6, sy + 7, card_w - 110, 22,
+                       s["search_placeholder"], size_pt=10, color=COLORS["muted"])
+        _pptx_add_box(slide, card[2] - 90, sy, 78, 30,
+                      fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.0)
+        _pptx_add_text(slide, card[2] - 90, sy + 7, 78, 22,
+                       s["button"], size_pt=10, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+
+        # Sort dropdown (After only)
+        sort_y = sy + 38
+        if s["sort_dropdown"]:
+            _pptx_add_box(slide, cx1, sort_y, card_w - 24, 24,
+                          fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=0.5)
+            _pptx_add_text(slide, cx1 + 6, sort_y + 5, card_w - 36, 20,
+                           s["sort_dropdown"], size_pt=9)
+
+        flt_y = sort_y + (28 if s["sort_dropdown"] else 0)
+        _pptx_add_text(slide, cx1, flt_y, 200, 18, "Filters:", size_pt=11, bold=True)
+        flt_y += 18
+        for cat in s["filter_categories"]:
+            _pptx_add_text(slide, cx1, flt_y, card_w - 24, 16,
+                           f"☐ {cat}", size_pt=9)
+            flt_y += 18
+        _pptx_add_text(slide, cx1, flt_y + 4, card_w - 24, 18,
+                       s["filter_price_range"], size_pt=9)
+        flt_y += 22
+        if s["filter_brands"]:
+            _pptx_add_text(slide, cx1, flt_y, card_w - 24, 18, s["filter_brands"], size_pt=9)
+            flt_y += 20
+        if s["filter_stock"]:
+            _pptx_add_text(slide, cx1, flt_y, card_w - 24, 18, s["filter_stock"], size_pt=9)
+            flt_y += 20
+
+        # Results
+        res_y = flt_y + 8
+        _pptx_add_text(slide, cx1, res_y, card_w - 24, 20,
+                       s["result_count_label"], size_pt=10, bold=True)
+        res_y += 22
+        for name, price, meta in s["result_rows"]:
+            _pptx_add_box(slide, cx1, res_y, card_w - 24, 36,
+                          fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=0.5)
+            _pptx_add_text(slide, cx1 + 6, res_y + 4, card_w - 36, 16,
+                           name, size_pt=9)
+            _pptx_add_text(slide, cx1 + 6, res_y + 20, card_w - 36, 14,
+                           f"{price}  /  {meta}", size_pt=8, color=COLORS["muted"])
+            res_y += 40
+
+        # Pagination
+        pag_y = res_y + 8
+        _pptx_add_text(slide, cx1, pag_y, card_w - 24, 22,
+                       s["pagination"], size_pt=11, bold=True)
+
+        # Footer links
+        _pptx_add_text(slide, cx1, card[3] - 28, card_w - 24, 20,
+                       "  |  ".join(s["footer_links"]), size_pt=8, color=COLORS["muted"])
+
+    # 5 vague diff labels at bottom (2 columns)
+    diff_y_start = card_bottom + 8
+    diff_w = 280
+    diff_h = 28
     for i, (label, text) in enumerate(layout["diffs"]):
-        y = CANVAS_H - 220 + i * 60
-        _pptx_add_box(slide, 40, y, 240, 44,
+        col = i % 2
+        row = i // 2
+        x = 40 + col * (diff_w + 16)
+        y = diff_y_start + row * (diff_h + 4)
+        _pptx_add_box(slide, x, y, diff_w, diff_h,
                       fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5)
-        _pptx_add_text(slide, 50, y + 12, 220, 24,
+        _pptx_add_text(slide, x + 8, y + 7, diff_w - 16, 18,
                        f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
     _pptx_footer(slide, layout['footer'])
 
@@ -903,27 +1183,32 @@ def _build_slide_p03(prs) -> None:
 
     steps = layout["steps"]
     n = len(steps)
-    margin = 40
-    gap = 48
+    margin = 30
+    gap = 32
     card_w = (CANVAS_W - 2 * margin - (n - 1) * gap) // n
-    card_h = 400
-    y1 = 230
-    for i, (label, step_title, step_desc) in enumerate(steps):
+    card_h = 600
+    y1 = 150
+    for i, step in enumerate(steps):
         x1 = margin + i * (card_w + gap)
-        # Step label badge
-        _pptx_add_box(slide, x1 + card_w // 2 - 24, y1 - 40, 48, 32,
+        # Step label badge above card
+        _pptx_add_box(slide, x1 + card_w // 2 - 24, y1 - 36, 48, 28,
                       fill=COLORS["primary"], outline=COLORS["primary_dk"], outline_w=1.5)
-        _pptx_add_text(slide, x1 + card_w // 2 - 24, y1 - 34, 48, 24,
-                       label, size_pt=14, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
-        # Card
+        _pptx_add_text(slide, x1 + card_w // 2 - 24, y1 - 32, 48, 22,
+                       step["label"], size_pt=12, bold=True, color=COLORS["header_text"], align=PP_ALIGN.CENTER)
+        # Card with header
         _pptx_add_box(slide, x1, y1, card_w, card_h,
                       fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
         _pptx_add_box(slide, x1, y1, card_w, 32,
                       fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-        _pptx_add_text(slide, x1 + 12, y1 + 6, card_w - 24, 24,
-                       step_title, size_pt=12, bold=True, color=COLORS["header_text"])
-        _pptx_add_text(slide, x1 + 12, y1 + 48, card_w - 24, card_h - 60,
-                       step_desc, size_pt=11)
+        _pptx_add_text(slide, x1 + 10, y1 + 6, card_w - 20, 22,
+                       step["title"], size_pt=12, bold=True, color=COLORS["header_text"])
+        # Lines stacked inside card
+        line_y = y1 + 44
+        for line in step["lines"]:
+            _pptx_add_text(slide, x1 + 10, line_y, card_w - 20, 18,
+                           line, size_pt=10)
+            line_y += 22
+        # Arrow to next card
         if i < n - 1:
             _pptx_add_line(slide, x1 + card_w + 4, y1 + card_h // 2,
                            x1 + card_w + gap - 4, y1 + card_h // 2,
@@ -937,56 +1222,70 @@ def _build_slide_p04(prs) -> None:
     layout = spec["layout"]
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
-    # Bar chart as labeled bars (native PPT elements, not image)
-    _pptx_add_box(slide, 40, 140, 600, 300,
+    # Bar chart (top-left): 12 months
+    bx1, by1 = 30, 110
+    bx2, by2 = 900, by1 + 240
+    _pptx_add_box(slide, bx1, by1, bx2 - bx1, by2 - by1,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_text(slide, 56, 152, 500, 28,
+    _pptx_add_text(slide, bx1 + 16, by1 + 8, 500, 24,
                    layout["bar_chart"]["title"], size_pt=12, bold=True)
     bars = layout["bar_chart"]["data"]
     max_v = max(v for _, v in bars)
-    chart_top, chart_bot = 200, 410
+    chart_top, chart_bot = by1 + 50, by2 - 32
+    chart_left, chart_right = bx1 + 40, bx2 - 16
+    bar_area_w = chart_right - chart_left - 20
+    bar_w = bar_area_w // len(bars) - 6
     for i, (lbl, v) in enumerate(bars):
-        x = 80 + i * 160
-        h = int((v / max_v) * (chart_bot - chart_top - 20))
-        _pptx_add_box(slide, x, chart_bot - h, 80, h,
+        x = chart_left + 12 + i * (bar_w + 6)
+        h = int((v / max_v) * (chart_bot - chart_top - 14))
+        _pptx_add_box(slide, x, chart_bot - h, bar_w, h,
                       fill=COLORS["primary"], outline=COLORS["primary"])
-        _pptx_add_text(slide, x, chart_bot - h - 22, 80, 20,
-                       str(v), size_pt=11, align=PP_ALIGN.CENTER)
-        _pptx_add_text(slide, x, chart_bot + 6, 80, 20,
-                       lbl, size_pt=11, align=PP_ALIGN.CENTER)
+        _pptx_add_text(slide, x - 4, chart_bot - h - 18, bar_w + 8, 16,
+                       str(v), size_pt=8, align=PP_ALIGN.CENTER)
+        _pptx_add_text(slide, x, chart_bot + 4, bar_w, 16,
+                       lbl, size_pt=8, align=PP_ALIGN.CENTER)
 
-    # Pie chart — approximate as labeled legend (python-pptx chart objects are heavier; legend-like text is sufficient for extraction test)
-    _pptx_add_box(slide, 800, 140, CANVAS_W - 840, 300,
+    # Pie chart legend (text-only — covers all 8 segments as legend text)
+    _pptx_add_box(slide, 920, by1, CANVAS_W - 950, by2 - by1,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_text(slide, 816, 152, 500, 28,
+    _pptx_add_text(slide, 936, by1 + 8, 600, 24,
                    layout["pie_chart"]["title"], size_pt=12, bold=True)
-    palette = [COLORS["primary"], COLORS["success"], COLORS["warn"], COLORS["muted"]]
+    palette = [COLORS["primary"], COLORS["success"], COLORS["warn"], COLORS["muted"],
+               COLORS["danger"], COLORS["primary_dk"], COLORS["card_border"], "#7c3aed"]
     for i, (lbl, v) in enumerate(layout["pie_chart"]["data"]):
-        _pptx_add_box(slide, 816, 190 + i * 44, 24, 24,
+        _pptx_add_box(slide, 936, by1 + 44 + i * 24, 18, 18,
                       fill=palette[i % len(palette)], outline=palette[i % len(palette)])
-        _pptx_add_text(slide, 850, 194 + i * 44, 400, 28,
-                       f"{lbl}  {v}%", size_pt=13)
+        _pptx_add_text(slide, 962, by1 + 46 + i * 24, 600, 22,
+                       f"{lbl}  {v}%", size_pt=11)
 
-    # 3 KPI cards
-    kpi_y = 470
-    kpi_w = (CANVAS_W - 2 * 40 - 2 * 20) // 3
+    # KPI cards: 7 cards in 2 rows (4 + 3)
+    kpi_y1 = by2 + 16
+    kpi_h = 110
+    cards_per_row = 4
+    row_gap = 12
+    col_gap = 12
+    kpi_w = (CANVAS_W - 2 * 30 - (cards_per_row - 1) * col_gap) // cards_per_row
     for i, (kpi_label, kpi_val, kpi_sub) in enumerate(layout["kpi_cards"]):
-        kx1 = 40 + i * (kpi_w + 20)
-        _pptx_add_box(slide, kx1, kpi_y, kpi_w, 160,
+        col = i % cards_per_row
+        row = i // cards_per_row
+        kx1 = 30 + col * (kpi_w + col_gap)
+        ky = kpi_y1 + row * (kpi_h + row_gap)
+        _pptx_add_box(slide, kx1, ky, kpi_w, kpi_h,
                       fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-        _pptx_add_text(slide, kx1 + 16, kpi_y + 16, kpi_w - 32, 20,
-                       kpi_label, size_pt=13, bold=True, color=COLORS["muted"])
-        _pptx_add_text(slide, kx1 + 16, kpi_y + 48, kpi_w - 32, 44,
-                       kpi_val, size_pt=26, bold=True)
-        _pptx_add_text(slide, kx1 + 16, kpi_y + 104, kpi_w - 32, 24,
-                       kpi_sub, size_pt=11, color=COLORS["success"])
+        _pptx_add_text(slide, kx1 + 12, ky + 10, kpi_w - 24, 18,
+                       kpi_label, size_pt=11, bold=True, color=COLORS["muted"])
+        _pptx_add_text(slide, kx1 + 12, ky + 32, kpi_w - 24, 30,
+                       kpi_val, size_pt=18, bold=True)
+        _pptx_add_text(slide, kx1 + 12, ky + 70, kpi_w - 24, 22,
+                       kpi_sub, size_pt=10, color=COLORS["success"])
 
-    # 3 annotation boxes
+    # 5 annotation rows
+    ann_y = kpi_y1 + (kpi_h + row_gap) * 2 + 10
     for i, (label, text) in enumerate(layout["annotations"]):
-        ay = 650 + i * 48
-        _pptx_add_box(slide, 40, ay, CANVAS_W - 80, 40,
+        ay = ann_y + i * 30
+        _pptx_add_box(slide, 30, ay, CANVAS_W - 60, 24,
                       fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.0)
-        _pptx_add_text(slide, 52, ay + 10, CANVAS_W - 120, 24,
+        _pptx_add_text(slide, 40, ay + 5, CANVAS_W - 80, 20,
                        f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
     _pptx_footer(slide, layout['footer'])
 
@@ -999,68 +1298,97 @@ def _build_slide_p05(prs) -> None:
 
     modules = layout["top_level_modules"]
     highlighted = layout["highlighted_module"]
-    n = len(modules)
-    mod_y1 = 120
-    mod_w = (CANVAS_W - 2 * 40 - (n - 1) * 20) // n
+    cols = 5
+    mod_band_top = 110
+    mod_w = (CANVAS_W - 2 * 30 - (cols - 1) * 12) // cols
+    mod_h = 56
+    row_gap = 8
+    hi_pos = None
     for i, name in enumerate(modules):
-        mx1 = 40 + i * (mod_w + 20)
+        r = i // cols
+        c = i % cols
+        mx1 = 30 + c * (mod_w + 12)
+        my1 = mod_band_top + r * (mod_h + row_gap)
         is_hi = (name == highlighted)
-        _pptx_add_box(slide, mx1, mod_y1, mod_w, 120,
+        if is_hi:
+            hi_pos = (mx1 + mod_w // 2, my1 + mod_h)
+        _pptx_add_box(slide, mx1, my1, mod_w, mod_h,
                       fill=COLORS["card_bg"],
                       outline=COLORS["danger"] if is_hi else COLORS["card_border"],
-                      outline_w=3.0 if is_hi else 1.5)
-        _pptx_add_text(slide, mx1, mod_y1 + 48, mod_w, 30,
-                       name, size_pt=14, bold=True, align=PP_ALIGN.CENTER)
+                      outline_w=3.0 if is_hi else 1.0)
+        _pptx_add_text(slide, mx1, my1 + 18, mod_w, 22,
+                       name, size_pt=12, bold=True, align=PP_ALIGN.CENTER)
+    mod_band_bot = mod_band_top + 2 * mod_h + row_gap
 
     # Drilldown arrow
-    hi_idx = modules.index(highlighted)
-    hi_cx = 40 + hi_idx * (mod_w + 20) + mod_w // 2
-    _pptx_add_line(slide, hi_cx, 244, CANVAS_W // 2, 300,
-                   color=COLORS["danger"], width_pt=3.0)
+    zoom_y1 = mod_band_bot + 30
+    zoom_y2 = zoom_y1 + 480
+    if hi_pos:
+        _pptx_add_line(slide, hi_pos[0], hi_pos[1], CANVAS_W // 2, zoom_y1 - 4,
+                       color=COLORS["danger"], width_pt=3.0)
 
-    # Zoomed submodules (left)
-    _pptx_add_box(slide, 40, 320, 660, 380,
+    # Zoomed submodules (left, 4x2)
+    sub_card_x2 = 700
+    _pptx_add_box(slide, 30, zoom_y1, sub_card_x2 - 30, zoom_y2 - zoom_y1,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 40, 320, 660, 32,
+    _pptx_add_box(slide, 30, zoom_y1, sub_card_x2 - 30, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 52, 326, 640, 24,
-                   f"拡大: {highlighted}", size_pt=12, bold=True, color=COLORS["header_text"])
+    _pptx_add_text(slide, 42, zoom_y1 + 6, sub_card_x2 - 50, 22,
+                   f"拡大: {highlighted} のサブモジュール",
+                   size_pt=12, bold=True, color=COLORS["header_text"])
     sub = layout["zoom_submodules"]
+    sub_cols = 2
+    sub_w = (sub_card_x2 - 30 - 60) // sub_cols
+    sub_h = 90
     for i, name in enumerate(sub):
-        r, c = divmod(i, 2)
-        sx1 = 80 + c * 290
-        sy1 = 380 + r * 130
-        _pptx_add_box(slide, sx1, sy1, 260, 100,
-                      fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=1.5)
-        _pptx_add_text(slide, sx1, sy1 + 40, 260, 24,
-                       name, size_pt=14, bold=True, align=PP_ALIGN.CENTER)
+        r = i // sub_cols
+        c = i % sub_cols
+        sx1 = 50 + c * (sub_w + 20)
+        sy1 = zoom_y1 + 50 + r * (sub_h + 10)
+        _pptx_add_box(slide, sx1, sy1, sub_w, sub_h,
+                      fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=1.0)
+        _pptx_add_text(slide, sx1, sy1 + sub_h // 2 - 10, sub_w, 22,
+                       name, size_pt=12, bold=True, align=PP_ALIGN.CENTER)
 
-    # Config table (right)
-    _pptx_add_box(slide, 740, 320, CANVAS_W - 780, 380,
+    # Config table (right, 12 rows × 4 cols)
+    tbl_x1 = 720
+    tbl_x2 = CANVAS_W - 30
+    _pptx_add_box(slide, tbl_x1, zoom_y1, tbl_x2 - tbl_x1, zoom_y2 - zoom_y1,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 740, 320, CANVAS_W - 780, 32,
+    _pptx_add_box(slide, tbl_x1, zoom_y1, tbl_x2 - tbl_x1, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 752, 326, 300, 24,
-                   "設定パラメータ", size_pt=12, bold=True, color=COLORS["header_text"])
+    _pptx_add_text(slide, tbl_x1 + 12, zoom_y1 + 6, 400, 22,
+                   "設定パラメータ (12 項目)", size_pt=12, bold=True, color=COLORS["header_text"])
     cfg = layout["config_table"]
-    col_widths = [320, 200, 200]
-    hy = 380
-    hx = 752
+    col_widths = [340, 100, 110, 110]
+    hx = tbl_x1 + 12
+    hy = zoom_y1 + 40
+    row_h = 32
     for ci, col in enumerate(cfg["columns"]):
-        _pptx_add_box(slide, hx, hy, col_widths[ci], 36,
-                      fill=COLORS["grid"], outline=COLORS["card_border"])
-        _pptx_add_text(slide, hx + 8, hy + 8, col_widths[ci] - 16, 24,
-                       col, size_pt=12, bold=True)
+        _pptx_add_box(slide, hx, hy, col_widths[ci], row_h,
+                      fill=COLORS["grid"], outline=COLORS["card_border"], outline_w=0.5)
+        _pptx_add_text(slide, hx + 6, hy + 8, col_widths[ci] - 12, 18,
+                       col, size_pt=10, bold=True)
         hx += col_widths[ci]
     for r, row in enumerate(cfg["rows"]):
-        rx = 752
-        ry = hy + 36 * (r + 1)
+        rx = tbl_x1 + 12
+        ry = hy + row_h * (r + 1)
+        bg = COLORS["bg"] if r % 2 == 0 else COLORS["card_bg"]
         for ci, val in enumerate(row):
-            _pptx_add_box(slide, rx, ry, col_widths[ci], 36,
-                          fill=COLORS["bg"], outline=COLORS["card_border"])
-            _pptx_add_text(slide, rx + 8, ry + 8, col_widths[ci] - 16, 24,
-                           val, size_pt=11)
+            _pptx_add_box(slide, rx, ry, col_widths[ci], row_h,
+                          fill=bg, outline=COLORS["card_border"], outline_w=0.5)
+            _pptx_add_text(slide, rx + 6, ry + 8, col_widths[ci] - 12, 18,
+                           val, size_pt=9)
             rx += col_widths[ci]
+
+    # 2 vague callouts below zoom
+    cy = zoom_y2 + 14
+    for i, (label, text) in enumerate(layout["callouts"]):
+        x = 30 + i * 600
+        _pptx_add_box(slide, x, cy, 280, 28,
+                      fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5)
+        _pptx_add_text(slide, x + 10, cy + 7, 270, 18,
+                       f"{label} {text}", size_pt=11, bold=True, color=COLORS["danger_text"])
     _pptx_footer(slide, layout['footer'])
 
 
@@ -1070,37 +1398,40 @@ def _build_slide_p06(prs) -> None:
     layout = spec["layout"]
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
-    # Left: mockup with 6 sections
-    _pptx_add_box(slide, 40, 110, 740, 720,
+    # Left: mockup with 8 sections
+    _pptx_add_box(slide, 40, 110, 680, 720,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 40, 110, 740, 32,
+    _pptx_add_box(slide, 40, 110, 680, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 52, 116, 700, 24,
+    _pptx_add_text(slide, 52, 116, 640, 24,
                    "ダッシュボード モックアップ", size_pt=12, bold=True, color=COLORS["header_text"])
     sections = layout["mockup_sections"]
     sec_h = (720 - 32) // len(sections)
     for i, sec in enumerate(sections):
         sy1 = 142 + i * sec_h
-        _pptx_add_box(slide, 56, sy1, 708, sec_h - 4,
+        _pptx_add_box(slide, 56, sy1, 648, sec_h - 4,
                       fill=COLORS["bg"], outline=COLORS["card_border"], outline_w=0.75)
-        _pptx_add_text(slide, 68, sy1 + 12, 680, 24,
-                       sec, size_pt=13, bold=True)
+        _pptx_add_text(slide, 68, sy1 + 10, 620, 22,
+                       sec, size_pt=12, bold=True)
 
-    # Right: 15 comments in 2 columns
+    # Right: 25 short comments in 3 columns
     comments = layout["comments"]
-    comment_x1 = 800
-    comment_w = (CANVAS_W - comment_x1 - 40 - 10) // 2
+    comment_x1 = 740
+    cols = 3
+    comment_w = (CANVAS_W - comment_x1 - 30 - (cols - 1) * 8) // cols
+    bubble_h = 70
+    row_gap = 8
     for i, (label, text) in enumerate(comments):
-        col = i % 2
-        row = i // 2
-        cx1 = comment_x1 + col * (comment_w + 10)
-        cy1 = 120 + row * 90
-        _pptx_add_box(slide, cx1, cy1, comment_w, 78,
+        col = i % cols
+        row = i // cols
+        cx1 = comment_x1 + col * (comment_w + 8)
+        cy1 = 120 + row * (bubble_h + row_gap)
+        _pptx_add_box(slide, cx1, cy1, comment_w, bubble_h,
                       fill=COLORS["danger_bg"], outline=COLORS["danger"], outline_w=1.5)
-        _pptx_add_text(slide, cx1 + 10, cy1 + 8, comment_w - 20, 20,
-                       label, size_pt=12, bold=True, color=COLORS["danger_text"])
-        _pptx_add_text(slide, cx1 + 10, cy1 + 32, comment_w - 20, 44,
-                       text, size_pt=11, color=COLORS["danger_text"])
+        _pptx_add_text(slide, cx1 + 8, cy1 + 4, comment_w - 16, 18,
+                       label, size_pt=11, bold=True, color=COLORS["danger_text"])
+        _pptx_add_text(slide, cx1 + 8, cy1 + 24, comment_w - 16, 42,
+                       text, size_pt=10, color=COLORS["danger_text"])
     _pptx_footer(slide, layout['footer'])
 
 
@@ -1110,94 +1441,99 @@ def _build_slide_p07(prs) -> None:
     layout = spec["layout"]
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
-    # Top-left: table
+    # Top-left: 9-col 8-row table
     tbl = layout["table"]
-    _pptx_add_box(slide, 40, 120, 780, 360,
+    _pptx_add_box(slide, 40, 110, 1040, 380,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 40, 120, 780, 32,
+    _pptx_add_box(slide, 40, 110, 1040, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 52, 126, 700, 24, tbl["title"],
+    _pptx_add_text(slide, 52, 116, 1000, 24, tbl["title"],
                    size_pt=12, bold=True, color=COLORS["header_text"])
-    col_widths = [140, 130, 130, 140, 140]
-    hy = 168
-    hx = 52
+    col_widths = [70, 90, 80, 80, 80, 80, 70, 90, 90]
+    hy = 154
+    hx = 48
+    row_h = 32
     for ci, col in enumerate(tbl["columns"]):
-        _pptx_add_box(slide, hx, hy, col_widths[ci], 34,
+        _pptx_add_box(slide, hx, hy, col_widths[ci], row_h,
                       fill=COLORS["grid"], outline=COLORS["card_border"])
-        _pptx_add_text(slide, hx + 8, hy + 8, col_widths[ci] - 16, 20,
-                       col, size_pt=12, bold=True)
+        _pptx_add_text(slide, hx + 4, hy + 8, col_widths[ci] - 8, 20,
+                       col, size_pt=10, bold=True)
         hx += col_widths[ci]
     for r, row in enumerate(tbl["rows"]):
-        rx = 52
-        ry = hy + 34 * (r + 1)
+        rx = 48
+        ry = hy + row_h * (r + 1)
         for ci, val in enumerate(row):
-            _pptx_add_box(slide, rx, ry, col_widths[ci], 34,
+            _pptx_add_box(slide, rx, ry, col_widths[ci], row_h,
                           fill=COLORS["bg"], outline=COLORS["card_border"])
-            _pptx_add_text(slide, rx + 8, ry + 8, col_widths[ci] - 16, 20,
-                           val, size_pt=11)
+            _pptx_add_text(slide, rx + 4, ry + 8, col_widths[ci] - 8, 20,
+                           val, size_pt=10)
             rx += col_widths[ci]
 
-    # Top-right: bar chart
+    # Top-right: bar chart (8 weeks)
     bc = layout["bar_chart"]
-    _pptx_add_box(slide, 860, 120, CANVAS_W - 900, 360,
+    _pptx_add_box(slide, 1100, 110, CANVAS_W - 1140, 380,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 860, 120, CANVAS_W - 900, 32,
+    _pptx_add_box(slide, 1100, 110, CANVAS_W - 1140, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 872, 126, 600, 24, bc["title"],
-                   size_pt=12, bold=True, color=COLORS["header_text"])
+    _pptx_add_text(slide, 1112, 116, CANVAS_W - 1180, 24, bc["title"],
+                   size_pt=11, bold=True, color=COLORS["header_text"])
     bars = bc["data"]
     max_v = max(v for _, v in bars)
-    chart_top, chart_bot = 180, 460
+    chart_top, chart_bot = 170, 460
+    chart_area_left = 1130
+    chart_area_w = CANVAS_W - 40 - chart_area_left
+    slot_w = chart_area_w // len(bars)
+    bar_w = max(int(slot_w * 0.6), 12)
     for i, (lbl, v) in enumerate(bars):
-        x = 900 + i * 150
-        h = int((v / max_v) * (chart_bot - chart_top - 20))
-        _pptx_add_box(slide, x, chart_bot - h, 80, h,
+        x = chart_area_left + i * slot_w + (slot_w - bar_w) // 2
+        h = int((v / max_v) * (chart_bot - chart_top - 24))
+        _pptx_add_box(slide, x, chart_bot - h, bar_w, h,
                       fill=COLORS["primary"], outline=COLORS["primary"])
-        _pptx_add_text(slide, x, chart_bot - h - 22, 80, 20,
-                       str(v), size_pt=11, align=PP_ALIGN.CENTER)
-        _pptx_add_text(slide, x, chart_bot + 6, 80, 20,
-                       lbl, size_pt=11, align=PP_ALIGN.CENTER)
+        _pptx_add_text(slide, x - 8, chart_bot - h - 18, bar_w + 16, 18,
+                       str(v), size_pt=9, align=PP_ALIGN.CENTER)
+        _pptx_add_text(slide, x - 8, chart_bot + 4, bar_w + 16, 18,
+                       lbl, size_pt=10, align=PP_ALIGN.CENTER)
 
     # Bottom-left: screenshot placeholder
-    _pptx_add_box(slide, 40, 500, 400, 360,
+    _pptx_add_box(slide, 40, 510, 340, 360,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 40, 500, 400, 32,
+    _pptx_add_box(slide, 40, 510, 340, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 52, 506, 380, 24,
+    _pptx_add_text(slide, 52, 516, 320, 24,
                    "スクリーンショット", size_pt=12, bold=True, color=COLORS["header_text"])
-    _pptx_add_box(slide, 60, 550, 360, 240,
+    _pptx_add_box(slide, 56, 552, 308, 240,
                   fill=COLORS["card_border"], outline=COLORS["card_border"])
-    _pptx_add_text(slide, 60, 810, 360, 24,
-                   layout["screenshot_caption"], size_pt=12, bold=True)
+    _pptx_add_text(slide, 56, 800, 308, 60,
+                   layout["screenshot_caption"], size_pt=11, bold=True)
 
-    # Bottom-middle: code snippet
-    _pptx_add_box(slide, 460, 500, 500, 360,
+    # Bottom-middle: 16-line code snippet
+    _pptx_add_box(slide, 400, 510, 520, 360,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 460, 500, 500, 32,
+    _pptx_add_box(slide, 400, 510, 520, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 472, 506, 480, 24,
+    _pptx_add_text(slide, 412, 516, 500, 24,
                    layout["code_snippet"]["filename"],
                    size_pt=12, bold=True, color=COLORS["header_text"])
-    _pptx_add_box(slide, 472, 548, 476, 300,
+    _pptx_add_box(slide, 412, 548, 496, 312,
                   fill="#1e1e1e", outline=COLORS["card_border"])
-    code_y = 560
+    code_y = 554
     for line in layout["code_snippet"]["lines"]:
-        _pptx_add_text(slide, 484, code_y, 456, 22,
-                       line, size_pt=11, color="#d4d4d4")
-        code_y += 26
+        _pptx_add_text(slide, 420, code_y, 480, 18,
+                       line, size_pt=10, color="#d4d4d4")
+        code_y += 19
 
-    # Bottom-right: bullets
-    _pptx_add_box(slide, 980, 500, CANVAS_W - 1020, 360,
+    # Bottom-right: 8 bullets
+    _pptx_add_box(slide, 940, 510, CANVAS_W - 980, 360,
                   fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
-    _pptx_add_box(slide, 980, 500, CANVAS_W - 1020, 32,
+    _pptx_add_box(slide, 940, 510, CANVAS_W - 980, 32,
                   fill=COLORS["header_bg"], outline=COLORS["header_bg"])
-    _pptx_add_text(slide, 992, 506, 400, 24,
+    _pptx_add_text(slide, 952, 516, 400, 24,
                    "主要メトリクス", size_pt=12, bold=True, color=COLORS["header_text"])
-    by = 560
+    by = 552
     for b in layout["bullets"]:
-        _pptx_add_text(slide, 1000, by, CANVAS_W - 1060, 28,
-                       f"• {b}", size_pt=12)
-        by += 40
+        _pptx_add_text(slide, 960, by, CANVAS_W - 1020, 36,
+                       f"• {b}", size_pt=11)
+        by += 38
     _pptx_footer(slide, layout['footer'])
 
 
@@ -1208,32 +1544,44 @@ def _build_slide_p08(prs) -> None:
     _pptx_title(slide, spec["title"], subtitle=layout["subtitle"])
 
     nodes = layout["nodes"]
+    depts = layout["departments"]
     by_level: dict[int, list[tuple]] = {}
     for nd in nodes:
         by_level.setdefault(nd[1], []).append(nd)
-    level_ys = {1: 140, 2: 330, 3: 580}
-    node_w, node_h = 180, 120
+    level_ys = {1: 110, 2: 280, 3: 470, 4: 690}
+    node_w, node_h = 150, 130
     node_positions: dict[str, tuple[int, int, int]] = {}
 
     for lvl, items in sorted(by_level.items()):
-        total_w = len(items) * node_w + (len(items) - 1) * 40
-        start_x = (CANVAS_W - total_w) // 2
-        for i, (nid, _lvl, name, role, _parent) in enumerate(items):
-            nx1 = start_x + i * (node_w + 40)
+        total_w = len(items) * node_w + (len(items) - 1) * 18
+        start_x = max(20, (CANVAS_W - total_w) // 2)
+        for i, (nid, _lvl, name, role, _parent, joined, headcount, dept_key) in enumerate(items):
+            nx1 = start_x + i * (node_w + 18)
             ny1 = level_ys[lvl]
+            _, dept_color = depts[dept_key]
+            # Card body
             _pptx_add_box(slide, nx1, ny1, node_w, node_h,
                           fill=COLORS["card_bg"], outline=COLORS["card_border"], outline_w=1.5)
+            # Department color band on top
+            _pptx_add_box(slide, nx1, ny1, node_w, 8,
+                          fill=dept_color, outline=dept_color)
             # Avatar circle
-            _pptx_add_box(slide, nx1 + node_w // 2 - 22, ny1 + 16, 44, 44,
+            _pptx_add_box(slide, nx1 + node_w // 2 - 16, ny1 + 14, 32, 32,
                           fill=COLORS["card_border"], outline=COLORS["card_border"],
                           shape=MSO_SHAPE.OVAL)
-            _pptx_add_text(slide, nx1, ny1 + 66, node_w, 22,
-                           name, size_pt=12, bold=True, align=PP_ALIGN.CENTER)
-            _pptx_add_text(slide, nx1, ny1 + 90, node_w, 22,
-                           role, size_pt=10, color=COLORS["muted"], align=PP_ALIGN.CENTER)
+            _pptx_add_text(slide, nx1, ny1 + 48, node_w, 20,
+                           name, size_pt=11, bold=True, align=PP_ALIGN.CENTER)
+            _pptx_add_text(slide, nx1, ny1 + 68, node_w, 20,
+                           role, size_pt=9, color=COLORS["muted"], align=PP_ALIGN.CENTER)
+            _pptx_add_text(slide, nx1, ny1 + 88, node_w, 18,
+                           f"{joined} 入社 / 配下 {headcount}", size_pt=9,
+                           color=COLORS["muted"], align=PP_ALIGN.CENTER)
+            _pptx_add_text(slide, nx1, ny1 + 106, node_w, 18,
+                           depts[dept_key][0], size_pt=9, bold=True,
+                           color=dept_color, align=PP_ALIGN.CENTER)
             node_positions[nid] = (nx1 + node_w // 2, ny1, ny1 + node_h)
 
-    for nid, _lvl, _name, _role, parent in nodes:
+    for nid, _lvl, _name, _role, parent, *_rest in nodes:
         if parent and parent in node_positions:
             pcx, _, py2 = node_positions[parent]
             ccx, cy1, _ = node_positions[nid]
@@ -1241,6 +1589,17 @@ def _build_slide_p08(prs) -> None:
             _pptx_add_line(slide, pcx, py2, pcx, mid_y, color=COLORS["text"], width_pt=1.75)
             _pptx_add_line(slide, pcx, mid_y, ccx, mid_y, color=COLORS["text"], width_pt=1.75)
             _pptx_add_line(slide, ccx, mid_y, ccx, cy1, color=COLORS["text"], width_pt=1.75)
+
+    # Dotted matrix reporting lines (rendered as red lines; pptx connector lacks
+    # a clean cross-platform dash style, so use color + thinner width as the
+    # visual cue instead. Kept consistent with PIL output's red dashed style.)
+    for from_id, to_id, _note in layout.get("dotted_links", []):
+        if from_id in node_positions and to_id in node_positions:
+            fcx, fy_top, fy_bot = node_positions[from_id]
+            tcx, ty_top, ty_bot = node_positions[to_id]
+            _pptx_add_line(slide, fcx, fy_top, tcx, ty_bot,
+                           color=COLORS["danger"], width_pt=1.25)
+
     _pptx_footer(slide, layout['footer'])
 
 
