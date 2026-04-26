@@ -1,0 +1,421 @@
+{
+  "pattern_id": "p02",
+  "pattern_name": "before_after",
+  "n_runs": 3,
+  "n_facts": 32,
+  "recall_avg": 0.5104166666666666,
+  "recall_std": 0.023867581744561665,
+  "hallucination_count": 7,
+  "hallucination_examples": [
+    "Before のフィルタにおける「価格: ～¥50,000」",
+    "After のフィルタにおける「価格: ～¥50,000」",
+    "After の検索結果「Wireless Headphones (Sony WH-1000XM5) ¥12,800 / 在庫 42 / 4.5 (1,240 件)」における「4.5 (1,240 件)」",
+    "After の検索結果「USB-C Hub (7-in-1) - Logitech ¥4,500 / 在庫 118 / 4.2 (820 件)」における「- Logitech」",
+    "After の検索結果「USB-C Hub (7-in-1) - Logitech ¥4,500 / 在庫 118 / 4.2 (820 件)」における「4.2 (820 件)」",
+    "After の検索結果「Mech. Keyboard (Tactile Brown) ¥15,200 / 在庫 7 / 4.7 (510 件)」における「(Tactile Brown)」",
+    "After の検索結果「Mech. Keyboard (Tactile Brown) ¥15,200 / 在庫 7 / 4.7 (510 件)」における「4.7 (510 件)」"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.53125,
+      "judge_seconds": 23.448407250456512
+    },
+    {
+      "run": 2,
+      "score_avg": 0.484375,
+      "judge_seconds": 17.450142332352698
+    },
+    {
+      "run": 3,
+      "score_avg": 0.515625,
+      "judge_seconds": 23.044129125773907
+    }
+  ],
+  "facts": [
+    {
+      "id": "p02_f01",
+      "text": "左側は「Before (現行 v2.4)」、右側は「After (改修後 v3.0)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f02",
+      "text": "Before のヘッダーメニューは Home / Search / Help の 3 項目",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f03",
+      "text": "After のヘッダーメニューは Home / Search / お気に入り / 履歴 / Help の 5 項目 (お気に入り ⭐ と履歴 ⏱ が追加)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f04",
+      "text": "Before の検索プレースホルダーは「キーワード入力」",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f05",
+      "text": "After の検索プレースホルダーは「キーワードまたは商品コード (例: ABC-123)」",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f06",
+      "text": "Before の検索ボタンは「検索」、After は「🔍 検索」(虫眼鏡アイコン付き)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f07",
+      "text": "Before にソート dropdown なし",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "present",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f08",
+      "text": "After のソート dropdown は「並び順: 関連度順 ▼」(オプション: 関連度 / 価格昇 / 新着 / 評価)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f09",
+      "text": "Before のフィルタはカテゴリ 3 項目 (Books / Electronics / Clothing) + 価格範囲のみ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f10",
+      "text": "After のフィルタはカテゴリ階層構造 (Books に Programming/Design 子、Electronics に Audio/PC 周辺 子)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f11",
+      "text": "After にブランドフィルタ追加 (Sony / Logitech / Apple / その他)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f12",
+      "text": "After に「在庫あり のみ」チェックボックス追加",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f13",
+      "text": "Before の結果表示は「結果: 12 件」(並び順なし)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f14",
+      "text": "After の結果表示は「結果: 12 件 / 並び順: 関連度順」",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f15",
+      "text": "両方とも同じ結果件数 (12 件) を表示",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f16",
+      "text": "Before の結果行は商品名 + 価格 + 在庫数 のみ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f17",
+      "text": "After の結果行はブランド名併記 (Sony WH-1000XM5 等) + 評価 ⭐ とレビュー件数",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f18",
+      "text": "Wireless Headphones の価格は両方とも ¥12,800 / 在庫 42",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f19",
+      "text": "USB-C Hub (7-in-1) の価格は ¥4,500 / 在庫 118",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f20",
+      "text": "Mech. Keyboard の価格は ¥15,200 / 在庫 7",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f21",
+      "text": "Before のページネーションは < 1 2 3 >",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f22",
+      "text": "After のページネーションは < 1 2 3 4 5 … 20 > (省略記号と最終ページ 20 まで)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f23",
+      "text": "Before のフッターリンクは 4 つ (利用規約 / プライバシー / FAQ / お問い合わせ)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f24",
+      "text": "After のフッターリンクは 6 つ (上記 + サイトマップ + API ドキュメント)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f25",
+      "text": "差分注釈は D1〜D5 の 5 個、文言は順に「入力ヒント追加」「フィルタ細かく」「並び替え追加」「メニュー増えた」「ページ拡張」",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f26",
+      "text": "D1 矢印は検索プレースホルダー部分を指している (入力ヒントの違い)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f27",
+      "text": "D2 矢印はフィルタエリアを指している (カテゴリ階層 + ブランド + 在庫の追加)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f28",
+      "text": "D3 矢印はソート dropdown を指している (After のみ存在)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f29",
+      "text": "D4 矢印はヘッダーメニュー部分を指している (お気に入り/履歴 追加)",
+      "verdict": "missing",
+      "verdicts": [
+        "partial",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f30",
+      "text": "D5 矢印はページネーション部分を指している (ページ拡張)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p02_f31",
+      "text": "subtitle に「TICKET-8421」「Review: 2026-03-15」「鈴木 (UX Lead)」「Diff scope: search-ui only」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p02_f32",
+      "text": "footer に「Design Review Doc v1.2 / Internal / Sprint 24 / Page 7 of 18」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}
