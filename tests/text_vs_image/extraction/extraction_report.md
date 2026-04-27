@@ -16,8 +16,8 @@ fact 被覆率) と hallucination 件数で 3 run 採点した結果。
 
 | trial id | label | prompt | corpus | n_facts | 実施日 |
 | --- | --- | --- | --- | --- | --- |
-| `v1` | v1 prompt × v1 corpus | v1 (baseline) | v1 | 157 | 2026-04-24 |
-| `v2` | v1 prompt × v2 corpus | v1 (baseline) | v2 | 273 | 2026-04-26 |
+| `v1` | v1 prompt × v1 corpus | v1 (baseline) | v1 | 157 | 2026-04-23 |
+| `v2` | v1 prompt × v2 corpus | v1 (baseline) | v2 | 273 | 2026-04-24 |
 
 - **`v1`**: 初期ベースライン。v1 corpus (P1-P8 計 157 facts) に v1 prompt (シンプルな書き起こし指示) を投入。
 - **`v2`**: Ceiling fix 検証。v2 corpus (密度 2 倍化 + vague 吹き出し、計 273 facts) に v1 prompt をそのまま投入。corpus 改修だけで recall がどれだけ動くかを観測。
