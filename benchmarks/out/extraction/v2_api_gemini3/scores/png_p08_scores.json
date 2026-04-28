@@ -1,0 +1,508 @@
+{
+  "pattern_id": "p08",
+  "pattern_name": "org_chart",
+  "n_runs": 3,
+  "n_facts": 39,
+  "recall_avg": 0.8803418803418803,
+  "recall_std": 0.007401926528072099,
+  "hallucination_count": 15,
+  "hallucination_examples": [
+    "伊藤 花子 ... 配下 2",
+    "渡辺 梅子 ... 配下 2",
+    "田川 桃子 ... 配下 1",
+    "山田 桜子 ... 配下 2",
+    "佐々木 松子 ... 配下 1",
+    "吉田 竹子 ... 配下 2",
+    "井上 柳子 ... 配下 1",
+    "森田 蘭子 ... 配下 1",
+    "高橋 太郎 ... 配下 0",
+    "木村 大輔 ... 配下 0"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8717948717948718,
+      "judge_seconds": 20.46345124999789
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8846153846153846,
+      "judge_seconds": 17.70233333399665
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8846153846153846,
+      "judge_seconds": 18.528106084002502
+    }
+  ],
+  "facts": [
+    {
+      "id": "p08_f01",
+      "text": "組織図は 4 階層 (CEO / VP / Director / Manager)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f02",
+      "text": "全ノード数は 20",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f03",
+      "text": "部門色は 4 種 (青=Tech / 緑=Sales / 橙=Ops / 灰=Corp)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f04",
+      "text": "第 1 階層 (CEO) は 1 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f05",
+      "text": "第 2 階層 (VP) は 4 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f06",
+      "text": "第 3 階層 (Director) は 8 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f07",
+      "text": "第 4 階層 (Manager) は 7 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f08",
+      "text": "各ノードには顔写真風サムネイル + 部門色の上端帯",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f09",
+      "text": "実線は直属関係 / 点線は兼務 (matrix) 関係",
+      "verdict": "partial",
+      "verdicts": [
+        "missing",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p08_f10",
+      "text": "兼務点線は 2 本",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f11",
+      "text": "CEO 山本 一郎 配下: 19 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f12",
+      "text": "VP Tech 中村 次郎 配下: 8 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f13",
+      "text": "VP Sales 小林 三郎 配下: 5 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f14",
+      "text": "VP Operations 加藤 四郎 配下: 4 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f15",
+      "text": "VP Corporate 久保田 五郎 配下: 2 名",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f16",
+      "text": "N01: 山本 一郎 / CEO / 2008 入社 / Corp",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f17",
+      "text": "N02: 中村 次郎 / VP Tech / 2010 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f18",
+      "text": "N03: 小林 三郎 / VP Sales / 2011 入社 / Sales",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f19",
+      "text": "N04: 加藤 四郎 / VP Operations / 2012 入社 / Ops",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f20",
+      "text": "N05: 久保田 五郎 / VP Corporate / 2013 入社 / Corp",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f21",
+      "text": "N06: 伊藤 花子 / Dir. Backend / 2014 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f22",
+      "text": "N07: 渡辺 梅子 / Dir. Frontend / 2015 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f23",
+      "text": "N08: 田川 桃子 / Dir. Infra / 2016 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f24",
+      "text": "N09: 山田 桜子 / Dir. Enterprise / 2014 入社 / Sales",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f25",
+      "text": "N10: 佐々木 松子 / Dir. SMB / 2015 入社 / Sales",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f26",
+      "text": "N11: 吉田 竹子 / Dir. CS / 2016 入社 / Ops",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f27",
+      "text": "N12: 井上 柳子 / Dir. Logistics / 2017 入社 / Ops",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f28",
+      "text": "N13: 森田 蘭子 / Dir. Finance / 2014 入社 / Corp",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f29",
+      "text": "N14: 高橋 太郎 / Mgr Backend Plat / 2018 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f30",
+      "text": "N15: 木村 大輔 / Mgr Backend API / 2019 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f31",
+      "text": "N16: 林 翔太 / Mgr Web / 2018 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f32",
+      "text": "N17: 池田 昇 / Mgr Mobile / 2019 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f33",
+      "text": "N18: 松本 健 / Mgr SRE / 2020 入社 / Tech",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f34",
+      "text": "N19: 谷口 涼 / Mgr Field Sales / 2017 入社 / Sales",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f35",
+      "text": "N20: 北村 慎 / Mgr Inside Sales / 2018 入社 / Sales",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f36",
+      "text": "兼務点線: N18 (Mgr SRE 松本 健) → N04 (VP Operations 加藤 四郎)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f37",
+      "text": "兼務点線: N13 (Dir. Finance 森田 蘭子) → N02 (VP Tech 中村 次郎) (コストオーナー)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f38",
+      "text": "subtitle: Effective: 2026-04-01 | Source: HRIS 2026-03-31 | 部門色: 青=Tech / 緑=Sales / 橙=Ops / 灰=Corp | ※ 2020 年以降の社員のみ表示",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p08_f39",
+      "text": "footer: HR Org Chart / Effective 2026-04-01 / Confidential",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

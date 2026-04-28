@@ -27,16 +27,24 @@ TRIAL_META = {
         "corpus": "v1",
         "prompt": "v1 (baseline)",
         "n_facts": 157,
-        "date": "2026-04-24",
+        "date": "2026-04-23",
         "note": "初期ベースライン。v1 corpus (P1-P8 計 157 facts) に v1 prompt (シンプルな書き起こし指示) を投入。",
     },
     "v2": {
-        "label": "v1 prompt × v2 corpus",
+        "label": "v1 prompt × v2 corpus (Copilot Web)",
         "corpus": "v2",
         "prompt": "v1 (baseline)",
         "n_facts": 273,
-        "date": "2026-04-26",
-        "note": "Ceiling fix 検証。v2 corpus (密度 2 倍化 + vague 吹き出し、計 273 facts) に v1 prompt をそのまま投入。corpus 改修だけで recall がどれだけ動くかを観測。",
+        "date": "2026-04-24",
+        "note": "Ceiling fix 検証。v2 corpus (密度 2 倍化 + vague 吹き出し、計 273 facts) に v1 prompt をそのまま投入。Microsoft Copilot Web (UI 経由、人手で貼り付け) の baseline。",
+    },
+    "v2_api_gemini3": {
+        "label": "v1 prompt × v2 corpus (Gemini 3 Flash API)",
+        "corpus": "v2",
+        "prompt": "v1 (baseline)",
+        "n_facts": 273,
+        "date": "2026-04-27",
+        "note": "コントロール群。v2 と同じ v1 prompt + v2 corpus を、Microsoft Copilot Web ではなく Gemini 3 Flash API (extractor) に直接投入。フロントエンド (Copilot Web vs 純粋 API) の差を測る。Judge 役は引き続き Gemini 2.5 Flash で同条件。",
     },
 }
 
@@ -137,17 +145,31 @@ def build_report(out_root: Path, today: str) -> str:
         )
     lines.append("")
 
-    # 試行間の差分 (delta) を v1 → v2 で出す。
-    if len(trials) >= 2:
-        base_name, base_sc = trials[0]
-        lines.append(f"### 主要な変化 (`{trials[0][0]}` → `{trials[-1][0]}`)")
-        lines.append("")
-        head_name, head_sc = trials[-1]
-        delta_png = (_trial_avg(head_sc, "png") or 0) - (_trial_avg(base_sc, "png") or 0)
-        delta_pptx = (_trial_avg(head_sc, "pptx") or 0) - (_trial_avg(base_sc, "pptx") or 0)
-        lines.append(f"- PNG recall: **{delta_png:+.3f}** ({_fmt(_trial_avg(base_sc, 'png'))} → {_fmt(_trial_avg(head_sc, 'png'))})")
-        lines.append(f"- PPTX recall: **{delta_pptx:+.3f}** ({_fmt(_trial_avg(base_sc, 'pptx'))} → {_fmt(_trial_avg(head_sc, 'pptx'))})")
-        lines.append("")
+    # 試行間の差分 (delta) を有意なペアで複数出す。
+    trial_map = {name: sc for name, sc in trials}
+    delta_pairs = [
+        ("v1", "v2", "ceiling fix (corpus 難化、Copilot Web 一定)"),
+        ("v2", "v2_api_gemini3", "frontend 切替 (corpus + prompt 一定、Copilot Web → Gemini 3 API)"),
+    ]
+    shown_any = False
+    for base, head, label in delta_pairs:
+        if base in trial_map and head in trial_map:
+            if not shown_any:
+                lines.append("### 主要な変化")
+                lines.append("")
+                shown_any = True
+            base_sc, head_sc = trial_map[base], trial_map[head]
+            for ch, ch_label in (("png", "PNG"), ("pptx", "PPTX")):
+                base_v = _trial_avg(base_sc, ch)
+                head_v = _trial_avg(head_sc, ch)
+                if base_v is None or head_v is None:
+                    continue
+                delta = head_v - base_v
+                lines.append(
+                    f"- `{base}` → `{head}` ({label}) — {ch_label} recall: "
+                    f"**{delta:+.3f}** ({_fmt(base_v)} → {_fmt(head_v)})"
+                )
+            lines.append("")
 
     lines.append("## 4. パターン別 recall (PNG)")
     lines.append("")
@@ -243,12 +265,51 @@ def build_report(out_root: Path, today: str) -> str:
     lines.append("")
     lines.append("詳細は [PATTERNS.md](./PATTERNS.md) を参照。")
     lines.append("")
-    lines.append("### 9.3 v1 prompt × v2 corpus (ceiling fix の効果検証)")
+    lines.append("### 9.3 v1 prompt × v2 corpus (ceiling fix の効果検証 / Copilot Web)")
     lines.append("")
     lines.append("**同じ v1 prompt** をそのまま v2 corpus に投入。同条件 (prompt 一定) で corpus 難化が")
-    lines.append("どれだけ recall を下げるかを観測した。結果は §3 / §4 / §5 のテーブルを参照。")
+    lines.append("どれだけ recall を下げるかを観測した。Microsoft Copilot Web (UI 経由、人手で")
+    lines.append("ファイルアップロード + プロンプト貼付) で実施。結果は §3 / §4 / §5 のテーブルを参照。")
+    lines.append("")
+    lines.append("### 9.4 v1 prompt × v2 corpus (Gemini 3 Flash API / コントロール群)")
+    lines.append("")
+    lines.append("Copilot Web が提供する recall 値が「Copilot 固有 (UI / 内部処理) の制約」なのか、")
+    lines.append("それとも「画像コンテンツの本質的な難しさ」なのかを切り分けるため、同じ v1 prompt と")
+    lines.append("v2 corpus を **Gemini 3 Flash Preview API に直接投入** したコントロール群を追加した。")
+    lines.append("")
+    lines.append("- Extractor: `gemini-3-flash-preview` (Google AI Studio API、画像直接入力)")
+    lines.append("- Judge: `gemini-2.5-flash` (v1 / v2 trial と同じ判定モデル)")
+    lines.append("- 入力: tests/text_vs_image/extraction/p0N_*.png 8 枚 (v2 corpus と同一バイナリ)")
+    lines.append("- Prompt: benchmarks/out/extraction/v1/prompt.md と完全に同じ本文")
+    lines.append("")
+    lines.append("Extractor は別モデル (Gemini 3 Flash) を使い、Judge は据え置き (Gemini 2.5 Flash)。")
+    lines.append("「同モデルの自己評価バイアス」は発生しない。")
     lines.append("")
     lines.append("## 10. 考察")
+    lines.append("")
+    lines.append("### 10.0 Copilot Web vs Gemini 3 Flash API (重要な発見)")
+    lines.append("")
+    lines.append("**同じ画像 + 同じプロンプト** を Microsoft Copilot Web 経由 (`v2`) と Gemini 3 Flash API")
+    lines.append("経由 (`v2_api_gemini3`) で投入した結果、**recall は 0.723 → 0.875 (+0.152)** と大幅改善。")
+    lines.append("特にテーブル / 構造系で差が大きい:")
+    lines.append("")
+    lines.append("- p01 勤怠表: 0.483 → **0.800** (+0.317) — Copilot が「[判読不能]」と諦めた表を API は完読")
+    lines.append("- p02 Before/After: 0.510 → **0.833** (+0.323) — 左右ペア要素を API は網羅")
+    lines.append("- p07 混合ダッシュボード: 0.780 → **1.000** (+0.220) — API は全 41 facts を完全抽出")
+    lines.append("- p08 組織図: 0.701 → 0.880 (+0.179)")
+    lines.append("")
+    lines.append("これは「v2 corpus が難しすぎる」のではなく、**Copilot Web の UI / 内部処理パイプライン")
+    lines.append("自体が抽出精度を ~15% 押し下げている** ことを意味する。原因の候補:")
+    lines.append("")
+    lines.append("- Copilot Web のチャット UI 内で出力長を切り詰めている可能性")
+    lines.append("- 画像のリサイズ / 圧縮が UI で介在している可能性")
+    lines.append("- 内部で異なる (より小さい) モデルにルーティングされている可能性")
+    lines.append("- 安全フィルタや投影層 (system prompt) が verbatim 出力を抑制している可能性")
+    lines.append("")
+    lines.append("→ **実運用上の含意**: 抽出精度を最大化したいクライアントには、Copilot Web 手作業より")
+    lines.append("**Gemini API (または同等の Vision API) を直接呼ぶ自動化** を推奨できる。")
+    lines.append("Copilot Web は便利だが「人間が手で確認する補助ツール」であり、")
+    lines.append("「下流 LLM への verbatim 入力源」としては精度が約 15% 不足する。")
     lines.append("")
     lines.append("### 10.1 ceiling effect は解消された")
     lines.append("")

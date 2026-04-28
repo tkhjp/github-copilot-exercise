@@ -1,0 +1,493 @@
+{
+  "pattern_id": "p06",
+  "pattern_name": "review_comments",
+  "n_runs": 3,
+  "n_facts": 38,
+  "recall_avg": 0.793859649122807,
+  "recall_std": 0.007596714068284573,
+  "hallucination_count": 7,
+  "hallucination_examples": [
+    "検索",
+    "通知",
+    "リンク",
+    "R03: 図小",
+    "R04: 図→9",
+    "R20: \"\"",
+    "R21: 図赤"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8026315789473685,
+      "judge_seconds": 16.166868042000715
+    },
+    {
+      "run": 2,
+      "score_avg": 0.7894736842105263,
+      "judge_seconds": 15.734059999998863
+    },
+    {
+      "run": 3,
+      "score_avg": 0.7894736842105263,
+      "judge_seconds": 19.817127833000995
+    }
+  ],
+  "facts": [
+    {
+      "id": "p06_f01",
+      "text": "モックアップは 8 セクション (ヘッダー / ブレッドクラム / サイドナビ / KPI カード / 売上推移グラフ / フィルタチップ列 / 取引テーブル / フッター)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f02",
+      "text": "サイドナビは 7 項目",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f03",
+      "text": "KPI カードは 5 枚",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f04",
+      "text": "取引テーブルは 8 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f05",
+      "text": "赤コメントは 25 個 (R01-R25)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f06",
+      "text": "コメントは赤色の番号付き吹き出しで右側 2 列に配置",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "missing",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p06_f07",
+      "text": "指示線が対象要素と各コメントを結んでいる",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f08",
+      "text": "R01: 中央？",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f09",
+      "text": "R02: 重い",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f10",
+      "text": "R03: 🔍小",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f11",
+      "text": "R04: 🔔→9",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f12",
+      "text": "R05: アバター→",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f13",
+      "text": "R06: 区切り>",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f14",
+      "text": "R07: 現在地太",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f15",
+      "text": "R08: 枠ナシ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f16",
+      "text": "R09: 色弱",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f17",
+      "text": "R10: アイコン無",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f18",
+      "text": "R11: 5→4",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f19",
+      "text": "R12: 数字大",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f20",
+      "text": "R13: Y軸 0?",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f21",
+      "text": "R14: 前年点線",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f22",
+      "text": "R15: 凡例下",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f23",
+      "text": "R16: 色変",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f24",
+      "text": "R17: 詰めすぎ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f25",
+      "text": "R18: 全クリア",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f26",
+      "text": "R19: header sticky",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f27",
+      "text": "R20: ,,,",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "missing"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p06_f28",
+      "text": "R21: −赤",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f29",
+      "text": "R22: ゼブラ薄",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f30",
+      "text": "R23: 16→24",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f31",
+      "text": "R24: #f5f5f5",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f32",
+      "text": "R25: M.O. 別 issue",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f33",
+      "text": "R01 (中央？) はヘッダー左端のロゴを指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f34",
+      "text": "R11 (5→4) は KPI カードの枚数削減を指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f35",
+      "text": "R23 (16→24) は全体マージンの px 値変更を指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f36",
+      "text": "R25 (M.O.) はダークモード (Mode Override) 対応を別 issue へ送る指示",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f37",
+      "text": "subtitle: PR #2847 | Figma node: 1920x1080 | Design Review #14 2026-04-10 15:00 | Owner: nakamura@example.com",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p06_f38",
+      "text": "footer: Design System Team / Draft v0.7 / Confidential",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

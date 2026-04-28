@@ -1,0 +1,521 @@
+{
+  "pattern_id": "p07",
+  "pattern_name": "mixed_dashboard",
+  "n_runs": 3,
+  "n_facts": 41,
+  "recall_avg": 1.0,
+  "recall_std": 0.0,
+  "hallucination_count": 0,
+  "hallucination_examples": [],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 1.0,
+      "judge_seconds": 17.652552915998967
+    },
+    {
+      "run": 2,
+      "score_avg": 1.0,
+      "judge_seconds": 18.450039374998596
+    },
+    {
+      "run": 3,
+      "score_avg": 1.0,
+      "judge_seconds": 15.959647290997964
+    }
+  ],
+  "facts": [
+    {
+      "id": "p07_f01",
+      "text": "地域別実績表の列は 地域 / 売上 / 成長率 / 顧客数 / 担当 / 解約率 / 新規 / 再購入率 / 平均単価 (9 列)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f02",
+      "text": "表は 8 行 (東京 / 大阪 / 名古屋 / 福岡 / 札幌 / 仙台 / 広島 / 高松)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f03",
+      "text": "東京: 売上 164M、成長率 +12%、顧客数 1,240、担当 佐藤、解約率 1.4%、新規 +182、再購入率 62%、平均単価 8,400",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f04",
+      "text": "大阪: 売上 103M、成長率 +8%、顧客数 820、担当 鈴木、解約率 1.8%、新規 +96、再購入率 58%、平均単価 7,900",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f05",
+      "text": "名古屋: 売上 62M、成長率 +5%、顧客数 510、担当 高橋、解約率 2.1%、新規 +48、再購入率 55%、平均単価 7,500",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f06",
+      "text": "福岡: 売上 36M、成長率 +15%、顧客数 310、担当 田中、解約率 1.6%、新規 +58、再購入率 60%、平均単価 7,200",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f07",
+      "text": "札幌: 売上 28M、成長率 +9%、顧客数 240、担当 渡辺、解約率 2.4%、新規 +24、再購入率 52%、平均単価 6,800",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f08",
+      "text": "仙台: 売上 21M、成長率 +11%、顧客数 190、担当 伊藤、解約率 1.9%、新規 +22、再購入率 57%、平均単価 7,100",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f09",
+      "text": "広島: 売上 18M、成長率 +6%、顧客数 160、担当 小林、解約率 2.0%、新規 +14、再購入率 54%、平均単価 6,900",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f10",
+      "text": "高松: 売上 12M、成長率 +18%、顧客数 110、担当 中村、解約率 1.3%、新規 +20、再購入率 63%、平均単価 7,300",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f11",
+      "text": "棒グラフのタイトルは「Weekly active users (8 週)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f12",
+      "text": "W1: 3200",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f13",
+      "text": "W2: 3450",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f14",
+      "text": "W3: 3100",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f15",
+      "text": "W4: 3680",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f16",
+      "text": "W5: 3920",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f17",
+      "text": "W6: 3520",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f18",
+      "text": "W7: 3850",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f19",
+      "text": "W8: 4100",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f20",
+      "text": "スクリーンショットのキャプションは「プッシュ通知設定画面 (iOS / Android 両対応 / 設定 v3.4.2)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f21",
+      "text": "コード片のファイル名は notify.py",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f22",
+      "text": "from typing import Optional のインポート行がある",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f23",
+      "text": "from .retry import retry のインポート行がある",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f24",
+      "text": "@retry(tries=3, delay=2) デコレータが付いている",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f25",
+      "text": "関数は async def send_push (非同期関数)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f26",
+      "text": "引数は user_id: str, msg: str, * (キーワード境界), priority: int = 5",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f27",
+      "text": "戻り値型は bool",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f28",
+      "text": "_is_opted_in(user_id) チェックがあり、False なら return False",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f29",
+      "text": "await _provider.send(user_id, msg, priority) を呼び出す",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f30",
+      "text": "except ProviderTimeout で return False (タイムアウト時のフォールバック)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f31",
+      "text": "箇条書き: API レイテンシ p95 は 240ms",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f32",
+      "text": "箇条書き: エラー率 0.4% (先月比 -0.1pt)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f33",
+      "text": "箇条書き: スパイクは水曜 14 時台",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f34",
+      "text": "箇条書き: DAU 30k / MAU 145k",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f35",
+      "text": "箇条書き: 解約率 月次 1.8%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f36",
+      "text": "箇条書き: ARPU 3,200 円",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f37",
+      "text": "箇条書き: インシデント Q1 で 2 件 (P3 のみ)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f38",
+      "text": "箇条書き: 次回リリース 2026-04-30",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f39",
+      "text": "1 枚に表・棒グラフ・スクショ・コード・箇条書きの 5 種要素",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f40",
+      "text": "subtitle: Period: 2026 Q1 | Total: 444M JPY | Code: Python 3.13 | Source: BI Snapshot 2026-04-15",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p07_f41",
+      "text": "footer: Analytics Dashboard / Q1 Wrap-up / Confidential",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

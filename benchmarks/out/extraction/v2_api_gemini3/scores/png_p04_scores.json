@@ -1,0 +1,451 @@
+{
+  "pattern_id": "p04",
+  "pattern_name": "dashboard_annotated",
+  "n_runs": 3,
+  "n_facts": 35,
+  "recall_avg": 0.7999999999999999,
+  "recall_std": 0.05150787536377126,
+  "hallucination_count": 1,
+  "hallucination_examples": [
+    "2026 通年 売上ダッシュボード (注釈付き)"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.7428571428571429,
+      "judge_seconds": 22.656243665998772
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8428571428571429,
+      "judge_seconds": 16.75201066700174
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8142857142857143,
+      "judge_seconds": 19.730364541999734
+    }
+  ],
+  "facts": [
+    {
+      "id": "p04_f01",
+      "text": "棒グラフのタイトルは「月別売上 (百万円)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f02",
+      "text": "棒グラフは 12 か月分 (Jan〜Dec)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f03",
+      "text": "Jan 120 / Feb 85 / Mar 160 (Q1)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f04",
+      "text": "Apr 145 / May 130 / Jun 175 (Q2)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f05",
+      "text": "Jul 160 / Aug 110 / Sep 195 (Q3)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f06",
+      "text": "Oct 180 / Nov 220 / Dec 250 (Q4)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f07",
+      "text": "最低月は Feb の 85 (百万円)",
+      "verdict": "present",
+      "verdicts": [
+        "missing",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p04_f08",
+      "text": "最高月は Dec の 250 (百万円)",
+      "verdict": "present",
+      "verdicts": [
+        "missing",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p04_f09",
+      "text": "円グラフのタイトルは「地域別売上構成 (%)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f10",
+      "text": "円グラフは 8 セグメント (関東 / 関西 / 中部 / 九州 / 東北 / 北海道 / 中国 / 四国)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f11",
+      "text": "関東が最大シェア 28%",
+      "verdict": "present",
+      "verdicts": [
+        "partial",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p04_f12",
+      "text": "関西 18% / 中部 12% / 九州 11%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f13",
+      "text": "東北 9% / 北海道 8% / 中国 7% / 四国 7%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f14",
+      "text": "8 セグメントの合計は 100%",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "partial",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p04_f15",
+      "text": "KPI カードは 7 枚",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f16",
+      "text": "KPI 売上合計: 実績 1,830 MJPY、目標 1,800、達成率 102%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f17",
+      "text": "KPI 新規顧客数: 実績 26,800、目標 25,000、達成率 107%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f18",
+      "text": "KPI 解約率: 実績 2.8%、目標 3.0%、改善 ✓",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f19",
+      "text": "KPI 客単価: 実績 ¥45,200、目標 ¥45,000、達成率 100%",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f20",
+      "text": "KPI リテンション: 実績 87.3%、目標 85%、+2.3pt",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f21",
+      "text": "KPI NPS: 実績 52、目標 50、達成 ✓",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f22",
+      "text": "KPI CAC: 実績 ¥21,500、目標 ¥23,000、-¥1,500 (改善)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p04_f23",
+      "text": "注釈は 5 個 (A1〜A5)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f24",
+      "text": "A1 文言「夏場低調」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f25",
+      "text": "A2 文言「Q4 大爆発」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f26",
+      "text": "A3 文言「東京以外も伸び」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f27",
+      "text": "A4 文言「リテンション◎」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f28",
+      "text": "A5 文言「CAC 下降」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f29",
+      "text": "A1 矢印は Jul-Aug の bar (160 / 110) を指している (低調期)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f30",
+      "text": "A2 矢印は Oct-Dec の bar (180 / 220 / 250) を指している (Q4 上昇)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f31",
+      "text": "A3 矢印は円グラフの非関東部分 (関西〜四国) を指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f32",
+      "text": "A4 矢印は KPI のリテンション行 (87.3%) を指している",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f33",
+      "text": "A5 矢印は KPI の CAC 行 (¥21,500) を指している (target 達成)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f34",
+      "text": "subtitle: Period: 2026 (FY) | Data as of 2026-12-31 23:59 JST | Source: CRM + GA4",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p04_f35",
+      "text": "footer: Finance Team / Monthly Report / 2026 FY Issue / Confidential",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

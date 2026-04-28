@@ -1,0 +1,416 @@
+{
+  "pattern_id": "p03",
+  "pattern_name": "process_flow",
+  "n_runs": 3,
+  "n_facts": 32,
+  "recall_avg": 0.9166666666666666,
+  "recall_std": 0.05487319662944135,
+  "hallucination_count": 2,
+  "hallucination_examples": [
+    "CVV: ●●●",
+    "☒ ご注文ありがとうございました"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.96875,
+      "judge_seconds": 16.746340249999776
+    },
+    {
+      "run": 2,
+      "score_avg": 0.859375,
+      "judge_seconds": 19.897663542000373
+    },
+    {
+      "run": 3,
+      "score_avg": 0.921875,
+      "judge_seconds": 17.910910250000597
+    }
+  ],
+  "facts": [
+    {
+      "id": "p03_f01",
+      "text": "5 画面の操作フロー (S1〜S5) を左から右に番号付き矢印で連結",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f02",
+      "text": "S1 ログイン: メール入力欄 placeholder 「taro@example.com」",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f03",
+      "text": "S1 にパスワード入力欄 (マスク表示)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f04",
+      "text": "S1 に「ログイン」ボタン",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f05",
+      "text": "S1 に「パスワードを忘れた?」リンク",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f06",
+      "text": "S1 にソーシャルログイン Google / Apple / LINE の 3 種",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f07",
+      "text": "S2 商品選択: カテゴリ階層 Books > Programming > Python の 3 階層",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f08",
+      "text": "S2 検索バー (虫眼鏡アイコン) あり",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f09",
+      "text": "S2 商品 1「Python 入門 第3版」¥4,200 在庫 ○ (十分)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f10",
+      "text": "S2 商品 2「実践 Django」¥3,500 在庫 △ (少)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f11",
+      "text": "S2 商品 3「マイクロサービス」¥2,800 在庫 × (在庫なし)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "partial"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f12",
+      "text": "S3 カート内は 2 商品 (Python 入門 + 実践 Django)、× 1 ずつ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f13",
+      "text": "S3 商品計 ¥7,700",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f14",
+      "text": "S3 配送料 ¥500",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f15",
+      "text": "S3 小計 ¥8,200 (商品計 + 配送料)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "partial",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f16",
+      "text": "S3 消費税 10% で ¥820",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f17",
+      "text": "S3 合計 ¥9,020 (税込)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "partial",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f18",
+      "text": "S4 決済はクレジットカード",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f19",
+      "text": "S4 カード番号は末尾 4 桁 1234 (前 12 桁マスク)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f20",
+      "text": "S4 有効期限 12/28",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f21",
+      "text": "S4 名義 TARO YAMADA (英大文字)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f22",
+      "text": "S4 3D セキュアで本人認証 ✓ 完了表示",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "partial",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f23",
+      "text": "S4 支払いボタンに金額表示「¥9,020 を支払う」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f24",
+      "text": "S5 注文番号 ORD-2026-04-13579",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f25",
+      "text": "S5 確認メール送信先 taro@example.com",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f26",
+      "text": "S5 配送予定 2026-04-18 (土)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f27",
+      "text": "S5 「マイページへ」ボタン",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f28",
+      "text": "ステップラベルは S1〜S5、すべての画面に表示",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "missing",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f29",
+      "text": "矢印は左→右の単方向",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f30",
+      "text": "S2 商品ごとの単価合計 (¥4,200 + ¥3,500 + ¥2,800 = ¥10,500) のうち、S3 カートには商品 1 + 2 のみ採用",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p03_f31",
+      "text": "subtitle: UI Build ui-v2.1 | Session timeout: 30 min | Updated 2026-04-10 | Browser: Chrome 124",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "partial",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    },
+    {
+      "id": "p03_f32",
+      "text": "footer: User Research Team / Page 1 of 4 / © 2026 ACME Corp.",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "partial",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 0.6666666666666666
+    }
+  ]
+}

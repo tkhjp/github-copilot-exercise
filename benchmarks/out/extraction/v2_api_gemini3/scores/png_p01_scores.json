@@ -1,0 +1,400 @@
+{
+  "pattern_id": "p01",
+  "pattern_name": "ui_callouts",
+  "n_runs": 3,
+  "n_facts": 30,
+  "recall_avg": 0.8000000000000002,
+  "recall_std": 1.3597399555105182e-16,
+  "hallucination_count": 25,
+  "hallucination_examples": [
+    "2026-04-01 (水) の出勤時刻「09:02」",
+    "2026-04-01 (水) の退勤時刻「18:15」",
+    "2026-04-01 (水) の残業時間「00:13」",
+    "2026-04-02 (木) の出勤時刻「08:58」",
+    "2026-04-02 (木) の退勤時刻「19:40」",
+    "2026-04-03 (金) の出勤時刻「09:15」",
+    "2026-04-03 (金) の退勤時刻「17:50」",
+    "2026-04-03 (金) の残業時間「—」",
+    "2026-04-06 (月) の行データ「09:00 | 18:00 | 08:00 | 00:00 | 承認済 | |」",
+    "2026-04-07 (火) の出勤時刻「08:50」"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "score_avg": 0.8,
+      "judge_seconds": 15.83743470799891
+    },
+    {
+      "run": 2,
+      "score_avg": 0.8,
+      "judge_seconds": 17.770650082999055
+    },
+    {
+      "run": 3,
+      "score_avg": 0.8,
+      "judge_seconds": 18.132729000000836
+    }
+  ],
+  "facts": [
+    {
+      "id": "p01_f01",
+      "text": "アプリ画面のタイトルは「勤怠管理」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f02",
+      "text": "ログインユーザー表示は「田中 太郎 さん」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f03",
+      "text": "ヘッダー右側に通知アイコン (バッジ「3」未読) / 設定アイコン / ログアウト の 3 アイコン",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f04",
+      "text": "タブバーは「今月」「先月」「全期間」の 3 つ、現在「今月」がアクティブ",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f05",
+      "text": "部署フィルタの dropdown あり、デフォルト「すべて」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f06",
+      "text": "テーブルは 7 列: 日付 / 出勤 / 退勤 / 実働 / 残業 / ステータス / 備考",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f07",
+      "text": "テーブル本体は 8 行のデータ + 末尾に summary 行",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f08",
+      "text": "2026-04-01 (水) の実働 08:13、ステータス 承認済",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f09",
+      "text": "2026-04-02 (木) の実働 09:42、残業 01:42、ステータス 承認待",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f10",
+      "text": "2026-04-03 (金) の実働 07:35、ステータス 要修正、備考「代休消化」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f11",
+      "text": "2026-04-07 (火) の実働 10:40、残業 02:40、備考「外出多」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f12",
+      "text": "2026-04-09 (木) の実働 07:30、ステータス 要修正、備考「半休 (午後)」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f13",
+      "text": "土日 (4/4・4/5) は表示されていない (連続営業日のみ)",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f14",
+      "text": "summary 行: 合計実働 60:25、合計残業 5:25、8 営業日",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f15",
+      "text": "アクションボタンは エクスポート / 新規追加 / 編集 / 削除 の 4 つ",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f16",
+      "text": "赤吹き出し C1 の文言は「目立たせて」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f17",
+      "text": "赤吹き出し C2 の文言は「警告つけて」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f18",
+      "text": "赤吹き出し C3 の文言は「→ 右へ」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f19",
+      "text": "赤吹き出し C4 の文言は「曜日いらん」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f20",
+      "text": "赤吹き出し C5 の文言は「ソート」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f21",
+      "text": "赤吹き出し C6 の文言は「月次出力」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f22",
+      "text": "吹き出しは赤色、番号 C1〜C6 の計 6 個",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f23",
+      "text": "C1 矢印の指示先はテーブルのステータス「承認待」の行 (例: 4/2 や 4/7)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f24",
+      "text": "C2 矢印の指示先は実働が短い行 (要修正のステータス、4/3 や 4/9)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f25",
+      "text": "C3 矢印の指示先は「エクスポート」ボタン",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f26",
+      "text": "C4 矢印の指示先は日付列ヘッダーまたは日付値の (水)(木) 等の曜日括弧表記",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f27",
+      "text": "C5 矢印の指示先はテーブル列ヘッダー全般 (列名のソート機能要望)",
+      "verdict": "partial",
+      "verdicts": [
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "verdict_mode": "partial",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f28",
+      "text": "C6 矢印の指示先は上部タブの「今月」(月次レポート出力機能要望)",
+      "verdict": "missing",
+      "verdicts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "verdict_mode": "missing",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f29",
+      "text": "スライド上部の小さいメタ情報行に「勤怠管理 v3.2 - 田中太郎」「Screen-ID: TS-042」「部署: 営業 1 課」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    },
+    {
+      "id": "p01_f30",
+      "text": "スライド下部のフッターに「© 2026 ACME Corp. / Confidential」「Last sync: 2026-04-10 20:48」",
+      "verdict": "present",
+      "verdicts": [
+        "present",
+        "present",
+        "present"
+      ],
+      "verdict_mode": "present",
+      "agreement": 1.0
+    }
+  ]
+}

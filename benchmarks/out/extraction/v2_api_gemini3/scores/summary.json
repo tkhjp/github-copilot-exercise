@@ -1,0 +1,15 @@
+{
+  "prompt_id": "v2_api_gemini3",
+  "judge_model": "gemini-2.5-flash",
+  "n_runs": 3,
+  "patterns_judged": [
+    "p01",
+    "p02",
+    "p03",
+    "p04",
+    "p05",
+    "p06",
+    "p07",
+    "p08"
+  ]
+}
