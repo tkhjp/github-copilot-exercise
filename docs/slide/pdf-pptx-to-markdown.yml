@@ -1,11 +1,11 @@
 app:
-  description: 複数ページの PDF / PPTX を Markdown 化。PDF は PDF Process(pdf_to_png) で全ページを PNG 化し、Iteration
-    で各ページを Gemini(VLM) が書き起こし。PPTX は markitdown でテキスト抽出。使用プラグインは PDF Process / markitdown
-    / gemini のみ。出力は結合した Markdown テキスト。
+  description: PDF を単ページ PDF に分割し、各ページについて「ページ画像(pdf_to_png) + そのページのテキスト(markitdown)」を両方
+    Gemini(VLM) に渡してページ単位で書き起こす。PDF のみ受付。使用プラグインは PDF Process / markitdown / gemini。出力は結合した
+    Markdown テキスト。
   icon: 📄
   icon_background: '#FFEAD5'
   mode: workflow
-  name: PDF・PPTX → Markdown 変換（VLM・3プラグイン構成）
+  name: PDF → Markdown 変換（画像+テキスト 両入力 / VLM）
   use_icon_as_answer_icon: false
 dependencies: []
 kind: app
@@ -17,8 +17,6 @@ workflow:
     file_upload:
       allowed_file_extensions:
       - .PDF
-      - .PPTX
-      - .PPT
       allowed_file_types:
       - document
       allowed_file_upload_methods:
@@ -59,35 +57,11 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: start
-        targetType: if-else
-      id: start-source-branch-target
+        targetType: tool
+      id: start-source-splitter-target
       source: start
       sourceHandle: source
-      target: branch
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: if-else
-        targetType: tool
-      id: branch-true-pdf2png-target
-      source: branch
-      sourceHandle: 'true'
-      target: pdf2png
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: if-else
-        targetType: tool
-      id: branch-false-mkit-target
-      source: branch
-      sourceHandle: 'false'
-      target: mkit
+      target: splitter
       targetHandle: target
       type: custom
       zIndex: 0
@@ -95,21 +69,9 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: tool
-        targetType: code
-      id: pdf2png-source-sizecheck-target
-      source: pdf2png
-      sourceHandle: source
-      target: sizecheck
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: code
         targetType: iteration
-      id: sizecheck-source-iter-target
-      source: sizecheck
+      id: splitter-source-iter-target
+      source: splitter
       sourceHandle: source
       target: iter
       targetHandle: target
@@ -120,9 +82,35 @@ workflow:
         isInLoop: false
         iteration_id: iter
         sourceType: iteration-start
-        targetType: llm
-      id: iterstart-source-vlm-target
+        targetType: tool
+      id: iterstart-source-pageimg-target
       source: iterstart
+      sourceHandle: source
+      target: pageimg
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: iter
+        sourceType: tool
+        targetType: tool
+      id: pageimg-source-pagetext-target
+      source: pageimg
+      sourceHandle: source
+      target: pagetext
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: iter
+        sourceType: tool
+        targetType: llm
+      id: pagetext-source-vlm-target
+      source: pagetext
       sourceHandle: source
       target: vlm
       targetHandle: target
@@ -144,33 +132,9 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: code
-        targetType: variable-aggregator
-      id: joincode-source-agg-target
-      source: joincode
-      sourceHandle: source
-      target: agg
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: tool
-        targetType: variable-aggregator
-      id: mkit-source-agg-target
-      source: mkit
-      sourceHandle: source
-      target: agg
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: variable-aggregator
         targetType: end
-      id: agg-source-end-target
-      source: agg
+      id: joincode-source-end-target
+      source: joincode
       sourceHandle: source
       target: end
       targetHandle: target
@@ -178,21 +142,19 @@ workflow:
       zIndex: 0
     nodes:
     - data:
-        desc: PDF または PPTX を1つアップロード
+        desc: PDF を1つアップロード
         selected: false
         title: 開始
         type: start
         variables:
         - allowed_file_extensions:
           - .PDF
-          - .PPTX
-          - .PPT
           allowed_file_types:
           - document
           allowed_file_upload_methods:
           - local_file
           - remote_url
-          label: ファイル (PDF/PPTX)
+          label: PDF ファイル
           options: []
           required: true
           type: file
@@ -210,58 +172,19 @@ workflow:
       type: custom
       width: 244
     - data:
-        cases:
-        - case_id: 'true'
-          conditions:
-          - comparison_operator: is
-            id: cond-pdf-lower
-            value: .pdf
-            varType: string
-            variable_selector:
-            - start
-            - file
-            - extension
-          - comparison_operator: is
-            id: cond-pdf-upper
-            value: .PDF
-            varType: string
-            variable_selector:
-            - start
-            - file
-            - extension
-          id: 'true'
-          logical_operator: or
-        desc: PDF はページ画像→視覚転写、その他(PPTX)は markitdown へ
-        selected: false
-        title: PDF かどうか
-        type: if-else
-      height: 150
-      id: branch
-      position:
-        x: 380
-        y: 300
-      positionAbsolute:
-        x: 380
-        y: 300
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: PDF の全ページを PNG 画像に変換（配列で出力）
+        desc: PDF を単ページ PDF の配列に分割
         is_team_authorization: true
         params:
           pdf_content: ''
-          zoom: ''
         provider_id: kalochin/pdf_process/pdf_process
         provider_name: kalochin/pdf_process/pdf_process
         provider_type: builtin
         selected: false
-        title: PDF→PNG (PDF Process)
+        title: PDF分割（単ページ化）
         tool_configurations: {}
-        tool_description: Convert each PDF page to a PNG image
-        tool_label: PDF to PNG Converter
-        tool_name: pdf_to_png
+        tool_description: Split a PDF into individual single-page PDFs
+        tool_label: PDF Splitter
+        tool_name: pdf_splitter
         tool_node_version: '2'
         tool_parameters:
           pdf_content:
@@ -269,89 +192,27 @@ workflow:
             value:
             - start
             - file
-          zoom:
-            type: constant
-            value: 3
         type: tool
       height: 116
-      id: pdf2png
+      id: splitter
       position:
-        x: 680
-        y: 180
+        x: 380
+        y: 300
       positionAbsolute:
-        x: 680
-        y: 180
+        x: 380
+        y: 300
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
     - data:
-        code: |
-          def main(pages: list) -> dict:
-              # 品質ガード: ページ画像が大きすぎたら処理を止めてエラーにする。
-              # Gemini は大きい画像を内部で縮小するため、巨大/高密度ページは小さな文字が
-              # 失われる恐れがある。不完全な結果を返すより、ここで明示的に失敗させる方針。
-              # ※ Dify の File はバイトサイズ(size)のみ取得可能（ピクセル寸法は不可）。
-              MAX_PAGE_PNG_MB = 7.0  # ← 自分の資料に合わせて調整（成功時の max_mb を見て決める）
-              sizes_mb = []
-              oversized = []
-              for i, f in enumerate(pages, start=1):
-                  size = (f or {}).get("size") or 0
-                  mb = round(size / 1024 / 1024, 2)
-                  sizes_mb.append(mb)
-                  if mb > MAX_PAGE_PNG_MB:
-                      oversized.append(f"page {i}={mb}MB")
-              if oversized:
-                  raise Exception(
-                      f"ページ画像が大きすぎます (上限 {MAX_PAGE_PNG_MB}MB): "
-                      + ", ".join(oversized)
-                      + " / zoom を下げるか、該当ページを分割してください。"
-                  )
-              return {
-                  "page_count": len(pages),
-                  "max_mb": max(sizes_mb) if sizes_mb else 0,
-                  "sizes_mb": sizes_mb,
-              }
-        code_language: python3
-        desc: ページ画像が大きすぎる場合はエラー停止（不完全な結果を返さない）
-        outputs:
-          max_mb:
-            children: null
-            type: number
-          page_count:
-            children: null
-            type: number
-          sizes_mb:
-            children: null
-            type: array[number]
-        selected: false
-        title: 画像サイズ検査
-        type: code
-        variables:
-        - value_selector:
-          - pdf2png
-          - files
-          variable: pages
-      height: 54
-      id: sizecheck
-      position:
-        x: 940
-        y: 40
-      positionAbsolute:
-        x: 940
-        y: 40
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: 各ページを Gemini で視覚転写
+        desc: 各単ページPDF（画像+テキスト）を Gemini で書き起こし
         error_handle_mode: terminated
-        height: 250
+        height: 360
         is_parallel: false
         iterator_input_type: array[file]
         iterator_selector:
-        - pdf2png
+        - splitter
         - files
         output_selector:
         - vlm
@@ -362,20 +223,20 @@ workflow:
         start_node_id: iterstart
         title: ページごとに反復
         type: iteration
-        width: 520
-      height: 250
+        width: 1040
+      height: 360
       id: iter
       position:
-        x: 980
-        y: 160
+        x: 700
+        y: 140
       positionAbsolute:
-        x: 980
-        y: 160
+        x: 700
+        y: 140
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 520
+      width: 1040
       zIndex: 1
     - data:
         desc: ''
@@ -388,11 +249,11 @@ workflow:
       id: iterstart
       parentId: iter
       position:
-        x: 24
-        y: 100
+        x: 20
+        y: 160
       positionAbsolute:
-        x: 1004
-        y: 260
+        x: 720
+        y: 300
       selectable: false
       sourcePosition: right
       targetPosition: left
@@ -400,10 +261,92 @@ workflow:
       width: 44
       zIndex: 1002
     - data:
+        desc: この単ページPDFを PNG 画像に変換
+        is_team_authorization: true
+        isInIteration: true
+        isInLoop: false
+        iteration_id: iter
+        params:
+          pdf_content: ''
+          zoom: ''
+        provider_id: kalochin/pdf_process/pdf_process
+        provider_name: kalochin/pdf_process/pdf_process
+        provider_type: builtin
+        selected: false
+        title: ページ画像化
+        tool_configurations: {}
+        tool_description: Convert PDF page to PNG image
+        tool_label: PDF to PNG Converter
+        tool_name: pdf_to_png
+        tool_node_version: '2'
+        tool_parameters:
+          pdf_content:
+            type: variable
+            value:
+            - iter
+            - item
+          zoom:
+            type: constant
+            value: 3
+        type: tool
+      height: 116
+      id: pageimg
+      parentId: iter
+      position:
+        x: 90
+        y: 150
+      positionAbsolute:
+        x: 790
+        y: 290
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 220
+      zIndex: 1002
+    - data:
+        desc: この単ページPDFのテキストを抽出（markitdown）
+        is_team_authorization: true
+        isInIteration: true
+        isInLoop: false
+        iteration_id: iter
+        params:
+          files: ''
+        provider_id: yevanchen/markitdown/markitdown
+        provider_name: yevanchen/markitdown/markitdown
+        provider_type: builtin
+        selected: false
+        title: ページ文字抽出
+        tool_configurations: {}
+        tool_description: Extract text/markdown from the single-page PDF
+        tool_label: markitdown
+        tool_name: markitdown
+        tool_node_version: '2'
+        tool_parameters:
+          files:
+            type: variable
+            value:
+            - iter
+            - item
+        type: tool
+      height: 116
+      id: pagetext
+      parentId: iter
+      position:
+        x: 350
+        y: 150
+      positionAbsolute:
+        x: 1050
+        y: 290
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 220
+      zIndex: 1002
+    - data:
         context:
           enabled: false
           variable_selector: []
-        desc: Gemini flash-lite が画像を見てページを書き起こす
+        desc: 画像 + 抽出テキストを両方入力して書き起こし
         isInIteration: true
         isInLoop: false
         iteration_id: iter
@@ -417,72 +360,51 @@ workflow:
         - id: sys-transcribe
           role: system
           text: |
-            あなたは、与えられた **1 ページ分の画像**（PDF のページ、または PPT 由来のスライド画像）を、
-            **漏れなく原文のまま** Markdown に書き起こす OCR/VLM 転写エンジンです。
-            入力画像は常に「ドキュメントの 1 ページ」です。複数ページをまたぐ推論はせず、目の前の 1 枚に集中してください。
+            あなたは、与えられた **1 ページ分の画像** と、そのページから機械的に抽出された **参考テキスト** をもとに、
+            そのページを **漏れなく原文のまま** Markdown に書き起こす OCR/VLM 転写エンジンです。
+            常に「ドキュメントの 1 ページ」を対象とし、複数ページをまたぐ推論はせず、目の前の 1 枚に集中してください。
+
+            ## 入力の使い分け（重要）
+            - **画像**：レイアウト・表・グラフ・図・吹き出し・位置関係・視覚要素の「真実」。構造と配置は必ず画像を優先する。
+            - **参考テキスト**：文字（特に小さく潰れやすい文字・数値・記号）の **正確性確認** に使う。ただし順序・レイアウトが崩れていたり、図中の文字が欠けていることがある（スキャンPDFでは空のこともある）ので **鵜呑みにしない**。画像に見えるのにテキストに無いものは画像から補い、テキストにあるのに画像で確認できないものは画像を正とする。
 
             以下の手順を必ず順番に実行してください。
 
             # Step 1 — 構造把握 (頭の中で、出力不要)
-            画像を上から下、左から右に走査し、以下を数えてください:
-            - 表 (table) の数 / 各表の行数・列数
-            - グラフ・チャートの数と種類 (棒 / 円 / 折れ線 など)
-            - 注釈・吹き出し・赤枠・矢印の数
-            - ヘッダー / サブタイトル / フッターの有無 (薄い muted テキスト含む)
+            画像を上から下、左から右に走査し、以下を数える: 表の数/各表の行数・列数、グラフ・チャートの数と種類、注釈・吹き出し・赤枠・矢印の数、ヘッダー/サブタイトル/フッターの有無(薄い muted テキスト含む)。
 
             # Step 2 — 要素ごとに書き起こし
-            以下の順序で、各要素を漏らさず書き起こしてください:
-
-            1. **タイトル + サブタイトル + メタ情報**
-               - 主タイトルだけでなく、その直下にある小さい muted テキスト (実施日 / バージョン / 担当者 / チケット番号 / 環境名など) も必ず書き起こす。
-            2. **画面・モックアップ本体**
-               - 上から下、左から右の順に UI ブロックを順次書き起こす。
-               - ヘッダーの右上アイコン、通知バッジの数字、タブのアクティブ状態、ドロップダウンの開閉状態、ボタンラベルなど、小さい要素も省略しない。
-            3. **表 (table)**
-               - 表のタイトル / 列見出し / 全行を、Markdown のテーブル記法で書き起こす。
-               - **1 行たりとも省略しない**。N 行あれば N 行すべて。
-               - 文字が小さく見える場合も即座に「判読不能」とせず、まず一度よく見てから判断する。本当にどうしても読み取れない場合のみ「[判読不能]」と明示する。
-            4. **グラフ・チャート**
-               - タイトル、X 軸ラベル、Y 軸ラベル、凡例。
-               - 各データポイントの値を全て書き出す (棒 12 本なら 12 個、円グラフ 8 セグメントなら 8 個)。
-            5. **コード片**
-               - ファイル名 / 言語、import 行、デコレータ、関数シグネチャ (型注釈含む)、本体行、try/except の例外型まで全行を書き起こす。fenced code block で囲む。
-            6. **吹き出し・赤枠・コメント注釈**
-               - 番号 (例 C1, R01, A01, D1, M1) + 本文を verbatim で。
-               - **さらに、それぞれの吹き出しが指している対象を「→ ◯◯ を指している」と併記**する。判定基準は: 矢印の先の要素、または配置上最も近い画面要素。
-               - 略記コメント (例 「中央?」「5→4」「16→24」「#f5f5f5」「M.O.」など) はそのまま記録し、対象要素を別途明記する。
-            7. **組織図 / フロー図のノード**
-               - ノードごとに、書かれている全属性 (氏名 / 役職 / 入社年 / 配下人数 / 部門色帯のラベルなど) を漏らさず。
-               - 親子関係 (実線) と兼務関係 (点線) があれば区別して書く。
-            8. **フッター**
-               - ページ最下部の小さい muted テキスト (チーム名 / 機密区分 / 文書バージョンなど) も必ず書く。
+            1. **タイトル + サブタイトル + メタ情報**（直下の小さい muted テキスト: 実施日/バージョン/担当者/チケット番号/環境名等も必ず）。
+            2. **画面・モックアップ本体**（上→下・左→右。右上アイコン、通知バッジ数字、タブの活性状態、ドロップダウン開閉、ボタンラベル等の小要素も省略しない）。
+            3. **表**：タイトル/列見出し/全行を Markdown テーブルで。**1 行も省略しない**。小さくても即「判読不能」とせず、参考テキストと画像を突き合わせて確定する。どうしても不明な時のみ `[判読不能]`。
+            4. **グラフ・チャート**：タイトル、X/Y 軸ラベル、凡例、**各データポイントの値を全て**（棒12本なら12個）。
+            5. **コード片**：ファイル名/言語、import、デコレータ、関数シグネチャ(型注釈含む)、本体、try/except の例外型まで全行。fenced code block で囲む。
+            6. **吹き出し・赤枠・コメント注釈**：番号(例 C1,R01,A01)+本文を verbatim、さらに **「→ ◯◯ を指している」** と対象を併記（矢印の先 or 最も近い要素）。略記(「中央?」「5→4」「#f5f5f5」等)もそのまま。
+            7. **組織図/フロー図のノード**：各ノードの全属性(氏名/役職/入社年/配下人数/部門色帯ラベル等)、実線(親子)と点線(兼務)を区別。
+            8. **フッター**：最下部の小さい muted テキスト(チーム名/機密区分/文書バージョン等)も必ず。
 
             # Step 3 — 表記ルール
-            - 時刻は HH:MM (コロン区切り)。`60:25` を `60.25` のような decimal に変換しない。
-            - 金額は元のまま (`¥4,200`、`164M`、`365 MJPY` など)、カンマ・通貨記号を保持。
-            - 割合は `%` 記号を維持 (`+12%`、`-0.5pt`)。符号 (+ / −) も保持。
-            - 状態記号 (○ / △ / × / ✓ / ▲) はそのまま。
-            - カラーコード (`#3b6db8` 等) や ピクセル値 (`16px`、`16→24`) も書かれているまま。
-            - 部門色帯がある場合は、色 + ラベルを併記 (例: `青 (Tech)`、`緑 (Sales)`)。
+            - 時刻は HH:MM（`60:25` を `60.25` 等にしない）。金額は元のまま(`¥4,200`/`164M`/`365 MJPY`、カンマ・通貨記号保持)。割合は `%` と符号(+/−)維持。状態記号(○/△/×/✓/▲)そのまま。カラーコード(`#3b6db8`)やピクセル値(`16px`/`16→24`)もそのまま。部門色帯は色+ラベル併記(例 `青 (Tech)`)。
 
             # Step 4 — 厳守事項
-            - 要約 / 解釈 / 言い換えは禁止。書いてあるままに書く。
-            - 元のドキュメントにない情報を推測で追加しない。
-            - 1 行 / 1 セル / 1 注釈たりとも省略しない。
-            - **ページ見出し (## ページ N / ## Slide N) は出力しないこと。** ページ番号と区切りはシステム側で自動付与します。あなたはこの 1 ページの本文のみを返してください。
-            - 前置き・後書き・「以下に書き起こします」などのメタ発話は禁止。Markdown 本文のみを返す。
+            - 要約/解釈/言い換え禁止。書いてあるままに書く。推測でドキュメントに無い情報を足さない。1 行/1 セル/1 注釈も省略しない。
+            - **ページ見出し(## ページ N)は出力しない**（システムが自動付与）。前置き・後書きも禁止。Markdown 本文のみを返す。
 
-            # Step 5 — 自己確認 (出力末尾に必ず書く)
-            最後に `---` 区切りを入れ、以下のフォーマットで、このページについての件数照合を 1 行ずつ書いてください:
-            - 表: 検出 X 行 / 書き起こし Y 行 (X = Y であること)
+            # Step 5 — 自己確認（出力末尾に必ず）
+            `---` 区切りの後、このページの件数照合を 1 行ずつ:
+            - 表: 検出 X 行 / 書き起こし Y 行 (X = Y)
             - 注釈・吹き出し: 検出 X 個 / 書き起こし Y 個
             - グラフ データポイント: 検出 X 個 / 書き起こし Y 個
-            - ノード (組織図など): 検出 X / 書き起こし Y
-
-            X ≠ Y のズレがあれば、戻って再走査し補完してから返答する。
+            - ノード: 検出 X / 書き起こし Y
+            X ≠ Y があれば再走査して補完してから返答する。
         - id: usr-page
           role: user
-          text: このページを書き起こしてください。
+          text: |
+            このページの「参考テキスト（機械抽出・順序やレイアウトは崩れている可能性あり / スキャンPDFでは空のこともある）」:
+            ----------------
+            {{#pagetext.text#}}
+            ----------------
+            上記を文字の正確性確認に使いつつ、添付のページ画像を Step1〜5 に従って書き起こしてください。
         selected: false
         title: 視覚転写 (Gemini)
         type: llm
@@ -490,23 +412,23 @@ workflow:
           configs:
             detail: high
             variable_selector:
-            - iter
-            - item
+            - pageimg
+            - files
           enabled: true
       height: 120
       id: vlm
       parentId: iter
       position:
-        x: 120
-        y: 100
+        x: 620
+        y: 150
       positionAbsolute:
-        x: 1100
-        y: 260
+        x: 1320
+        y: 290
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
-      width: 244
+      width: 300
       zIndex: 1002
     - data:
         code: |
@@ -539,67 +461,10 @@ workflow:
       height: 54
       id: joincode
       position:
-        x: 1560
-        y: 180
-      positionAbsolute:
-        x: 1560
-        y: 180
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: PPTX からテキストを抽出して Markdown 化（テキストのみ）
-        is_team_authorization: true
-        params:
-          files: ''
-        provider_id: yevanchen/markitdown/markitdown
-        provider_name: yevanchen/markitdown/markitdown
-        provider_type: builtin
-        selected: false
-        title: markitdown (PPTX)
-        tool_configurations: {}
-        tool_description: Convert office documents to Markdown
-        tool_label: markitdown
-        tool_name: markitdown
-        tool_node_version: '2'
-        tool_parameters:
-          files:
-            type: variable
-            value:
-            - start
-            - file
-        type: tool
-      height: 116
-      id: mkit
-      position:
-        x: 680
-        y: 460
-      positionAbsolute:
-        x: 680
-        y: 460
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 244
-    - data:
-        desc: PDF / PPTX どちらかの結果を統合
-        output_type: string
-        selected: false
-        title: 結果をマージ
-        type: variable-aggregator
-        variables:
-        - - joincode
-          - markdown
-        - - mkit
-          - text
-      height: 130
-      id: agg
-      position:
-        x: 1880
+        x: 1860
         y: 300
       positionAbsolute:
-        x: 1880
+        x: 1860
         y: 300
       sourcePosition: right
       targetPosition: left
@@ -609,8 +474,8 @@ workflow:
         desc: 結合した Markdown を出力
         outputs:
         - value_selector:
-          - agg
-          - output
+          - joincode
+          - markdown
           value_type: string
           variable: markdown
         selected: false
@@ -619,10 +484,10 @@ workflow:
       height: 90
       id: end
       position:
-        x: 2200
+        x: 2160
         y: 300
       positionAbsolute:
-        x: 2200
+        x: 2160
         y: 300
       sourcePosition: right
       targetPosition: left
@@ -631,4 +496,4 @@ workflow:
     viewport:
       x: 0
       y: 0
-      zoom: 0.7
+      zoom: 0.6
