@@ -132,9 +132,21 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: code
-        targetType: end
-      id: joincode-source-end-target
+        targetType: tool
+      id: joincode-source-mdfile-target
       source: joincode
+      sourceHandle: source
+      target: mdfile
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: mdfile-source-end-target
+      source: mdfile
       sourceHandle: source
       target: end
       targetHandle: target
@@ -360,13 +372,16 @@ workflow:
         - id: sys-transcribe
           role: system
           text: |
-            あなたは、与えられた **1 ページ分の画像** と、そのページから機械的に抽出された **参考テキスト** をもとに、
-            そのページを **漏れなく原文のまま** Markdown に書き起こす OCR/VLM 転写エンジンです。
+            あなたは、与えられた **1 ページ分の画像**（および補助の参考テキスト）を、
+            **元のドキュメントの情報量を一切落とさず、同じ情報量のまま Markdown へ「変換」する**変換エンジンです。
+            これは単なる文字抽出ではありません。本文だけでなく、表・グラフ・図・フロー図・吹き出し・レイアウト・視覚的構造まで、
+            元ページに在る情報を **すべて** 適切な Markdown 表現（本文 / 表 / Mermaid / 箇条書き / 注釈）で忠実に再現し、
+            「元ページと同じ情報量の Markdown」を作ることがゴールです。
             常に「ドキュメントの 1 ページ」を対象とし、複数ページをまたぐ推論はせず、目の前の 1 枚に集中してください。
 
             ## 入力の使い分け（重要）
-            - **画像**：レイアウト・表・グラフ・図・吹き出し・位置関係・視覚要素の「真実」。構造と配置は必ず画像を優先する。
-            - **参考テキスト**：文字（特に小さく潰れやすい文字・数値・記号）の **正確性確認** に使う。ただし順序・レイアウトが崩れていたり、図中の文字が欠けていることがある（スキャンPDFでは空のこともある）ので **鵜呑みにしない**。画像に見えるのにテキストに無いものは画像から補い、テキストにあるのに画像で確認できないものは画像を正とする。
+            - **画像こそが情報源（主）**：レイアウト・表・グラフ・図・吹き出し・位置関係・視覚要素のすべて。構造も内容も画像を正とする。
+            - **参考テキストは補助（従）**：小さい文字・数値・記号の確認用ヒントに過ぎない。これに引きずられて「文字だけを並べる」ことは禁止。図・表・レイアウト・視覚情報も必ず Markdown 化し、元と同じ情報量を保つこと。スキャンPDFでは空のこともある。
 
             以下の手順を必ず順番に実行してください。
 
@@ -395,14 +410,7 @@ workflow:
             - **目次・索引など「項目 ……… ページ番号」が長い点線(・・・)/リーダー線で繋がっている箇所**：点線そのものは**再現しない**（`項目名 … ページ番号` 程度に簡略化、または `| 項目名 | ページ番号 |` のテーブルでも可）。ただし**項目は1つも省略せず、最初から最後まで全て**書き起こすこと。長い `・` の羅列を延々と出力してはいけない（途中で打ち切らない）。
             - **途中で出力を止めない**：参考テキストに項目が多数あるなら、その件数ぶん最後まで出し切る。
             - **ページ見出し(## ページ N)は出力しない**（システムが自動付与）。前置き・後書きも禁止。Markdown 本文のみを返す。
-
-            # Step 5 — 自己確認（出力末尾に必ず）
-            `---` 区切りの後、このページの件数照合を 1 行ずつ:
-            - 表: 検出 X 行 / 書き起こし Y 行 (X = Y)
-            - 注釈・吹き出し: 検出 X 個 / 書き起こし Y 個
-            - グラフ データポイント: 検出 X 個 / 書き起こし Y 個
-            - ノード: 検出 X / 書き起こし Y
-            X ≠ Y があれば再走査して補完してから返答する。
+            - 出力前に、表の行数・注釈/吹き出し数・グラフのデータ点数・図のノード数を**自分で数えて漏れが無いか自己確認**し、漏れがあれば補ってから出す。ただし**数えた結果（照合）は出力に含めない**（本文のみ）。
         - id: usr-page
           role: user
           text: |
@@ -477,23 +485,60 @@ workflow:
       type: custom
       width: 244
     - data:
-        desc: 結合した Markdown を出力
+        desc: 結合した Markdown を .md ファイル化
+        is_team_authorization: true
+        params:
+          md_text: ''
+        provider_id: bowenliang123/md_exporter/md_exporter
+        provider_name: bowenliang123/md_exporter/md_exporter
+        provider_type: builtin
+        selected: false
+        title: .md 出力 (Markdown Exporter)
+        tool_configurations: {}
+        tool_description: Save Markdown text as a downloadable .md file
+        tool_label: Markdown ⮕ MD
+        tool_name: md_to_md
+        tool_node_version: '2'
+        tool_parameters:
+          md_text:
+            type: mixed
+            value: '{{#joincode.markdown#}}'
+        type: tool
+      height: 116
+      id: mdfile
+      position:
+        x: 2160
+        y: 300
+      positionAbsolute:
+        x: 2160
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: Markdown テキスト + .md ファイルを出力
         outputs:
         - value_selector:
           - joincode
           - markdown
           value_type: string
           variable: markdown
+        - value_selector:
+          - mdfile
+          - files
+          value_type: array[file]
+          variable: md_file
         selected: false
         title: 終了
         type: end
-      height: 90
+      height: 120
       id: end
       position:
-        x: 2160
+        x: 2460
         y: 300
       positionAbsolute:
-        x: 2160
+        x: 2460
         y: 300
       sourcePosition: right
       targetPosition: left
