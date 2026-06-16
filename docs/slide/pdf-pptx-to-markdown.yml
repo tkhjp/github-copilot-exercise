@@ -1,5 +1,6 @@
 app:
-  description: "PDFを画像配列(PDF-to-Images)化し、markitdown全文を\fでページ分割、各ページ画像+テキストをgpt-5.4-miniに渡して書き起こし→結合→.md出力。pdf_splitter不要。"
+  description: '分割なし構成: PDF-to-Images(全体)で画像配列 + markitdown(全体)を\fで分割したテキストを、添字[i]で対応づけて
+    gpt-5.4-mini に渡す。pdf_splitter 不要。'
   icon: 🆕
   icon_background: '#E0F2FE'
   mode: workflow
@@ -181,7 +182,7 @@ workflow:
       type: custom
       width: 244
     - data:
-        desc: PDF全体を一括でPNG配列に変換 (PDF-to-Images)
+        desc: PDF全体を一括でPNG配列に変換
         is_team_authorization: true
         params:
           pdf_files: ''
@@ -191,12 +192,12 @@ workflow:
         provider_name: atoy0m0/pdf-to-images/pdf-to-images
         provider_type: builtin
         selected: false
-        title: PDF→画像配列
+        title: PDF→画像配列 (PDF-to-Images)
         tool_configurations:
           image_format:
             type: constant
             value: PNG
-        tool_description: Convert PDF pages to images (PyMuPDF)
+        tool_description: Convert each PDF page to a PNG image
         tool_label: PDF-to-Images
         tool_name: pdf-to-images
         tool_node_version: '2'
@@ -231,7 +232,7 @@ workflow:
         provider_name: yevanchen/markitdown/markitdown
         provider_type: builtin
         selected: false
-        title: 全文テキスト抽出
+        title: 全文テキスト抽出 (markitdown)
         tool_configurations: {}
         tool_description: Convert file to Markdown text
         tool_label: markitdown
@@ -269,10 +270,10 @@ workflow:
         - vlm
         - text
         output_type: array[string]
-        parallel_nums: 10
+        parallel_nums: 5
         selected: false
         start_node_id: iterstart
-        title: ページごとに反復
+        title: ページごとに反復（並列5）
         type: iteration
         width: 560
       height: 250
@@ -325,7 +326,7 @@ workflow:
             children: null
             type: string
         selected: false
-        title: ページ文字取り出し
+        title: ページ文字取り出し (Code)
         type: code
         variables:
         - value_selector:
@@ -381,7 +382,12 @@ workflow:
 
             # フロー図/プロセス図/組織図は Mermaid コードブロックで（flowchart TB/LR）。矢印の向き/分岐、subgraphでまとまり、中央ノードも1ノードとして入れる。【参照】等の吹き出しは
             Mermaid 内にノート風ノード(R1等)を作り対象へ点線 `-.->|参照|` で繋ぎ、末尾に classDef note と class
-            指定。図の下にも箇条書きで残す。
+            指定。図の下にも箇条書きで残す。**Mermaidのノードラベルは改行せず必ず1行で書く（`<br>` も `\n` も入れない）。ノード形状は
+            `id[ラベル]` の四角形のみ使用（`(...)` 等の他形状は使わない）。ラベルに丸括弧が必要なら全角（）を使う。**
+
+            # 複雑なフロー図（ノード/分岐が多い）では特に: ノード・矢印・分岐・合流を1つも省略しない（簡略化/要約禁止）。ノードidは一意な半角英数の短いID（N1,N2…）にし同じidを二度定義しない。ラベルとエッジラベルに
+            | ( ) { } # ; : " < > & を入れない（必要なら全角か言い換え）。条件分岐は判断ノード D1[〜か？] を四角で置き、分岐先へは A -->|はい| B のようにエッジ側に条件を書く。段が深い図は flowchart
+            TB、横に広い図は flowchart LR、工程の塊は subgraph でまとめる。規模が大きくても図全体をMermaidで描き、図の直後に全エッジ（A→B：条件）を箇条書きで必ず併記する（描画が崩れても情報が残るように）。
 
             # 目次/索引の長い点線(・・・)リーダーは再現せず簡略化、ただし項目は1つも省略せず最後まで（途中で止めない）。
 
@@ -402,7 +408,7 @@ workflow:
 
             '
         selected: false
-        title: 視覚転写 (Gemini)
+        title: 視覚転写 (gpt-5.4-mini)
         type: llm
         vision:
           configs:
@@ -426,8 +432,17 @@ workflow:
       width: 220
       zIndex: 1002
     - data:
-        code: "def main(pages: list) -> dict:\n    parts = []\n    for i, md in enumerate(pages,\
-          \ start=1):\n        text = (md or \"\").strip()\n        parts.append(f\"\
+        code: "def main(pages: list) -> dict:\n    # mermaidコードブロック内のリテラル \\n を <br>\
+          \ に置換（mermaidの改行はbr。コード片の\\nは壊さないようmermaid内に限定）\n    def fix_mermaid(s):\n\
+          \        out=[]; i=0\n        while True:\n            st=s.find(\"```mermaid\"\
+          , i)\n            if st<0:\n                out.append(s[i:]); break\n \
+          \           en=s.find(\"```\", st+9)\n            if en<0:\n           \
+          \     out.append(s[i:]); break\n            en+=3\n            bsn=chr(92)+\"\
+          n\"   # バックスラッシュ+n を曖昧さなく指定\n            blk=s[st:en].replace(bsn,\"<br>\"\
+          ).replace(\"(\",\"（\").replace(\")\",\"）\")  # \\n→<br>, ()→全角（Mermaid描画崩れ防止）\n\
+          \            out.append(s[i:st]); out.append(blk); i=en\n        return\
+          \ \"\".join(out)\n    parts = []\n    for i, md in enumerate(pages, start=1):\n\
+          \        text = fix_mermaid((md or \"\").strip())\n        parts.append(f\"\
           ## ページ {i}\\n\\n{text}\")\n    body = \"\\n\\n---\\n\\n\".join(parts)\n\
           \    header = \"> ※本MarkdownはPDFから自動変換したものです。図表・複雑なレイアウトは精度が十分でなく誤りを含む場合があります。\\\
           n\\n\"\n    return {\"markdown\": header + body, \"page_count\": len(parts)}\n"
@@ -441,7 +456,7 @@ workflow:
             children: null
             type: number
         selected: false
-        title: 結合(注意書き+番号)
+        title: 結合 (Code・注意書き+番号)
         type: code
         variables:
         - value_selector:
@@ -469,7 +484,7 @@ workflow:
         provider_name: bowenliang123/md_exporter/md_exporter
         provider_type: builtin
         selected: false
-        title: .md 出力
+        title: .md 出力 (md_exporter)
         tool_configurations: {}
         tool_description: Save Markdown text as .md file
         tool_label: Markdown ⮕ MD
