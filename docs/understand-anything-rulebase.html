@@ -3,599 +3,1718 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Understand-Anything の「LLM を使わない処理」調査資料</title>
+<title>Understand-Anything 処理フロー解剖資料</title>
 <style>
   :root {
-    --paper: #F5F7F6;
-    --card: #FFFFFF;
-    --ink: #1D2A2E;
-    --ink-soft: #4A5A5E;
-    --line: #D9E0DE;
-    --rule: #0E7C66;
-    --rule-bg: #E4F1ED;
-    --llm: #B07018;
-    --llm-bg: #F7EEDD;
+    color-scheme: light;
+    --bg: #F6F8F7;
+    --surface: #FFFFFF;
+    --surface-soft: #FAFBFA;
+    --ink: #172126;
+    --muted: #56646A;
+    --faint: #7B888D;
+    --line: #D8E0DD;
+    --line-strong: #B8C6C1;
+    --rule: #0D765D;
+    --rule-ink: #084A3B;
+    --rule-soft: #E1F0EC;
+    --llm: #8A5B11;
+    --llm-soft: #F3E9D4;
+    --ops: #285D90;
+    --ops-soft: #E5EEF7;
+    --risk: #8C3E3E;
+    --risk-soft: #F2E4E4;
+    --shadow: 0 16px 44px rgba(22, 35, 42, 0.07);
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
     --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
-    --sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   }
+  * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
-    background: var(--paper);
+    margin: 0;
+    background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 15.5px;
-    line-height: 1.9;
-    margin: 0;
+    font-size: 16px;
+    line-height: 1.75;
   }
-  .wrap {
-    max-width: 46em;
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: #E9EEEC;
+    border: 1px solid #DCE4E1;
+    border-radius: 4px;
+    padding: 0.08em 0.34em;
+    word-break: break-word;
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(246, 248, 247, 0.93);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 3.5rem 1.4rem 6rem;
+    padding: 0.78rem 1.35rem;
     display: flex;
-    flex-direction: column;
-    gap: 3rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
-  header.doc-head { display: flex; flex-direction: column; gap: 1.1rem; }
+  .brand {
+    min-width: 14rem;
+    display: grid;
+    gap: 0.05rem;
+  }
+  .brand strong { font-size: 0.9rem; line-height: 1.35; }
+  .brand span { color: var(--muted); font-size: 0.76rem; }
+  .topnav {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .topnav a {
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.15rem 0;
+  }
+  .topnav a:hover { color: var(--rule-ink); border-color: var(--rule); }
+
+  .hero {
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 4rem 1.35rem 3rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(330px, 0.82fr);
+    gap: 3rem;
+    align-items: start;
+  }
   .eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
     color: var(--rule);
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
   }
   h1 {
     font-family: var(--serif);
-    font-weight: 600;
-    font-size: 1.9rem;
-    line-height: 1.45;
+    font-size: clamp(2.1rem, 5vw, 4.6rem);
+    line-height: 1.08;
+    letter-spacing: 0;
     margin: 0;
-    text-wrap: balance;
+    max-width: 10em;
   }
-  .lede { margin: 0; color: var(--ink-soft); font-size: 0.94rem; }
-  .meta {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 0.15rem 1.2rem;
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    border-top: 1px solid var(--line);
+  .lede {
+    color: var(--muted);
+    font-size: 1.04rem;
+    line-height: 1.9;
+    max-width: 46rem;
+    margin: 1.45rem 0 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 1.4rem;
+  }
+  .meta-chip {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: 0.34rem 0.62rem;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .reader-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .reader-panel header {
+    padding: 1rem 1.1rem;
     border-bottom: 1px solid var(--line);
-    padding: 0.8rem 0.2rem;
-    margin: 0;
+    background: var(--surface-soft);
   }
-  .meta dt { font-weight: 600; margin: 0; }
-  .meta dd { margin: 0; }
+  .reader-panel header strong { display: block; font-size: 0.9rem; }
+  .reader-panel header span { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 0.15rem; }
+  .reader-list { margin: 0; padding: 0; list-style: none; }
+  .reader-list li {
+    display: grid;
+    grid-template-columns: 5.7rem 1fr;
+    gap: 0.75rem;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .reader-list li:last-child { border-bottom: 0; }
+  .label {
+    color: var(--rule-ink);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .reader-list p { margin: 0; color: var(--ink); font-size: 0.9rem; line-height: 1.65; }
+
+  main { display: block; }
+  .layout {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 1.35rem;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .toc {
+    position: sticky;
+    top: 4.2rem;
+    align-self: start;
+    width: 48px;
+    min-width: 0;
+    min-height: 13rem;
+    height: 13rem;
+    padding: 1rem 0.45rem;
+    overflow: hidden;
+    z-index: 7;
+    background: rgba(246, 248, 247, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: width 0.18s ease, padding 0.18s ease, box-shadow 0.18s ease;
+  }
+  .toc:hover,
+  .toc:focus-within {
+    width: 225px;
+    height: auto;
+    max-height: calc(100vh - 5.2rem);
+    padding: 1rem 0.95rem;
+    overflow-y: auto;
+    box-shadow: 0 16px 38px rgba(22, 35, 42, 0.12);
+  }
+  .toc::before {
+    content: "Index";
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 11rem;
+    color: var(--rule-ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+  }
+  .toc:hover::before,
+  .toc:focus-within::before {
+    display: none;
+  }
+  .toc nav {
+    border-left: 1px solid var(--line);
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.55rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+  }
+  .toc:hover nav,
+  .toc:focus-within nav {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .toc a {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .toc a:hover { color: var(--rule); }
+  .toc small {
+    display: block;
+    color: var(--faint);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    margin-top: 1.4rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+  }
+  .toc:hover small,
+  .toc:focus-within small {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .content { min-width: 0; }
+  .band {
+    padding: 3.2rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .band:last-child { border-bottom: 0; }
   h2 {
     font-family: var(--serif);
-    font-weight: 600;
-    font-size: 1.4rem;
-    line-height: 1.5;
-    margin: 0 0 1.1rem;
-    padding-top: 0.4rem;
-    text-wrap: balance;
-  }
-  h2 .secno {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--rule);
-    display: block;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.3rem;
+    font-size: clamp(1.55rem, 2.5vw, 2.25rem);
+    line-height: 1.25;
+    margin: 0 0 0.7rem;
+    letter-spacing: 0;
   }
   h3 {
-    font-size: 1.02rem;
-    font-weight: 600;
-    margin: 2rem 0 0.6rem;
-    line-height: 1.6;
+    font-size: 1.08rem;
+    line-height: 1.45;
+    margin: 2rem 0 0.75rem;
   }
-  h3 code { font-size: 0.92em; }
-  p { margin: 0 0 1em; }
-  section > p:last-child, section > ul:last-child { margin-bottom: 0; }
-  ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
-  li { margin-bottom: 0.4em; }
-  li::marker { color: var(--rule); }
-  code {
-    font-family: var(--mono);
-    font-size: 0.84em;
-    background: #EAEEEC;
-    border-radius: 3px;
-    padding: 0.08em 0.35em;
-    word-break: break-all;
-  }
-  strong { font-weight: 600; }
-  pre {
-    font-family: var(--mono);
-    font-size: 0.76rem;
-    line-height: 1.7;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    overflow-x: auto;
-  }
-  pre code { background: none; padding: 0; font-size: inherit; }
-  .tablewrap { overflow-x: auto; margin: 1rem 0 1.4rem; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
-  table { border-collapse: collapse; width: 100%; font-size: 0.84rem; line-height: 1.65; }
-  th, td { text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
-  tr:last-child td { border-bottom: none; }
-  th {
-    font-size: 0.72rem;
+  h4 {
+    margin: 0 0 0.4rem;
+    color: var(--muted);
+    font-size: 0.73rem;
     letter-spacing: 0.08em;
-    color: var(--ink-soft);
-    background: #F0F3F2;
-    font-weight: 600;
-    white-space: nowrap;
+    text-transform: uppercase;
   }
-  td.c { text-align: center; white-space: nowrap; }
-  .pr {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    padding: 0.15em 0.6em;
-    border-radius: 3px;
-    white-space: nowrap;
+  .section-lede {
+    color: var(--muted);
+    max-width: 53rem;
+    margin: 0 0 1.4rem;
   }
-  .pr-high { background: var(--rule); color: #fff; }
-  .pr-mid  { background: var(--rule-bg); color: var(--rule); }
-  blockquote {
-    margin: 1.2rem 0;
-    padding: 0.8rem 1.2rem;
-    border-left: 3px solid var(--rule);
-    background: var(--card);
-    border-radius: 0 8px 8px 0;
-    font-size: 0.86rem;
-    color: var(--ink-soft);
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; }
+  li { margin-bottom: 0.36rem; }
+  li::marker { color: var(--rule); }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.4rem;
   }
-  blockquote p { margin: 0 0 0.5em; }
-  blockquote p:last-child { margin: 0; }
-  .keypoints { display: flex; flex-direction: column; gap: 0.9rem; margin: 1.2rem 0; padding: 0; list-style: none; }
-  .keypoints li {
-    background: var(--card);
+  .concept-card {
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 0.9rem 1.3rem;
-    margin: 0;
-    font-size: 0.92rem;
+    padding: 1.05rem 1.1rem;
   }
-  .keypoints strong { display: block; margin-bottom: 0.15rem; color: var(--rule); }
-  .steps { counter-reset: st; list-style: none; padding: 0; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
-  .steps li {
-    counter-increment: st;
-    position: relative;
-    padding: 0.35rem 0 0.35rem 2.6rem;
-    margin: 0;
-    font-size: 0.94rem;
-  }
-  .steps li::before {
-    content: counter(st);
-    position: absolute;
-    left: 0;
-    top: 0.45rem;
-    width: 1.7rem;
-    height: 1.7rem;
-    border-radius: 50%;
-    background: var(--rule-bg);
+  .concept-card .num {
     color: var(--rule);
     font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .concept-card strong {
+    display: block;
+    font-size: 1rem;
+    margin: 0.25rem 0;
+  }
+  .concept-card p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .summary-script {
+    background: #132521;
+    color: #EAF3F0;
+    border-radius: 8px;
+    padding: 1.1rem 1.2rem;
+    margin: 1.4rem 0 0;
+  }
+  .summary-script p { color: #D8E7E2; margin: 0 0 0.8rem; }
+  .summary-script p:last-child { margin-bottom: 0; }
+  .summary-script strong { color: #FFFFFF; }
+
+  .flow-system {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 1.1rem;
+    align-items: start;
+  }
+  .flow-rail {
+    position: sticky;
+    top: 4.75rem;
+    align-self: start;
+    background: #F7FAF8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: calc(100vh - 5.6rem);
+    overflow-y: auto;
+    z-index: 6;
+  }
+  .flow-rail-title {
+    display: grid;
+    gap: 0.2rem;
+    margin-bottom: 0.75rem;
+  }
+  .flow-rail-title strong { font-size: 0.95rem; }
+  .flow-rail-title span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(142px, 1fr));
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+  .flow-rail .flow {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.9rem;
+    min-height: 11.5rem;
+    border-left: 7px solid transparent;
+  }
+  .flow-rail .step {
+    min-height: 0;
+    padding: 0.72rem 0.78rem;
+  }
+  .step.rule {
+    background: linear-gradient(90deg, rgba(13, 118, 93, 0.12), rgba(255, 255, 255, 0.96) 44%);
+    border-left-color: var(--rule);
+  }
+  .step.llm {
+    background: linear-gradient(90deg, rgba(138, 91, 17, 0.14), rgba(255, 255, 255, 0.96) 44%);
+    border-left-color: var(--llm);
+  }
+  .step.mix {
+    background: linear-gradient(90deg, rgba(40, 93, 144, 0.13), rgba(255, 255, 255, 0.96) 44%);
+    border-left-color: var(--ops);
+  }
+  .step small {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 0.08rem 0.32rem;
+    color: var(--surface);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .step.rule small { background: var(--rule); }
+  .step.llm small { background: var(--llm); }
+  .step.mix small { background: var(--ops); }
+  .step strong { display: block; line-height: 1.4; }
+  .step p {
+    color: var(--muted);
+    margin: 0.55rem 0 0;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  .flow a.step {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+  }
+  .flow a.step:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 10px 28px rgba(22, 35, 42, 0.07);
+    transform: translateY(-1px);
+  }
+  .phase-detail-list {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 0;
+  }
+  .phase-detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    scroll-margin-top: 5rem;
+  }
+  .phase-detail.rule { border-left: 8px solid var(--rule); }
+  .phase-detail.llm { border-left: 8px solid var(--llm); }
+  .phase-detail.mix { border-left: 8px solid var(--ops); }
+  .phase-detail.rule header { background: linear-gradient(90deg, var(--rule-soft), #FFFFFF 74%); }
+  .phase-detail.llm header { background: linear-gradient(90deg, var(--llm-soft), #FFFFFF 74%); }
+  .phase-detail.mix header { background: linear-gradient(90deg, var(--ops-soft), #FFFFFF 74%); }
+  .phase-detail header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem 0.75rem;
+    padding: 0.9rem 1rem;
+  }
+  .phase-detail header small {
+    color: var(--faint);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .phase-detail header h3 {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+  .phase-intro {
+    color: var(--muted);
+    margin: 0;
+    padding: 0 1rem 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .io-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    padding: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  .io-grid p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+  .phase-tools {
+    border-top: 1px solid var(--line);
+    padding: 1rem;
+  }
+  .phase-tools > h4 {
+    margin-bottom: 0.65rem;
+  }
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .tool-card {
+    background: #FBFCFB;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.82rem 0.9rem;
+  }
+  .tool-card strong {
+    display: block;
+    color: var(--rule-ink);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    margin-bottom: 0.38rem;
+  }
+  .tool-card p {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.58;
+    margin: 0 0 0.5rem;
+  }
+  .tool-meta {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+  .tool-meta div {
+    display: grid;
+    grid-template-columns: 4.1rem minmax(0, 1fr);
+    gap: 0.45rem;
+  }
+  .tool-meta dt {
+    color: var(--faint);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .tool-meta dd {
+    margin: 0;
+    color: var(--muted);
+  }
+  .mode-compare {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    padding: 0 1rem 1rem;
+  }
+  .mode-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.9rem;
+    background: #FBFCFB;
+  }
+  .mode-card.llm { border-top: 4px solid var(--llm); }
+  .mode-card.rule { border-top: 4px solid var(--rule); }
+  .mode-card h4 {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+  .mode-card h4 span {
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .mode-card p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.87rem;
+    line-height: 1.62;
+  }
+  .mode-card strong { color: var(--ink); }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 1rem;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.42rem 0.55rem;
+    color: var(--ink);
     font-size: 0.8rem;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
-  .steps li.ai::before { background: var(--llm-bg); color: var(--llm); }
-  .steps .tag {
-    display: inline-block;
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    padding: 0.05em 0.55em;
-    border-radius: 999px;
-    margin-left: 0.5em;
-    vertical-align: 0.12em;
-    background: var(--rule-bg);
-    color: var(--rule);
-  }
-  .steps li.ai .tag { background: var(--llm-bg); color: var(--llm); }
-  details.appx {
-    background: var(--card);
+  .legend .legend-rule { background: var(--rule-soft); border-color: rgba(13, 118, 93, 0.28); }
+  .legend .legend-llm { background: var(--llm-soft); border-color: rgba(138, 91, 17, 0.3); }
+  .legend .legend-mix { background: var(--ops-soft); border-color: rgba(40, 93, 144, 0.28); }
+  .dot { width: 0.9rem; height: 0.9rem; border-radius: 3px; display: inline-block; }
+  .dot.rule { background: var(--rule); }
+  .dot.llm { background: var(--llm); }
+  .dot.mix { background: var(--ops); }
+
+  .tablewrap {
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 0;
-    margin-bottom: 0.9rem;
+    overflow-x: auto;
+    background: var(--surface);
+    margin: 1rem 0 1.4rem;
   }
-  details.appx > summary {
-    cursor: pointer;
-    padding: 0.85rem 1.3rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    list-style: none;
-    display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    line-height: 1.62;
   }
-  details.appx > summary::-webkit-details-marker { display: none; }
-  details.appx > summary::before {
-    content: "+";
-    font-family: var(--mono);
-    color: var(--rule);
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.72rem 0.88rem;
+    border-bottom: 1px solid var(--line);
+  }
+  tr:last-child td { border-bottom: 0; }
+  th {
+    background: #F0F4F2;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
     font-weight: 700;
-    flex-shrink: 0;
+    white-space: nowrap;
   }
-  details.appx[open] > summary::before { content: "−"; }
-  details.appx > summary:focus-visible { outline: 2px solid var(--rule); outline-offset: 2px; border-radius: 8px; }
-  details.appx > .appx-body { padding: 0 1.3rem 1.1rem; border-top: 1px solid var(--line); font-size: 0.92rem; }
-  details.appx > .appx-body > :first-child { margin-top: 1rem; }
-  details.appx code { font-size: 0.82em; }
-  footer {
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 0.12rem 0.42rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .b-rule { color: var(--rule-ink); background: var(--rule-soft); }
+  .b-llm { color: var(--llm); background: var(--llm-soft); }
+  .b-mix { color: var(--ops); background: var(--ops-soft); }
+  .b-risk { color: var(--risk); background: var(--risk-soft); }
+
+  .cards-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.05rem 1.1rem;
+  }
+  .info-card h3 { margin: 0 0 0.45rem; font-size: 1rem; }
+  .info-card p { color: var(--muted); margin: 0; font-size: 0.9rem; line-height: 1.7; }
+
+  .callout {
+    border-left: 4px solid var(--rule);
+    background: var(--surface);
+    padding: 1rem 1.15rem;
+    margin: 1.25rem 0;
+  }
+  .callout p { margin: 0; color: var(--muted); }
+  .callout strong { color: var(--rule-ink); }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+    margin: 1.2rem 0 1rem;
+  }
+  .filter {
+    flex: 1 1 18rem;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    border-radius: 6px;
+    min-height: 2.5rem;
+    padding: 0 0.8rem;
+    font: inherit;
+    font-size: 0.92rem;
+  }
+  .button {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 6px;
+    min-height: 2.5rem;
+    padding: 0 0.85rem;
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+  }
+  .button:hover { border-color: var(--rule); color: var(--rule-ink); }
+
+  details.item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  details.item[open] { box-shadow: 0 10px 30px rgba(22, 35, 42, 0.05); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .item summary {
+    padding: 0.95rem 1rem;
+    display: grid;
+    grid-template-columns: minmax(14rem, 0.9fr) minmax(0, 1.4fr) auto;
+    gap: 1rem;
+    align-items: center;
+  }
+  .item summary::after {
+    content: "+";
+    color: var(--rule);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .item[open] summary::after { content: "-"; }
+  .item-name { color: var(--rule-ink); font-family: var(--mono); font-size: 0.86rem; }
+  .item-purpose { color: var(--muted); font-size: 0.88rem; }
+  .item-body {
     border-top: 1px solid var(--line);
-    padding-top: 1.2rem;
-    font-size: 0.78rem;
-    color: var(--ink-soft);
+    padding: 1rem;
+  }
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+  .spec p { margin: 0; font-size: 0.88rem; line-height: 1.65; }
+
+  footer {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 2.5rem 1.35rem 4rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 1020px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 1.8rem; padding-top: 3rem; }
+    .layout { grid-template-columns: 1fr; }
+    .toc,
+    .toc:hover,
+    .toc:focus-within {
+      position: static;
+      width: auto;
+      min-height: 0;
+      height: auto;
+      max-height: none;
+      padding: 1rem 0 0;
+      overflow: visible;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .toc::before { display: none; }
+    .toc nav {
+      border-left: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 0 0 1rem;
+      display: flex;
+      overflow-x: auto;
+      gap: 1rem;
+      white-space: nowrap;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toc small { display: none; }
+    .concept-grid, .cards-2, .spec-grid, .io-grid, .tool-grid, .mode-compare { grid-template-columns: 1fr; }
+    .flow-system { grid-template-columns: 1fr; }
+    .flow-rail {
+      position: static;
+      max-height: none;
+      padding: 1rem;
+      overflow: visible;
+    }
+    .flow-rail .flow { grid-template-columns: repeat(10, 155px); overflow-x: auto; padding-bottom: 0.2rem; }
+  }
+  @media (max-width: 720px) {
+    .topbar-inner { align-items: flex-start; flex-direction: column; gap: 0.55rem; }
+    .brand { min-width: 0; }
+    .reader-list li { grid-template-columns: 1fr; gap: 0.2rem; }
+    .item summary { grid-template-columns: 1fr auto; }
+    .item-purpose { grid-column: 1 / -1; }
+    table { font-size: 0.82rem; }
+    th, td { padding: 0.6rem 0.72rem; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-<header class="doc-head">
-  <div class="eyebrow">調査資料 — リポジトリ調査 SKILL 検討</div>
-  <h1>Understand-Anything の<br>「LLM を使わない処理」調査資料</h1>
-  <p class="lede">
-    テスト支援エージェントに「リポジトリ調査 SKILL」を組み込むにあたり、
-    Understand-Anything のうち LLM(AI)を使わないルールベース処理から取り込むべきものを整理した。
-  </p>
-  <dl class="meta">
-    <dt>対象</dt><dd><code>github.com/Egonex-AI/Understand-Anything</code>(コミット <code>0e8ad84a</code>、2026-07-03 時点)</dd>
-    <dt>作成日</dt><dd>2026-07-04</dd>
-    <dt>構成</dt><dd>1章: エグゼクティブサマリ / 2章: 仕組みの解説 / Appendix: 技術詳細(エンジニア向け・折りたたみ)</dd>
-  </dl>
-</header>
-
-<section id="summary">
-  <h2><span class="secno">1</span>エグゼクティブサマリ</h2>
-
-  <h3>結論 — 取り込む価値のある「LLM なし処理」</h3>
-  <p>
-    Understand-Anything は「AI がリポジトリを理解するツール」に見えますが、中身を精査すると、
-    <strong>調査の土台になる事実の収集はすべて AI を使わない機械的な処理(ルールベース)で行い、
-    AI は説明文の作成だけを担当</strong>しています。
-    この「機械でできることは機械でやる」部分こそが、今回のテスト支援エージェントに取り込むべき資産です。
-  </p>
-  <p>取り込み候補は以下の 6 つです。上から順に「実装が軽く、テスト支援に直接効く」ものです。</p>
-
-  <div class="tablewrap"><table>
-    <thead><tr><th>#</th><th>処理</th><th>できること</th><th>テスト支援への効果</th><th>優先度</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="c">1</td><td><strong>リポジトリの棚卸し</strong></td>
-        <td>全ファイルを一覧化し、言語・種類(コード/設定/ドキュメント等)・行数を機械的に判定</td>
-        <td>エージェントが調査を始める前に「正確な地図」を持てる。推測で探し回らなくなる</td>
-        <td class="c"><span class="pr pr-high">高</span></td>
-      </tr>
-      <tr>
-        <td class="c">2</td><td><strong>テストと実装の対応付け</strong></td>
-        <td>ファイル名と配置のルール(例: <code>foo.test.ts</code> は <code>foo.ts</code> のテスト)から、どのテストがどの実装を検証しているかを特定</td>
-        <td><strong>最も直接効く</strong>。「この変更に関係するテストはどれか」を AI の推測なしで答えられる</td>
-        <td class="c"><span class="pr pr-high">高</span></td>
-      </tr>
-      <tr>
-        <td class="c">3</td><td><strong>フォルダ名からの役割推定</strong></td>
-        <td>フォルダ名(controllers, models, tests など)から各ファイルの役割(API/画面/データ/テスト等)を推定</td>
-        <td>コードの「どのあたりを見ればよいか」の当たりを付けられる。ルール表を渡すだけでも効果あり</td>
-        <td class="c"><span class="pr pr-high">高</span></td>
-      </tr>
-      <tr>
-        <td class="c">4</td><td><strong>ファイル間の依存関係の解決</strong></td>
-        <td>「どのファイルがどのファイルを読み込んでいるか」を言語ごとのルールで正確に特定</td>
-        <td>変更点の周辺を正確に辿れる。対象言語を自社スタックに絞れば小さく作れる</td>
-        <td class="c"><span class="pr pr-mid">中</span></td>
-      </tr>
-      <tr>
-        <td class="c">5</td><td><strong>変更の影響範囲の算出</strong></td>
-        <td>変更ファイルから依存関係を辿り、影響し得る箇所を提示</td>
-        <td>「どのテストを実行すべきか」の選定に直結</td>
-        <td class="c"><span class="pr pr-mid">中</span></td>
-      </tr>
-      <tr>
-        <td class="c">6</td><td><strong>再調査要否の自動判定</strong></td>
-        <td>ファイルの構造変化だけを見て「調査結果を作り直す必要があるか」を判定</td>
-        <td>毎回ゼロから調査し直さなくなる。AI 利用料ゼロで判定できる</td>
-        <td class="c"><span class="pr pr-mid">中</span></td>
-      </tr>
-    </tbody>
-  </table></div>
-
-  <h3>なぜ「LLM なし」の部分に価値があるのか</h3>
-  <ul class="keypoints">
-    <li><strong>正確</strong>AI にファイル一覧や依存関係を推測させると、間違えたり取りこぼしたりします(Understand-Anything の実測では、AI は依存関係の約 25% を取りこぼす)。機械的な処理なら取りこぼしゼロです。</li>
-    <li><strong>毎回同じ結果</strong>同じリポジトリに対して常に同じ結果が出ます(AI は実行のたびに答えが揺れる)。</li>
-    <li><strong>コストゼロ・高速</strong>AI の API 利用料がかからず、数秒で終わります。</li>
-    <li><strong>検証可能</strong>ルールが明文化されているので、間違っていれば直せます。Understand-Anything はこの部分に 2,500 行超のテストを備えています。</li>
-  </ul>
-
-  <h3>取り込みの進め方(提案)</h3>
-  <ol>
-    <li>まず優先度「高」の 3 つ(棚卸し・テスト対応付け・役割推定)を SKILL に組み込む。いずれも依存が薄く、単体で移植できる規模。</li>
-    <li>効果を確認後、優先度「中」(依存関係 → 影響範囲 → 再調査判定)を対象言語を絞って追加する。</li>
-    <li>ライセンスは MIT のため、コードの流用・改変は可能。ただし丸ごと導入は実行環境の前提(Node 22 以上等)が重いため、必要な処理だけ移植する方が現実的。</li>
-  </ol>
-</section>
-
-<section id="how">
-  <h2><span class="secno">2</span>Understand-Anything では何が行われているのか</h2>
-
-  <h3>2.1 全体の仕組み</h3>
-  <p>
-    Understand-Anything は、リポジトリを解析して「知識グラフ」(ファイル・関数とそれらの関係を表した地図)を作るツールです。
-    処理は 7 段階のパイプラインで進みます。
-  </p>
-  <ol class="steps">
-    <li><strong>準備</strong> — 調査対象から外すファイル(ライブラリ置き場、ビルド成果物など)を決める<span class="tag">機械</span></li>
-    <li><strong>棚卸し</strong> — 全ファイルを列挙し、言語・種類・行数・依存関係を調べる<span class="tag">機械</span></li>
-    <li><strong>仕分け</strong> — 関係の深いファイル同士をグループにまとめ、AI が調査しやすい単位に分割する<span class="tag">機械</span></li>
-    <li class="ai"><strong>調査</strong> — グループごとに AI が「このファイルは何をしているか」の説明文を書く<span class="tag">AI</span></li>
-    <li><strong>検品</strong> — AI の出力を機械的にチェックし、書式の揺れや間違いを自動修正する<span class="tag">機械</span></li>
-    <li class="ai"><strong>整理</strong> — アーキテクチャの層分けや「読む順番のガイド」を AI が作る<span class="tag">AI</span></li>
-    <li><strong>保存</strong> — 結果を保存し、次回以降の差分更新に備えた「指紋」を取っておく<span class="tag">機械</span></li>
-  </ol>
-  <p>
-    このうち <strong>AI が働くのは 4 と 6 だけ</strong>です。それ以外はすべてルールベースの機械処理で、
-    さらに 4 と 6 の前後にも機械処理が挟まっています。
-  </p>
-
-  <h3>2.2 機械(ルールベース)が担っている 4 つの仕事</h3>
-  <p>
-    <strong>(1) 事実の収集</strong> —
-    ファイルの一覧、各ファイルの言語や種類、行数、「どのファイルがどのファイルを使っているか」、関数やクラスの一覧。
-    こうした「調べれば確実に分かる事実」は、すべて機械が収集します。
-    AI には「この事実を自分で調べ直すことを禁止する」という指示まで明文化されています。
-  </p>
-  <p>
-    <strong>(2) AI の下ごしらえ</strong> —
-    数百ファイルを AI に一度に渡すことはできないため、依存関係の近いファイル同士を数学的な手法(コミュニティ検出)でグループ化し、
-    「一緒に読むと理解しやすい単位」に分けてから AI に渡します。グループの大きさにも上限(35 ファイル)を設けて暴走を防いでいます。
-  </p>
-  <p>
-    <strong>(3) AI の出力の検品と修正</strong> —
-    AI の書いた結果には決まったパターンの間違いが混ざります。ID の書式が揺れる、「テスト → 実装」の関係の向きを逆に書く、
-    依存関係を約 25% 取りこぼす、などです。Understand-Anything はこれらを「よくある間違いのカタログ」として蓄積し、機械的に自動修正します。
-    <strong>AI を賢くしようとするのではなく、AI の出力を機械で直す</strong>という発想です。
-  </p>
-  <p>
-    <strong>(4) 再調査の要否判定</strong> —
-    コードが変更されたとき、各ファイルの「構造の指紋」(関数の名前や引数など、地図に影響する情報だけ)を取って前回と比較し、
-    「調査のやり直しが必要か / 一部だけ更新すればよいか / 何もしなくてよいか」を判定します。
-    この判定自体に AI は一切使わないため、変更のたびに AI 利用料が発生しません。
-  </p>
-
-  <h3>2.3 AI が担っている仕事</h3>
-  <p>
-    AI の担当は「人間向けの説明」に限定されています。各ファイルの要約文とタグ付け、アーキテクチャの層への命名、
-    初学者向けの「読む順番ガイド」の作成です。つまり <strong>事実は機械、解釈と言語化は AI</strong> という分担です。
-  </p>
-
-  <h3>2.4 テスト支援エージェントへの示唆</h3>
-  <p>
-    エージェントの回答精度が低く見える原因の多くは、リポジトリの事実(何がどこにあり、何と繋がっているか)を
-    毎回 AI の推測で補っていることにあると考えられます。Understand-Anything の答えは明快で、
-    <strong>推測させる前に、正確な事実を機械が用意して渡す</strong>ことです。
-    特に「テストと実装の対応付け」は、ファイル名のルールだけで機械的に導けるうえテスト支援の核心に直結するため、
-    最初に取り込む価値があります。
-  </p>
-</section>
-
-<section id="appendix">
-  <h2><span class="secno">Appendix</span>技術詳細(エンジニア向け)</h2>
-  <p style="font-size: 0.9rem; color: var(--ink-soft);">
-    以降は実装調査の詳細です。各処理の入力・アルゴリズム・定数をコード根拠(ファイル名・関数名)付きで記載します。
-    各項目をクリックすると展開されます。
-  </p>
-
-  <details class="appx" id="a1">
-    <summary>A.1 パイプラインと LLM/非LLM の境界</summary>
-    <div class="appx-body">
-<pre><code>Phase 0    Pre-flight            … git worktree 判定、増分/全量の決定     【ルールベース】
-Phase 0.5  Ignore 設定           … generate-ignore.mjs                   【ルールベース】
-Phase 1    SCAN (project-scanner agent)
-            ├ Step A: README/manifest から name/description/frameworks    【LLM】
-            ├ Step B: scan-project.mjs (列挙/言語/カテゴリ/行数)          【ルールベース】
-            └ Step C: extract-import-map.mjs (import 解決)               【ルールベース】
-Phase 1.5  BATCH                 … compute-batches.mjs (Louvain 分割)    【ルールベース】
-Phase 2    ANALYZE (file-analyzer agent ×並列)
-            ├ 前処理: extract-structure.mjs (tree-sitter 構造抽出)       【ルールベース】
-            ├ summary/tags/complexity/意味的エッジの生成                 【LLM】
-            └ 後処理: merge-batch-graphs.py (正規化/修復/マージ)         【ルールベース】
-Phase 3    ASSEMBLE REVIEW (assemble-reviewer agent)                     【LLM】
-Phase 4    ARCHITECTURE (レイヤ分け)                                     【LLM】(+決定的正規化)
-Phase 5    TOUR (ガイドツアー生成)                                       【LLM】(+決定的正規化)
-Phase 6    REVIEW               … デフォルトはインライン検証スクリプト   【ルールベース】
-Phase 7    SAVE                 … build-fingerprints.mjs                 【ルールベース】</code></pre>
-      <p>境界はエージェント定義に明文化されている:</p>
-      <blockquote>
-        <p>"Deterministic (file enumeration, language detection, category assignment, line counting, complexity estimation, import resolution) is handled by two bundled scripts. <strong>Do NOT re-implement any of this logic.</strong>" — <code>agents/project-scanner.md</code></p>
-        <p>"The output edge count for this file MUST equal <code>batchImportData[filePath].length</code>. Not 90% of it. Not 'the meaningful ones'. All of them." — <code>agents/file-analyzer.md</code>(imports エッジは LLM に判断させず機械転記を強制)</p>
-      </blockquote>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <strong>Understand-Anything 処理フロー解剖</strong>
+        <span>何が、どこで、誰の責任で処理されるかを読む資料</span>
+      </div>
+      <nav class="topnav" aria-label="ページ内ナビゲーション">
+        <a href="#overview">要点</a>
+        <a href="#no-llm">LLMなし</a>
+        <a href="#safety">Security</a>
+        <a href="#flow">固定Flow</a>
+        <a href="#tech-stack">技術スタック</a>
+        <a href="#responsibility">責任境界</a>
+        <a href="#artifacts">生成物</a>
+      </nav>
     </div>
-  </details>
+  </header>
 
-  <details class="appx" id="a2">
-    <summary>A.2 ignore 設定生成(generate-ignore.mjs / ignore-generator.ts / ignore-filter.ts)</summary>
-    <div class="appx-body">
-      <ul>
-        <li><code>.gitignore</code> 互換の <code>ignore</code> npm ライブラリを使用。パターンは 3 層マージ(後勝ち、<code>!</code> 否定可): ①<code>DEFAULT_IGNORE_PATTERNS</code>(<code>node_modules/ dist/ coverage/</code> 等のハードコード、ロックファイル、バイナリ拡張子、<code>*.min.js *.generated.*</code> 等)→ ②<code>.understand-anything/.understandignore</code> → ③ルートの <code>.understandignore</code>。</li>
-        <li>generator は <code>.gitignore</code> の取り込み提案、実在するテスト系ディレクトリ(<code>EXACT_DIR_NAMES</code>: <code>__tests__ test tests fixtures testdata docs examples scripts migrations</code> 等)、言語別テストパターン(JS/TS: <code>*.test.*</code>、Go: <code>**/*_test.go</code>、Java: <code>**/src/test/**</code>、C#: <code>**/*Tests.cs</code> 等)を全行コメントアウトで提案(自動有効化しない)。</li>
-      </ul>
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">Internal explanation page</div>
+        <h1>Tech leader が先に見るべき論点</h1>
+        <p class="lede">
+          この資料は、Understand-Anything の採用提案ではありません。
+          Tech leader がまず確認したい <strong>LLM なしでの到達範囲、security、処理 flow、各 step の input/output、技術スタック</strong>を先頭に置いた分解資料です。
+        </p>
+        <div class="meta-row" aria-label="資料メタ情報">
+          <span class="meta-chip">対象: Egonex-AI/Understand-Anything</span>
+          <span class="meta-chip">調査基準: 2026-07-03 時点</span>
+          <span class="meta-chip">再設計: 2026-07-06</span>
+          <span class="meta-chip">読者: 組内エンジニア</span>
+        </div>
+      </div>
+
+      <aside class="reader-panel" aria-label="読後に分かること">
+        <header>
+          <strong>Tech leader の確認観点</strong>
+          <span>先に判断したい順に並べています</span>
+        </header>
+        <ul class="reader-list">
+          <li>
+            <span class="label">NO LLM</span>
+            <p>LLM を外した場合、どこまで machine-readable に作れるか。</p>
+          </li>
+          <li>
+            <span class="label">SECURITY</span>
+            <p>source code 読み取り、LLM 送信、公開 demo、license の境界。</p>
+          </li>
+          <li>
+            <span class="label">FLOW</span>
+            <p>repo path 入力から graph/dashboard 出力までの処理 chain。</p>
+          </li>
+          <li>
+            <span class="label">STACK</span>
+            <p>各 step を支える Node.js、tree-sitter、Python、dashboard 技術。</p>
+          </li>
+        </ul>
+      </aside>
     </div>
-  </details>
+  </section>
 
-  <details class="appx" id="a3">
-    <summary>A.3 プロジェクトスキャン(scan-project.mjs)</summary>
-    <div class="appx-body">
-      <ol>
-        <li><strong>列挙</strong>: <code>git ls-files -z -co --exclude-standard</code>(NUL 区切りで非 ASCII パス対応)。git 不在時は再帰ウォーク(<code>HARD_SKIP_DIRS = {node_modules, .git, .svn, .hg, __pycache__}</code>、シンボリックリンク無視、<code>localeCompare</code> ソートで決定性確保)。</li>
-        <li><strong>言語検出</strong>(<code>detectLanguage</code>): <code>Dockerfile*</code> 特別扱い → dotfile キー(<code>.env.local</code>→<code>.env</code>)→ 約 60 拡張子の <code>LANGUAGE_BY_EXT</code> → 未知拡張子はそのまま小文字で返す(null を返さない契約)→ ファイル名テーブル(Makefile 等)→ <code>unknown</code>。</li>
-        <li><strong>カテゴリ分類</strong>(<code>detectCategory</code>): <code>LICENSE</code>→code 例外 → infra ファイル名 → infra パス(<code>.github/workflows/</code>、<code>/(^|\/)(k8s|kubernetes)\//</code>)→ 拡張子テーブル(docs/config/infra/data/script/markup)→ <code>code</code>。</li>
-        <li><strong>行数</strong>: バッファ内 <code>0x0a</code> バイト直接カウント。読取失敗は Warning + そのファイルのみドロップ。</li>
-        <li><strong>複雑度</strong>: ファイル総数のみで <code>≤30: small / ≤150: moderate / ≤500: large / &gt;500: very-large</code>。</li>
-      </ol>
+  <main class="layout">
+    <aside class="toc" aria-label="読む順">
+      <nav>
+        <a href="#overview">1. Tech leader 向け要点</a>
+        <a href="#no-llm">2. LLMなしの範囲</a>
+        <a href="#safety">3. 安全・制約</a>
+        <a href="#flow">4. Flow + Step + Function</a>
+        <a href="#tech-stack">5. 技術スタック</a>
+        <a href="#responsibility">6. 責任境界</a>
+        <a href="#artifacts">7. 生成物</a>
+        <a href="#appendix">8. 技術根拠</a>
+      </nav>
+      <small>読み方: まず 1-5 を読めば、LLMなしの上限、security、flow と step input/output、技術構成が分かります。6-8 は補足です。</small>
+    </aside>
+
+    <div class="content">
+      <section id="overview" class="band">
+        <h2>1. Tech leader 向け要点</h2>
+        <p class="section-lede">
+          Understand-Anything は「LLM が全部読む」ツールではありません。
+          実態は、機械処理で repo の事実を作り、LLM が説明や構造化を補い、最後に機械処理で検証・修復する pipeline です。
+        </p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <span class="num">INPUT</span>
+            <strong>入力は repository path</strong>
+            <p><code>/understand [path]</code> が起点。flags により full rebuild、auto-update、language などを制御する。</p>
+          </article>
+          <article class="concept-card">
+            <span class="num">PROCESS</span>
+            <strong>事実、解釈、修復を分ける</strong>
+            <p>file list/import/structure は rule-based。summary/layer/tour は LLM。ID/edge/validation は再び rule-based。</p>
+          </article>
+          <article class="concept-card">
+            <span class="num">OUTPUT</span>
+            <strong>出力は graph と補助ファイル</strong>
+            <p><code>knowledge-graph.json</code>、fingerprints、meta、必要に応じて <code>domain-graph.json</code> を作る。</p>
+          </article>
+        </div>
+
+        <div class="summary-script">
+          <p><strong>組内に説明するなら:</strong></p>
+          <p>
+            Understand-Anything は、repo の「事実」を決定的 script で集め、その事実を LLM に渡して説明を作らせ、
+            LLM の出力を再び決定的 script で修復・検証して graph にする仕組みです。
+          </p>
+          <p>
+            したがって見るべきポイントは UI ではなく、どの情報が rule-based の事実で、どの情報が LLM の解釈なのか、
+            そして source code や生成物をどう安全に扱うかです。
+          </p>
+        </div>
+      </section>
+
+      <section id="no-llm" class="band">
+        <h2>2. LLM なしでできる範囲</h2>
+        <p class="section-lede">
+          LLM を完全に外しても、Understand-Anything のかなり大きな部分は動かせます。
+          ただし、その出力は「人間向けの理解資料」ではなく、<strong>決定的に作れる repository fact map</strong> になります。
+        </p>
+
+        <h3>結論</h3>
+        <div class="callout">
+          <p>
+            <strong>LLM なしで到達できるのは、構造・依存・変更・候補関係の machine-readable graph までです。</strong>
+            「このファイルはなぜ重要か」「この product の business flow は何か」「初心者はどこから読むべきか」といった説明・解釈は弱くなります。
+          </p>
+        </div>
+
+        <h3>確実にできること</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>できること</th><th>出力例</th><th>信頼度</th><th>根拠</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>ファイル棚卸し</td>
+                <td><code>files[]</code>、言語、カテゴリ、行数、規模</td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>scan-project.mjs</code></td>
+              </tr>
+              <tr>
+                <td>ignore 適用</td>
+                <td>解析対象/除外対象、<code>filteredByIgnore</code></td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>ignore-filter.ts</code>、<code>generate-ignore.mjs</code></td>
+              </tr>
+              <tr>
+                <td>project 内部 import 解決</td>
+                <td><code>importMap: file → targets[]</code></td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>extract-import-map.mjs</code></td>
+              </tr>
+              <tr>
+                <td>構造抽出</td>
+                <td>functions、classes、exports、callGraph、非コード parser 結果</td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>extract-structure.mjs</code>、tree-sitter</td>
+              </tr>
+              <tr>
+                <td>batching</td>
+                <td><code>batches.json</code>、<code>neighborMap</code></td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>compute-batches.mjs</code>、Louvain</td>
+              </tr>
+              <tr>
+                <td>graph 正規化・検証</td>
+                <td>ID 正規化、dangling edge drop、duplicate merge</td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>merge-batch-graphs.py</code>、inline validator</td>
+              </tr>
+              <tr>
+                <td>変更判定</td>
+                <td><code>SKIP</code> / <code>PARTIAL_UPDATE</code> / <code>FULL_UPDATE</code></td>
+                <td><span class="badge b-rule">高</span></td>
+                <td><code>fingerprint.ts</code>、<code>change-classifier.ts</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>候補までは出せること</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>候補として出せること</th><th>できる範囲</th><th>弱点</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>テストと実装の対応付け</td>
+                <td>命名規約から <code>production → test</code> 候補を作る。</td>
+                <td>本当にその test が十分に検証しているかは判断しない。</td>
+              </tr>
+              <tr>
+                <td>役割推定</td>
+                <td><code>routes</code>、<code>service</code>、<code>model</code> など path segment で layer 候補を作る。</td>
+                <td>project 規約に強く依存する。未知構成では外れる。</td>
+              </tr>
+              <tr>
+                <td>business/domain の入口候補</td>
+                <td>HTTP route、CLI、event、cron、GraphQL など entry point を拾う。</td>
+                <td>業務 flow の意味づけはできない。</td>
+              </tr>
+              <tr>
+                <td>影響範囲の候補</td>
+                <td>変更 file から import/call/contains の近傍を辿る。</td>
+                <td>semantic impact、業務影響、優先度は別途判断が必要。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>LLM なしでは弱い、またはできないこと</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>弱い/できないこと</th><th>理由</th><th>LLM が担当している箇所</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>ファイルの自然言語 summary</td>
+                <td>構造は取れるが「何のための処理か」は文脈理解が必要。</td>
+                <td>file-analyzer agent</td>
+              </tr>
+              <tr>
+                <td>architecture layer の命名</td>
+                <td>path pattern だけでは project 固有の切り方を説明しにくい。</td>
+                <td>architecture-analyzer agent</td>
+              </tr>
+              <tr>
+                <td>tour / 読む順番</td>
+                <td>README、entry point、graph を踏まえた説明順の設計が必要。</td>
+                <td>tour-builder agent</td>
+              </tr>
+              <tr>
+                <td>business flow / domain graph</td>
+                <td>entry point は拾えるが、業務用語や process step の意味づけは推論になる。</td>
+                <td>domain-analyzer agent</td>
+              </tr>
+              <tr>
+                <td>「なぜ重要か」の説明</td>
+                <td>重要度は構造だけでなく、設計意図、運用、業務文脈に依存する。</td>
+                <td>各 LLM agent の summary/description</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>LLM なし版の成果物イメージ</h3>
+        <p>
+          LLM なしで作るなら、最終成果物は <code>knowledge-graph.json</code> というより、
+          <code>repository-facts.json</code> のようなものになります。中身は file、function、class、import、tested_by 候補、
+          entry point 候補、fingerprint、変更分類です。人が読む説明資料ではなく、他の LLM/test framework に渡すための
+          <strong>事実ベースの context</strong> と考えるのが自然です。
+        </p>
+      </section>
+
+      <section id="safety" class="band">
+        <h2>3. 安全・制約</h2>
+        <p class="section-lede">
+          「コードを読むだけ」でも、source path、関数名、domain 用 snippet などが生成物や LLM context に入ります。
+          安全性は full pipeline と rule-based 部分で分けて見る必要があります。
+        </p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>観点</th><th>現状</th><th>説明すべき責任/制約</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>読み取り範囲</td>
+                <td><code>projectRoot</code> 配下を読む。<code>.understandignore</code> と既定除外を適用。</td>
+                <td>root を許可 workspace に閉じる。任意絶対パスや <code>..</code> を tool API で通さない。</td>
+              </tr>
+              <tr>
+                <td>コード実行</td>
+                <td>解析処理は source を読むだけ。test/build/package script は実行しない。</td>
+                <td>解析 tool と実行 tool を分ける。解析側で project scripts を起動しない。</td>
+              </tr>
+              <tr>
+                <td>外部コマンド</td>
+                <td><code>git ls-files</code> を固定 argv で実行。失敗時は walk fallback。</td>
+                <td>shell string に user input を連結しない。任意 command 実行にしない。</td>
+              </tr>
+              <tr>
+                <td>LLM 送信</td>
+                <td>full <code>/understand</code> では README、manifest、file structure、batch context、必要に応じて snippets が LLM に渡る。</td>
+                <td>秘密情報を含む repo では実行環境/送信先の確認が必要。rule-based only ならこの送信は避けられる。</td>
+              </tr>
+              <tr>
+                <td>生成物の公開</td>
+                <td>graph には path、関数名、クラス名、summary、domain 語彙が入る。</td>
+                <td>公開 demo では raw source preview、intermediate、domain-context を出さない。必要なら redaction。</td>
+              </tr>
+              <tr>
+                <td>License</td>
+                <td>Understand-Anything は MIT License。</td>
+                <td>切り出し/改変は可能。著作権表示と MIT 許諾文を同梱。依存 license は別途棚卸し。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <p><strong>重要:</strong> rule-based script だけを使う場合と、full pipeline で LLM agents を使う場合では、情報の外部送信リスクが違います。この差を説明資料内で明確に分けます。</p>
+        </div>
+      </section>
+
+      <section id="flow" class="band">
+        <h2>4. 固定フローと Step / Function 解剖</h2>
+        <p class="section-lede">
+          Repository path の入力から graph 保存までの処理 chain です。
+          表示上の <code>Phase 2/7</code> は「7 つの主 phase のうち第 2 phase」という進捗表記です。
+          下では各 phase を分けて、input / process / output / guardrail、関連 function/tool、「LLMあり」「LLMなし」の到達点を比較します。
+        </p>
+        <div class="flow-system">
+          <aside class="flow-rail" aria-label="Understand-Anything fixed processing flow">
+            <div class="flow-rail-title">
+              <strong>固定 Flow</strong>
+              <span>Repository 入力から <code>knowledge-graph.json</code> 保存までの実行順。</span>
+            </div>
+            <div class="flow">
+              <a class="step rule" href="#phase-preflight">
+                <small>Phase 0</small>
+                <strong>Pre-flight</strong>
+                <p>root、git hash、config、既存 graph を確認。</p>
+              </a>
+              <a class="step rule" href="#phase-ignore">
+                <small>Phase 0.5</small>
+                <strong>Ignore</strong>
+                <p>解析対象と除外対象を確定。</p>
+              </a>
+              <a class="step mix" href="#phase-scan">
+                <small>Phase 1</small>
+                <strong>Scan</strong>
+                <p>file inventory と importMap を作る。</p>
+              </a>
+              <a class="step rule" href="#phase-batch">
+                <small>Phase 1.5</small>
+                <strong>Batch</strong>
+                <p>import graph から解析単位を作る。</p>
+              </a>
+              <a class="step mix" href="#phase-analyze">
+                <small>Phase 2</small>
+                <strong>Analyze & Merge</strong>
+                <p>batch 分析と graph 結合。</p>
+              </a>
+              <a class="step llm" href="#phase-assemble-review">
+                <small>Phase 3</small>
+                <strong>Assemble Review</strong>
+                <p>結合済み graph を確認。</p>
+              </a>
+              <a class="step llm" href="#phase-architecture">
+                <small>Phase 4</small>
+                <strong>Architecture</strong>
+                <p>architectural layers を生成。</p>
+              </a>
+              <a class="step llm" href="#phase-tour">
+                <small>Phase 5</small>
+                <strong>Tour</strong>
+                <p>読む順と学習 tour を生成。</p>
+              </a>
+              <a class="step mix" href="#phase-final-review">
+                <small>Phase 6</small>
+                <strong>Final Review</strong>
+                <p>schema と参照整合性を検証。</p>
+              </a>
+              <a class="step rule" href="#phase-save">
+                <small>Phase 7</small>
+                <strong>Save</strong>
+                <p>graph、fingerprint、meta を保存。</p>
+              </a>
+            </div>
+            <div class="legend">
+              <span class="legend-rule"><i class="dot rule"></i>Rule-based / deterministic</span>
+              <span class="legend-llm"><i class="dot llm"></i>LLM interpretation</span>
+              <span class="legend-mix"><i class="dot mix"></i>Mixed phase</span>
+            </div>
+          </aside>
+
+          <div class="phase-detail-list">
+            <article id="phase-preflight" class="phase-detail rule">
+              <header>
+                <small>Phase 0</small>
+                <h3>Pre-flight</h3>
+                <span class="badge b-rule">Orchestrator</span>
+              </header>
+              <p class="phase-intro">解析を始める前に、対象 repository と実行モードを固定する入口です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p><code>PROJECT_ROOT</code>、flags、既存 <code>knowledge-graph.json</code>、<code>meta.json</code></p></div>
+                <div><h4>Process</h4><p>root 解決、worktree redirect、git hash 取得、full/incremental 判定、language 設定。</p></div>
+                <div><h4>Output</h4><p>実行モード、出力先、config、次 phase の前提。</p></div>
+                <div><h4>Guardrail</h4><p>誤った root を渡すと別 repo を読む。path 境界と許可 workspace が重要。</p></div>
+              </div>
+              <div class="phase-tools">
+                <h4>対応 function / tool</h4>
+                <div class="tool-grid">
+                  <article class="tool-card">
+                    <strong>classifyRepositoryUpdate(changeAnalysis)</strong>
+                    <p>変更量から再解析 action を返す。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>changeAnalysis</code>、<code>totalFilesInGraph</code>、<code>allKnownFiles[]</code></dd></div>
+                      <div><dt>Output</dt><dd><code>SKIP</code> / <code>PARTIAL_UPDATE</code> / <code>ARCHITECTURE_UPDATE</code> / <code>FULL_UPDATE</code></dd></div>
+                      <div><dt>Source</dt><dd><code>fingerprint.ts</code>、<code>change-classifier.ts</code></dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>差分は小さい</span></h4><p>自然言語指示から実行意図を補助できるが、root 解決や git hash 確認は deterministic に処理する領域。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>十分可能</span></h4><p><strong>完全に実行可能。</strong>必要なのは path、既存 graph、設定値の検証であり、意味解釈は不要。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-ignore" class="phase-detail rule">
+              <header>
+                <small>Phase 0.5</small>
+                <h3>Ignore</h3>
+                <span class="badge b-rule">Script + Operator</span>
+              </header>
+              <p class="phase-intro">解析前に「読んでよい file」と「読まない file」を分ける security 上の重要 step です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p><code>.gitignore</code>、既定除外、project directory、operator の確認。</p></div>
+                <div><h4>Process</h4><p>starter <code>.understandignore</code> を生成し、ユーザー確認後に解析対象を確定。</p></div>
+                <div><h4>Output</h4><p><code>.understand-anything/.understandignore</code>、除外ルール、対象 file set。</p></div>
+                <div><h4>Guardrail</h4><p>秘密/生成物/巨大 file の除外確認は operator 責任。ここを自動化しすぎない。</p></div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>提案は可能</span></h4><p>repo 構成から「除外候補」を提案できる。ただし採用判断は人間側で、secret を LLM に見せる前に除外する必要がある。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>本命運用</span></h4><p><strong>十分可能。</strong><code>.gitignore</code>、既定 deny list、手動 review で安全側に倒せる。LLM 送信前の境界として扱う。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-scan" class="phase-detail mix">
+              <header>
+                <small>Phase 1</small>
+                <h3>Scan</h3>
+                <span class="badge b-mix">Script + optional LLM</span>
+              </header>
+              <p class="phase-intro">repository を file 単位で棚卸しし、後続処理の材料を作る step です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>repo files、README、manifest、ignore 済み file set。</p></div>
+                <div><h4>Process</h4><p>file list、language、category、line count、complexity、internal importMap を作る。</p></div>
+                <div><h4>Output</h4><p><code>scan-result.json</code>、<code>importMap</code>、project metadata。</p></div>
+                <div><h4>Guardrail</h4><p>file facts は script。project description/framework 推定は LLM 補助として扱う。</p></div>
+              </div>
+              <div class="phase-tools">
+                <h4>対応 function / tool</h4>
+                <div class="tool-grid">
+                  <article class="tool-card">
+                    <strong>scanProject(projectRoot)</strong>
+                    <p>ファイル一覧、言語、カテゴリ、行数、規模を返す。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>projectRoot</code></dd></div>
+                      <div><dt>Output</dt><dd><code>files[]</code>、<code>stats</code>、<code>estimatedComplexity</code></dd></div>
+                      <div><dt>Source</dt><dd><code>scan-project.mjs</code></dd></div>
+                    </dl>
+                  </article>
+                  <article class="tool-card">
+                    <strong>extractImportMap(projectRoot, files)</strong>
+                    <p>project 内部 import を解決する。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>projectRoot</code>、<code>files[]</code></dd></div>
+                      <div><dt>Output</dt><dd><code>importMap</code>、<code>filesWithImports</code>、<code>totalEdges</code></dd></div>
+                      <div><dt>Source</dt><dd><code>extract-import-map.mjs</code></dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>説明が増える</span></h4><p>README や manifest から project purpose、主要 framework、domain 語彙を文章化できる。人に説明する資料価値が上がる。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>構造は取れる</span></h4><p><strong>file inventory、言語、importMap、規模、候補カテゴリまでは可能。</strong>ただし business 目的や「なぜこの構成か」は弱い。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-batch" class="phase-detail rule">
+              <header>
+                <small>Phase 1.5</small>
+                <h3>Batch</h3>
+                <span class="badge b-rule">Graph algorithm</span>
+              </header>
+              <p class="phase-intro">LLM に渡す前、または rule-only graph を作る前に、解析単位を小さく分割します。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p><code>scan-result.json</code>、<code>importMap</code>、file category。</p></div>
+                <div><h4>Process</h4><p>Louvain community detection で code files を分割。non-code は path/category で group。</p></div>
+                <div><h4>Output</h4><p><code>batches.json</code>、<code>neighborMap</code>、<code>exportsByPath</code>。</p></div>
+                <div><h4>Guardrail</h4><p>batch は実行効率と context サイズの制御。意味理解そのものではない。</p></div>
+              </div>
+              <div class="phase-tools">
+                <h4>対応 function / tool</h4>
+                <div class="tool-grid">
+                  <article class="tool-card">
+                    <strong>computeBatches(projectRoot)</strong>
+                    <p>import graph と file category から解析 batch を作る。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>scan-result.json</code>、<code>importMap</code></dd></div>
+                      <div><dt>Output</dt><dd><code>batches.json</code>、<code>neighborMap</code>、<code>exportsByPath</code></dd></div>
+                      <div><dt>Source</dt><dd><code>compute-batches.mjs</code></dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>投入単位を制御</span></h4><p>LLM context に入れる file のまとまりを作る。batch の説明名は付けられるが、分割自体は graph algorithm 側。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>十分可能</span></h4><p><strong>import graph と path heuristic だけで実行可能。</strong>依存関係が薄い repo では path ベースの粗い group になる。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-analyze" class="phase-detail mix">
+              <header>
+                <small>Phase 2</small>
+                <h3>Analyze & Merge</h3>
+                <span class="badge b-mix">file-analyzer + merge script</span>
+              </header>
+              <p class="phase-intro">各 batch を分析し、最後に <code>merge-batch-graphs.py</code> で一つの assembled graph にまとめます。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>batch files、batch import data、neighborMap、必要に応じて source snippets。</p></div>
+                <div><h4>Process</h4><p>file-analyzer が <code>batch-*.json</code> を出し、merge script が ID/edge/complexity/test relation を正規化。</p></div>
+                <div><h4>Output</h4><p><code>batch-*.json</code>、<code>assembled-graph.json</code>、merge warnings。</p></div>
+                <div><h4>Guardrail</h4><p>source snippet が LLM context に入る可能性がある。merge は形式を直すが、意味の正しさまでは保証しない。</p></div>
+              </div>
+              <div class="phase-tools">
+                <h4>対応 function / tool</h4>
+                <div class="tool-grid">
+                  <article class="tool-card">
+                    <strong>extractFileStructure(batchFiles)</strong>
+                    <p>関数、クラス、export、call graph、非コード構造を抽出する。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>projectRoot</code>、<code>batchFiles[]</code>、<code>batchImportData</code></dd></div>
+                      <div><dt>Output</dt><dd><code>results[]</code></dd></div>
+                      <div><dt>Source</dt><dd><code>extract-structure.mjs</code></dd></div>
+                    </dl>
+                  </article>
+                  <article class="tool-card">
+                    <strong>normalizeGraphFragments(batchGraphs)</strong>
+                    <p>batch graph を統合し、ID/edge/import/test 関係を修復する。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>batchGraphs[]</code>、<code>scanResult</code>、<code>importMap</code></dd></div>
+                      <div><dt>Output</dt><dd><code>nodes[]</code>、<code>edges[]</code>、<code>report</code></dd></div>
+                      <div><dt>Source</dt><dd><code>merge-batch-graphs.py</code></dd></div>
+                    </dl>
+                  </article>
+                  <article class="tool-card">
+                    <strong>linkTestsByConvention(files, edges)</strong>
+                    <p>テスト命名規約から <code>production → test</code> edge を補完する。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>files[]</code>、任意 <code>existingEdges[]</code></dd></div>
+                      <div><dt>Output</dt><dd><code>testedByEdges[]</code>、<code>taggedProductionFiles[]</code></dd></div>
+                      <div><dt>Source</dt><dd><code>merge-batch-graphs.py</code> の <code>link_tests()</code></dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>理解の深さが出る</span></h4><p>関数や file の役割説明、domain tag、semantic relation を付けられる。merge script で壊れた ID/edge を補正する。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>構造 graph まで</span></h4><p><strong>関数/クラス抽出、import/calls/test link、依存 graph、merge は可能。</strong>一方で business role、自然言語 summary、意図推定は弱い。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-assemble-review" class="phase-detail llm">
+              <header>
+                <small>Phase 3</small>
+                <h3>Assemble Review</h3>
+                <span class="badge b-llm">assemble-reviewer</span>
+              </header>
+              <p class="phase-intro">Phase 2 で結合した graph を、batch 出力と import map を使って確認する review step です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p><code>assembled-graph.json</code>、<code>batch-*.json</code>、merge stderr、<code>importMap</code>。</p></div>
+                <div><h4>Process</h4><p>assemble-reviewer が結合結果、cross-batch edge、merge warning を確認。</p></div>
+                <div><h4>Output</h4><p><code>assemble-review.json</code>、Phase warnings。</p></div>
+                <div><h4>Guardrail</h4><p>review は graph の欠落や不整合を見つける補助。source truth の代替ではない。</p></div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>補助価値あり</span></h4><p>merge log と graph を読んで、構造的に怪しい箇所や cross-batch の取りこぼしを指摘できる。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>一部代替</span></h4><p><strong>schema、dangling edge、missing node、importMap 照合は可能。</strong>ただし「この edge が意味的に妥当か」の判断は弱い。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-architecture" class="phase-detail llm">
+              <header>
+                <small>Phase 4</small>
+                <h3>Architecture</h3>
+                <span class="badge b-llm">architecture-analyzer</span>
+              </header>
+              <p class="phase-intro">file-level graph を、人間が理解しやすい architectural layer に変換する step です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>file-level nodes、import edges、all edges、directory tree、language/framework context。</p></div>
+                <div><h4>Process</h4><p>architecture-analyzer が layer を提案し、後処理で <code>id</code>、<code>nodeIds</code>、dangling refs を正規化。</p></div>
+                <div><h4>Output</h4><p><code>layers[]</code>。</p></div>
+                <div><h4>Guardrail</h4><p>layer は解釈。厳密な依存順や業務上の真実ではない。</p></div>
+              </div>
+              <div class="phase-tools">
+                <h4>対応 function / tool</h4>
+                <div class="tool-grid">
+                  <article class="tool-card">
+                    <strong>extractDomainContext(projectRoot)</strong>
+                    <p>business/domain 分析の前処理として entry point と候補情報を集める。</p>
+                    <dl class="tool-meta">
+                      <div><dt>Input</dt><dd><code>projectRoot</code></dd></div>
+                      <div><dt>Output</dt><dd><code>fileTree</code>、<code>entryPoints[]</code>、<code>fileSignatures[]</code>、<code>metadata</code></dd></div>
+                      <div><dt>Source</dt><dd><code>extract-domain-context.py</code></dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>主価値</span></h4><p>directory、framework、edge を合わせて「この repo はどう分かれているか」を説明できる。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>近似まで</span></h4><p><strong>directory 階層、entry point、import centrality から layer 候補は作れる。</strong>責務名や理由付けは浅くなる。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-tour" class="phase-detail llm">
+              <header>
+                <small>Phase 5</small>
+                <h3>Tour</h3>
+                <span class="badge b-llm">tour-builder</span>
+              </header>
+              <p class="phase-intro">README、entry point、layers、edges を使って、初学者向けの読む順を作る step です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>README、entry point、file-level nodes、layers、all edges。</p></div>
+                <div><h4>Process</h4><p>tour-builder が learning tour を作り、後処理で <code>order</code>、<code>nodeIds</code>、field 名を正規化。</p></div>
+                <div><h4>Output</h4><p><code>tour[]</code>。</p></div>
+                <div><h4>Guardrail</h4><p>tour は onboarding 用の読み順。実行順や依存順そのものではない。</p></div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>説明資料向き</span></h4><p>README の文脈と graph を合わせて、なぜその順で読むかを自然言語で説明できる。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>候補生成まで</span></h4><p><strong>entry point、topological order、centrality から読む順候補は作れる。</strong>ただし narrative と目的説明は弱い。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-final-review" class="phase-detail mix">
+              <header>
+                <small>Phase 6</small>
+                <h3>Final Review</h3>
+                <span class="badge b-mix">inline validator / graph-reviewer</span>
+              </header>
+              <p class="phase-intro">保存前に final graph の schema、参照整合性、review issue を確認する gate です。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>metadata、nodes、edges、layers、tour、Phase warnings。</p></div>
+                <div><h4>Process</h4><p>通常は inline deterministic validation。<code>--review</code> 付きなら graph-reviewer subagent を実行。</p></div>
+                <div><h4>Output</h4><p><code>review.json</code>、validation result、保存可否。</p></div>
+                <div><h4>Guardrail</h4><p>default path は形式/参照整合性が中心。LLM review は追加確認であり、真偽保証ではない。</p></div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>--review 時</span></h4><p>graph-reviewer が warnings、scan result、final graph を見て、説明・edge・coverage の不自然さを追加で確認する。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>default path</span></h4><p><strong>schema、required fields、dangling refs、node/edge 整合性は検証可能。</strong>summary の意味品質までは見ない。</p></div>
+              </div>
+            </article>
+
+            <article id="phase-save" class="phase-detail rule">
+              <header>
+                <small>Phase 7</small>
+                <h3>Save</h3>
+                <span class="badge b-rule">Script</span>
+              </header>
+              <p class="phase-intro">解析結果を repository 内の生成物として固定し、再解析や UI 表示の入力にします。</p>
+              <div class="io-grid">
+                <div><h4>Input</h4><p>validated graph、source files、git hash、fingerprint baseline。</p></div>
+                <div><h4>Process</h4><p>final graph 保存、fingerprint baseline 作成、meta 更新、intermediate 整理。</p></div>
+                <div><h4>Output</h4><p><code>knowledge-graph.json</code>、<code>fingerprints.json</code>、<code>meta.json</code>。</p></div>
+                <div><h4>Guardrail</h4><p>生成物には path/name/summary/domain 語彙が含まれる。公開範囲に注意。</p></div>
+              </div>
+              <div class="mode-compare">
+                <div class="mode-card llm"><h4>LLMあり <span>説明付き graph</span></h4><p>summary、tags、architecture/tour を含む graph を保存する。便利だが、公開 demo では情報量が増える点に注意。</p></div>
+                <div class="mode-card rule"><h4>LLMなし <span>構造 graph</span></h4><p><strong>構造情報と fingerprint は保存できる。</strong>外部送信を避けやすいが、UI 上の説明文や business 解釈は薄くなる。</p></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="tech-stack" class="band">
+        <h2>5. 技術スタック</h2>
+        <p class="section-lede">
+          処理は UI と解析 pipeline に分かれます。LLM なしで使える rule-based 部分は主に Node.js/TypeScript、tree-sitter、Python script で構成されています。
+        </p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>領域</th><th>技術</th><th>使われ方</th><th>LLMなし利用</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>実行基盤</td>
+                <td>Node.js 22 以上、pnpm 10 系、TypeScript</td>
+                <td>scan、import 解決、構造抽出、fingerprint、更新分類。</td>
+                <td><span class="badge b-rule">必要</span></td>
+              </tr>
+              <tr>
+                <td>構文解析</td>
+                <td><code>web-tree-sitter</code> + tree-sitter grammar 群</td>
+                <td>functions/classes/imports/exports/callGraph を AST から抽出。</td>
+                <td><span class="badge b-rule">必要</span></td>
+              </tr>
+              <tr>
+                <td>非コード parser</td>
+                <td>YAML parser、正規表現 parser、zod schema</td>
+                <td>Dockerfile、SQL、GraphQL、Terraform、OpenAPI などを構造化。</td>
+                <td><span class="badge b-rule">必要</span></td>
+              </tr>
+              <tr>
+                <td>グラフ処理</td>
+                <td><code>graphology</code>、<code>graphology-communities-louvain</code></td>
+                <td>import graph から community を検出し、解析 batch を作る。</td>
+                <td><span class="badge b-rule">必要</span></td>
+              </tr>
+              <tr>
+                <td>修復/merge</td>
+                <td>Python 3</td>
+                <td>batch graph merge、ID 正規化、<code>tested_by</code> 補正、domain context 抽出。</td>
+                <td><span class="badge b-rule">必要</span></td>
+              </tr>
+              <tr>
+                <td>LLM agents</td>
+                <td>Claude/Codex 等の agent runtime</td>
+                <td>summary、tags、architecture layers、tour、domain flow を生成。</td>
+                <td><span class="badge b-llm">不要</span></td>
+              </tr>
+              <tr>
+                <td>Dashboard</td>
+                <td>React 19、Vite 6、XYFlow、ELK/Dagre、D3 force</td>
+                <td>生成済み graph JSON を可視化する UI。</td>
+                <td><span class="badge b-mix">任意</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <p><strong>切り分け:</strong> LLM なしの検証をするだけなら dashboard は必須ではありません。まず CLI/script と JSON 出力で repository fact map を作れるかを見るのが最短です。</p>
+        </div>
+      </section>
+
+      <section id="responsibility" class="band">
+        <h2>6. 責任境界</h2>
+        <p class="section-lede">
+          この tool を説明するときは、「誰が何を保証しているか」を分けて話す必要があります。
+        </p>
+        <div class="cards-2">
+          <article class="info-card">
+            <h3>Orchestrator / SKILL.md</h3>
+            <p>処理順、入力/出力パス、subagent dispatch、review/cleanup の手順を管理する。root と実行モードの責任を持つ。</p>
+          </article>
+          <article class="info-card">
+            <h3>Deterministic scripts</h3>
+            <p>file list、importMap、structure、batch、merge、validation、fingerprint を作る。同じ入力に対し同じ結果を返す責任を持つ。</p>
+          </article>
+          <article class="info-card">
+            <h3>LLM agents</h3>
+            <p>summary、tags、architecture layers、tour、domain flow など、人間向けの説明と推論を担当する。解釈なので検証対象。</p>
+          </article>
+          <article class="info-card">
+            <h3>Operator / user</h3>
+            <p>対象 repo、除外ルール、公開範囲、秘密情報の扱い、license notice の確認に責任を持つ。</p>
+          </article>
+        </div>
+
+        <h3>どの出力をどう扱うか</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>出力</th><th>性質</th><th>扱い方</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>files[]</code>、<code>importMap</code>、<code>fingerprints</code></td>
+                <td><span class="badge b-rule">機械的事実</span></td>
+                <td>比較的信用できる。parser/resolver の対応範囲外だけ注意。</td>
+              </tr>
+              <tr>
+                <td><code>summary</code>、<code>tags</code>、<code>layers</code>、<code>tour</code></td>
+                <td><span class="badge b-llm">LLM 解釈</span></td>
+                <td>説明材料として使う。重要判断には fact edge と source を併用する。</td>
+              </tr>
+              <tr>
+                <td><code>tested_by</code>、import edges after merge</td>
+                <td><span class="badge b-mix">LLM + rule repair</span></td>
+                <td>direction や missing import は補正される。semantic な「本当に検証しているか」は別途確認。</td>
+              </tr>
+              <tr>
+                <td><code>domain-graph.json</code></td>
+                <td><span class="badge b-llm">domain 推論</span></td>
+                <td>business 説明には便利。ただし rule-based だけで生成されたものではない。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="artifacts" class="band">
+        <h2>7. 生成物と repository の変化</h2>
+        <p class="section-lede">
+          実行後にどのファイルが増えるか、何を公開してはいけないかを一覧化します。
+        </p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>パス</th><th>作成タイミング</th><th>生成主体</th><th>意味</th><th>扱い</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>.understand-anything/.understandignore</code></td>
+                <td>Phase 0.5</td>
+                <td><span class="badge b-rule">Rule-based</span></td>
+                <td>解析除外ルール。候補はコメントアウトで生成される。</td>
+                <td>review 対象。秘密/生成物/巨大 file を除外する。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/knowledge-graph.json</code></td>
+                <td>Phase 7</td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>通常の code graph。nodes/edges/layers/tour を含む。</td>
+                <td>公開前に path/name/summary を確認。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/domain-graph.json</code></td>
+                <td><code>/understand-domain</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>business/domain view 用 graph。</td>
+                <td>業務語彙が出るため公開には特に注意。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/fingerprints.json</code></td>
+                <td>Phase 7</td>
+                <td><span class="badge b-rule">Rule-based</span></td>
+                <td>増分更新判定用の構造 fingerprint。</td>
+                <td>通常公開不要。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/meta.json</code></td>
+                <td>Phase 7</td>
+                <td><span class="badge b-rule">Rule-based</span></td>
+                <td>解析時刻、commit hash、解析ファイル数。</td>
+                <td>公開不要。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/intermediate/*</code>、<code>tmp/*</code></td>
+                <td>解析中</td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>scan result、batch、review、domain-context など。</td>
+                <td>公開しない。snippet/preview を含む場合がある。</td>
+              </tr>
+              <tr>
+                <td><code>.understand-anything/config.json</code></td>
+                <td>flags 指定時</td>
+                <td><span class="badge b-rule">Rule-based</span></td>
+                <td>autoUpdate や outputLanguage。</td>
+                <td>公開不要。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="appendix" class="band">
+        <h2>8. 技術根拠</h2>
+        <p class="section-lede">
+          実装担当が詳細を確認するための折りたたみメモです。
+        </p>
+        <div class="controls">
+          <button class="button" type="button" data-action="expand-evidence">すべて開く</button>
+          <button class="button" type="button" data-action="collapse-evidence">閉じる</button>
+        </div>
+
+        <details class="item evidence">
+          <summary><span class="item-name">scan-project.mjs</span><span class="item-purpose">file enumeration と分類</span></summary>
+          <div class="item-body">
+            <ul>
+              <li><code>git ls-files -z -co --exclude-standard</code> を優先。git 不在時は recursive walk。</li>
+              <li>hard skip: <code>node_modules</code>、<code>.git</code>、<code>__pycache__</code> 等。symlink は追わない。</li>
+              <li><code>detectCategory()</code>: LICENSE 例外、infra filename/path、拡張子 table、fallback code。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="item evidence">
+          <summary><span class="item-name">extract-import-map.mjs</span><span class="item-purpose">言語別 import resolver</span></summary>
+          <div class="item-body">
+            <ul>
+              <li>tree-sitter で raw import を抽出し、project 内部 file set に解決できたものだけ採用。</li>
+              <li>TS/JS、Python、Go、Java/Kotlin/C#、Ruby、PHP、Rust、C/C++、Swift に言語別 rule。</li>
+              <li>tree-sitter 初期化失敗時は importMap を空にして継続。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="item evidence">
+          <summary><span class="item-name">merge-batch-graphs.py</span><span class="item-purpose">LLM output repair</span></summary>
+          <div class="item-body">
+            <ul>
+              <li>node ID 正規化、complexity 正規化、dangling edge drop、重複 edge dedupe。</li>
+              <li><code>tested_by</code> は LLM が逆向きに出した <code>test → production</code> を <code>production → test</code> に反転。</li>
+              <li>importMap を真実源として、LLM の import edge 取りこぼしを再発行。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="item evidence">
+          <summary><span class="item-name">fingerprint.ts / change-classifier.ts</span><span class="item-purpose">増分更新判断</span></summary>
+          <div class="item-body">
+            <ul>
+              <li>fingerprint は contentHash と構造 signature。関数名、引数、戻り型、class、import/export を比較。</li>
+              <li><code>COSMETIC</code> は内容変化だが構造同一。tree-sitter 非対応は保守的に structural。</li>
+              <li>構造変更 0 件は <code>SKIP</code>、大量変更は <code>FULL_UPDATE</code>。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="item evidence">
+          <summary><span class="item-name">extract-domain-context.py</span><span class="item-purpose">Business/domain 前処理</span></summary>
+          <div class="item-body">
+            <ul>
+              <li>HTTP route、CLI、event、cron、GraphQL、gRPC、exported handler を正規表現で検出。</li>
+              <li>候補 file signature は business logic らしい path keyword で優先付け。</li>
+              <li>最終 domain graph は LLM domain-analyzer が生成する。</li>
+            </ul>
+          </div>
+        </details>
+      </section>
     </div>
-  </details>
+  </main>
 
-  <details class="appx" id="a4">
-    <summary>A.4 import 解決(extract-import-map.mjs, 1,874 行)</summary>
-    <div class="appx-body">
-      <p>tree-sitter で raw import を抽出し、12 言語の言語別ルールで内部ファイルへ写像。リゾルバの契約: throw しない・ディスクを読まない(全パス Set 照合のみ)・解決不能 = external。起動時に tsconfig(JSONC 対応・モノレポ per-package)、go.mod、composer.json PSR-4、Package.swift、Java/Kotlin/C# サフィックス索引を一括構築。</p>
-      <div class="tablewrap"><table>
-        <thead><tr><th>言語</th><th>解決ルール</th></tr></thead>
-        <tbody>
-          <tr><td>TS/JS</td><td><code>TS_EXT_PROBES</code>(<code>.ts .tsx .js .jsx .mjs .cjs /index.*</code> の 10 種)を順に照合。NodeNext の <code>./foo.js</code>→<code>.ts</code> 書き換え。tsconfig <code>paths</code> + <code>baseUrl</code>。CJS <code>require()</code> は正規表現補完</td></tr>
-          <tr><td>Python</td><td>ドット数で相対/絶対判別。絶対は祖先ディレクトリを深い順にルート候補試行。<code>a.b.c</code> → <code>a/b/c.py</code> / <code>a/b/c/__init__.py</code></td></tr>
-          <tr><td>Go</td><td>最近接 <code>go.mod</code> の module プレフィックスを剥がし、ディレクトリ内全 <code>.go</code> へ展開</td></tr>
-          <tr><td>Java/Kotlin/C#</td><td>FQN の <code>.</code>→<code>/</code> をサフィックス索引で照合</td></tr>
-          <tr><td>Ruby</td><td><code>require</code>/<code>require_relative</code> を正規表現判別、<code>lib/</code>→<code>app/</code>→ルートの順に probe</td></tr>
-          <tr><td>PHP</td><td>PSR-4 最長プレフィックス一致</td></tr>
-          <tr><td>Rust</td><td><code>crate::</code>/<code>super::</code>/<code>self::</code> 解釈、<code>x.rs</code>→<code>x/mod.rs</code> probe、<code>mod x;</code> 補完</td></tr>
-          <tr><td>C/C++</td><td>importer-dir → <code>include/</code> → <code>src/</code> → ルートの順に probe</td></tr>
-          <tr><td>Swift</td><td>モジュール名 → SwiftPM ターゲット/規約からモジュール内全 <code>.swift</code> へ展開</td></tr>
-        </tbody>
-      </table></div>
-      <p>フォールバック: tree-sitter 初期化失敗時は全 importMap を <code>[]</code> にして継続。</p>
-    </div>
-  </details>
+  <footer>
+    Understand-Anything 処理フロー解剖資料。前版バックアップ:
+    <code>/Users/tankuanghuan/Downloads/understand-anything-rulebase.before-flow-rewrite.html</code>
+  </footer>
 
-  <details class="appx" id="a5">
-    <summary>A.5 セマンティックバッチング(compute-batches.mjs)</summary>
-    <div class="appx-body">
-      <ul>
-        <li>importMap から <code>graphology</code> の無向グラフ(重みなし・code ファイルのみ)を構築し、<code>graphology-communities-louvain</code> でコミュニティ検出。失敗時はアルファベット順 12 ファイル/バッチに機械分割(<code>algorithm: 'count-fallback'</code>)。</li>
-        <li>定数: <code>MAX_COMMUNITY_SIZE = 35</code>(超過は均等分割)、<code>MIN_BATCH_SIZE = 3</code> 未満はプールして <code>MAX_MERGE_TARGET = 25</code> ずつ misc バッチに再パック(87 個のサイズ 1 コミュニティ→87 回のサブエージェント起動になった実測が動機)。制御は件数のみで、トークン/行数見積もりは不使用。</li>
-        <li>非 code ファイルは Groups A–E(Dockerfile+compose / GitHub Actions / GitLab+CircleCI / migrations SQL / 残りは親ディレクトリごと最大 20)。</li>
-        <li>neighborMap: 各ファイルの 1 ホップ近傍(import 先 + 被 import 元)のうち他バッチ分を export シンボル付きで最大 <code>MAX_NEIGHBORS = 50</code> 件記録(超過は次数降順)。</li>
-        <li><code>--changed-files</code> モードは変更ファイルを含むバッチのみ出力、batchIndex は振り直さない(参照整合性)。</li>
-        <li>テストに「produces deterministic output across runs」ケースあり。</li>
-      </ul>
-    </div>
-  </details>
+<script>
+  const evidence = [...document.querySelectorAll("details.evidence")];
 
-  <details class="appx" id="a6">
-    <summary>A.6 構造抽出(extract-structure.mjs + core extractor/parser 群)</summary>
-    <div class="appx-body">
-      <ul>
-        <li><strong>言語検出</strong>(<code>language-registry.ts</code>): ファイル名完全一致 → 拡張子一致の 2 段のみ。shebang・内容ベース検出は未実装(コメントに将来課題と明記)。builtin 約 40 言語。</li>
-        <li><strong>フレームワーク検出</strong>(<code>framework-registry.ts</code>): マニフェスト内容の小文字化 + <code>detectionKeywords</code> の単純部分一致(<code>includes()</code>)。10 フレームワーク。false positive の余地あり。<code>layerHints</code>/<code>promptSnippetPath</code> は定義のみで未配線。</li>
-        <li><strong>コード言語</strong>(extractor 12 種): 正規表現ではなく tree-sitter AST 走査。WASM 文法ロード失敗言語は空結果でスキップし LLM に委譲。関数(名前・行範囲・パラメータ・戻り型。Python は <code>self</code>/<code>cls</code> 除外)、クラス(Go は struct/interface を写像し receiver からメソッド紐付け)、export 判定は言語慣習のコード化(Go: 先頭大文字、Python: トップレベル定義すべて)、call graph(関数スタック DFS)。</li>
-        <li><strong>非コードパーサ 12 種</strong>: ライブラリ+正規表現。YAML はパース失敗時に行正規表現 <code>/^(\w[\w-]*)\s*:/</code> へフォールバック。Dockerfile は <code>/^FROM\s+(\S+)(?:\s+[Aa][Ss]\s+(\S+))?/i</code> 等。SQL は <code>CREATE TABLE/VIEW/INDEX</code> の正規表現 3 種。</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="appx" id="a7">
-    <summary>A.7 マージ・修復(merge-batch-graphs.py, 約 1,165 行)</summary>
-    <div class="appx-body">
-      <p>LLM 出力(batch-*.json)の系統的エラーを機械修復する「バリデータ/修復器」。</p>
-      <ol>
-        <li><strong>ファイル名検証</strong>: <code>batch-(\d+)(?:-part-(\d+))?\.json</code> 非一致は除外して警告。マルチパート欠番も警告。</li>
-        <li><strong>ノード ID 正規化</strong>(4 段階): 二重プレフィックス除去 → プロジェクト名プレフィックス除去 → <code>func:</code>→<code>function:</code> 正準化 → 裸パスへ type からプレフィックス付与。</li>
-        <li><strong>complexity 正規化</strong>: 文字列エイリアス(<code>low/easy</code>→<code>simple</code> 等)+ 数値スケール(<code>≤3</code>→simple、<code>≤6</code>→moderate、<code>7+</code>→complex)。不明値は <code>moderate</code> + 要レビュー報告。</li>
-        <li><strong>エッジ参照書き換え</strong> → <strong>ノード重複排除</strong>(後勝ち)。</li>
-        <li><strong><code>tested_by</code> リンカ(2 パス)</strong>: LLM は方向を系統的に逆に書くため、エッジを捨てず方向だけ反転する。
-          <ul>
-            <li>テストファイル判定: JS/TS は stem が <code>.test</code>/<code>.spec</code> 終端、Go <code>_test</code>、Python <code>test_*</code>/<code>*_test</code>、Java <code>*Test/*Tests/*IT</code>、Kotlin/C# <code>*Test/*Tests</code>、C/C++ <code>test_*</code>/<code>*_test</code>。<code>__tests__/helpers.ts</code> のように命名が合わなければディレクトリ内でも非テスト扱い。</li>
-            <li>Pass 1: 端点分類し <code>test→prod</code> は反転+監査マーカー、<code>test↔test</code>/<code>prod↔prod</code>/orphan は drop。重複は weight 大が勝つ。</li>
-            <li>Pass 2: パス規約でペア補完(weight 0.5)。同ディレクトリ兄弟(<code>foo.test.ts</code>→<code>foo.ts</code>)→ <code>__tests__</code> からの 1 段ウォークアウト → <code>tests/</code> ルートから <code>src/ app/ lib/</code> へのミラーツリー。Java は <code>src/test/java</code>→<code>src/main/java</code>、.NET は <code>My.App.Tests</code>→<code>My.App</code> 兄弟プロジェクトミラー。</li>
-            <li>カバレッジのある production ノードへ <code>"tested"</code> タグ。冪等性はテストで保証。</li>
-          </ul>
-        </li>
-        <li><strong>エッジ重複排除</strong>: キー <code>(source, target, type, direction)</code>、weight 大勝ち。dangling エッジは drop してレポート。</li>
-        <li><strong>imports エッジ復元</strong>: scan-result.json の importMap を真実源に、LLM の取りこぼし(実測 ~25%)を weight 0.7・<code>recoveredFromImportMap: true</code> で再発行。</li>
-      </ol>
-      <p>テスト: <code>test_merge_batch_graphs.py</code>(1,187 行・約 70 ケース)。</p>
-    </div>
-  </details>
-
-  <details class="appx" id="a8">
-    <summary>A.8 検証と多層修復(Phase 6 / schema.ts / normalize-graph.ts)</summary>
-    <div class="appx-body">
-      <ul>
-        <li>Phase 4/5 の LLM 出力には決定的正規化手順を規定(エンベロープ剥がし、フィールド名変更、<code>file:</code> プレフィックス付与、dangling 除去、order ソート)。</li>
-        <li>Phase 6 デフォルト検証はインライン Node スクリプト(非LLM): 必須フィールド、重複 ID、エッジ参照整合性、レイヤ網羅性、孤児検出、統計。<code>--review</code> 時のみ LLM レビュアー。</li>
-        <li><code>schema.ts</code>(zod)の多層修復: null 除去・小文字化 → エイリアス正規化(ノード型 約 50 種、エッジ型 約 40 種)→ auto-fix(欠損 type→"file"、weight 欠損→0.5、[0,1] clamp)→ 個別検証で不正要素のみ drop → 有効ノード 0 件のみ fatal。</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="appx" id="a9">
-    <summary>A.9 増分更新(fingerprint.ts / change-classifier.ts / hooks)</summary>
-    <div class="appx-body">
-      <ul>
-        <li><strong>fingerprint</strong>: SHA-256 contentHash + tree-sitter 由来のシグネチャ(関数名・パラメータ・戻り型・export・行数、クラス構成、import/export 一覧)。関数本体はハッシュしない。</li>
-        <li><strong>変更分類</strong>: <code>NONE</code>(ハッシュ一致)/ <code>COSMETIC</code>(内容変化だが構造一致)/ <code>STRUCTURAL</code>(構造変化、または行数比 1.5 倍超 or 0.5 倍未満)。tree-sitter 非対応言語は常に STRUCTURAL(保守的)。</li>
-      </ul>
-      <div class="tablewrap"><table>
-        <thead><tr><th>条件</th><th>アクション</th></tr></thead>
-        <tbody>
-          <tr><td>構造変更 0 件</td><td><code>SKIP</code>(LLM トークン消費ゼロ)</td></tr>
-          <tr><td>構造変更 &gt;30 件 または グラフ内ファイルの &gt;50%</td><td><code>FULL_UPDATE</code></td></tr>
-          <tr><td>構造変更 &gt;10 件 または 新トップレベルディレクトリ出現</td><td><code>ARCHITECTURE_UPDATE</code></td></tr>
-          <tr><td>それ以外</td><td><code>PARTIAL_UPDATE</code>(変更ファイルのみ再解析)</td></tr>
-        </tbody>
-      </table></div>
-      <ul>
-        <li><strong>hooks</strong>: PostToolUse で <code>grep -qE 'git\s+(commit|merge|cherry-pick|rebase)'</code> 判定、SessionStart でコミットハッシュ比較。auto-update の Phase 0–1 はゼロトークンで、SKIP/FULL 判定ならそこで停止。</li>
-        <li><strong>反映</strong>(<code>staleness.ts</code> <code>mergeGraphUpdate</code>): 旧ノード削除 → dangling エッジ削除 → 追加 → メタ更新。</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="appx" id="a10">
-    <summary>A.10 その他のルールベース機能</summary>
-    <div class="appx-body">
-      <ul>
-        <li><strong>レイヤ検出</strong>(<code>layer-detector.ts</code>): パスセグメントを <code>LAYER_PATTERNS</code>(先勝ち・複数形許容)と照合 — API(<code>routes controller handler endpoint api</code>)、Service(<code>service usecase business</code>)、Data(<code>model entity schema repository migration</code>)、UI(<code>component view page screen</code>)、Middleware、External、Background(<code>worker job queue cron</code>)、Utility(<code>util helper lib common shared</code>)、Test、Config。不一致は "Core"。</li>
-        <li><strong>diff 影響分析</strong>(<code>src/diff-analyzer.ts</code>): 変更ファイル → ノードマップ → <code>contains</code> で関数/クラス展開 → 1 ホップ近傍を blast radius として収集。リスク判定はハードコード規則(complex ノードあり / 影響レイヤ &gt;1 / 影響ノード &gt;5 / 未マップあり / それ以外 Low risk)。</li>
-        <li><strong>検索</strong>(<code>search.ts</code>): fuse.js ファジー検索(重み name 0.4 / tags 0.3 / summary 0.2 / languageNotes 0.1、threshold 0.4)。semantic 検索(<code>embedding-search.ts</code>)は受け皿のみで embedding 生成コードは不在。ダッシュボードは常に fuzzy にフォールバック。</li>
-        <li><strong>サブドメイングラフ統合</strong>(<code>merge-subdomain-graphs.py</code>): ID 後勝ち、エッジ <code>(source, target, type)</code> キー + weight 大勝ち。layers は和集合、tour はタイトルキー結合。</li>
-        <li><strong>ドメイン文脈抽出</strong>(<code>extract-domain-context.py</code>): エントリポイント検出の正規表現 11 種(Express/Flask/FastAPI/Spring ルート、Next.js HTTP export、CLI、イベント、cron、GraphQL、gRPC)、パスキーワード 25 語のスコアリングで上位 40 ファイルのシグネチャ抽出、出力 512KB 上限。</li>
-        <li><strong>ナレッジベース解析</strong>(<code>parse-knowledge-base.py</code>): wikilink 正規表現 <code>\[\[([^\]|]+)(?:\|([^\]]+))?\]\]</code>、wikilink 密度で complexity 算出(&gt;15=complex、&gt;5=moderate)。</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="appx" id="a11">
-    <summary>A.11 横断的な設計思想</summary>
-    <div class="appx-body">
-      <ol>
-        <li><strong>事実と解釈の分離</strong>: 機械的に取れる事実は 100% 決定的スクリプトが生成し、LLM には再導出を禁止。LLM は要約・タグ・命名・低確度の意味的エッジのみ。</li>
-        <li><strong>LLM 出力の決定的修復層</strong>: 系統的エラーをカタログ化して機械修復。「LLM を賢くする」のではなく「出力を機械で直す」。</li>
-        <li><strong>ゼロトークンのゲート</strong>: 変更検知と更新分類を完全ルールベースにし、LLM を呼ぶかどうか自体を決定的に判断。</li>
-        <li><strong>劣化継続</strong>: throw せず Warning + 空値で継続(per-file resilience)。フォールバックも決定的。</li>
-        <li><strong>決定性の徹底</strong>: 全出力ソート済み・再実行時バイト一致。テスト 2,500 行超が閾値を固定化。</li>
-        <li><strong>ディスパッチ単位の設計</strong>: LLM 呼び出し粒度を import グラフのコミュニティ構造で決め、件数定数(35/25/20/3)で暴走を防止。</li>
-      </ol>
-    </div>
-  </details>
-
-  <details class="appx" id="a12">
-    <summary>A.12 注記・調査の限界</summary>
-    <div class="appx-body">
-      <ul>
-        <li>本資料は <code>/understand</code>(コード調査)パイプラインが主対象。ダッシュボード描画系は対象外。</li>
-        <li>実装上の気づき: <code>staleness.ts</code> の <code>getChangedFiles</code> は git 失敗を握り潰して「stale でない」に倒れる一方、auto-update 側は「失敗時は全て STRUCTURAL」と保守的で、失敗時方針が非対称。framework-registry の <code>layerHints</code>/<code>promptSnippetPath</code> は未配線。</li>
-        <li>動作検証(実際の <code>/understand</code> 実行)は未実施。コード読解とテストコードの整合確認に基づく。</li>
-      </ul>
-    </div>
-  </details>
-</section>
-
-<footer>
-  Understand-Anything「LLM を使わない処理」調査資料 — 対象コミット <code>0e8ad84a</code> / 作成 2026-07-04。
-  Markdown 版: <code>docs/understand-anything-rulebase.md</code>
-</footer>
-
-</div>
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action]");
+    if (!button) return;
+    const action = button.dataset.action;
+    if (action === "expand-evidence") evidence.forEach((item) => { item.open = true; });
+    if (action === "collapse-evidence") evidence.forEach((item) => { item.open = false; });
+  });
+</script>
 </body>
 </html>
