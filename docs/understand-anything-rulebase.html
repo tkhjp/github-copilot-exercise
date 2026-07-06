@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understand-Anything の「LLM を使わない処理」調査資料</title>
+<style>
+  :root {
+    --paper: #F5F7F6;
+    --card: #FFFFFF;
+    --ink: #1D2A2E;
+    --ink-soft: #4A5A5E;
+    --line: #D9E0DE;
+    --rule: #0E7C66;
+    --rule-bg: #E4F1ED;
+    --llm: #B07018;
+    --llm-bg: #F7EEDD;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    --sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15.5px;
+    line-height: 1.9;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 46em;
+    margin: 0 auto;
+    padding: 3.5rem 1.4rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  header.doc-head { display: flex; flex-direction: column; gap: 1.1rem; }
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--rule);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.9rem;
+    line-height: 1.45;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede { margin: 0; color: var(--ink-soft); font-size: 0.94rem; }
+  .meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.15rem 1.2rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 0.8rem 0.2rem;
+    margin: 0;
+  }
+  .meta dt { font-weight: 600; margin: 0; }
+  .meta dd { margin: 0; }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    margin: 0 0 1.1rem;
+    padding-top: 0.4rem;
+    text-wrap: balance;
+  }
+  h2 .secno {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--rule);
+    display: block;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3rem;
+  }
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 2rem 0 0.6rem;
+    line-height: 1.6;
+  }
+  h3 code { font-size: 0.92em; }
+  p { margin: 0 0 1em; }
+  section > p:last-child, section > ul:last-child { margin-bottom: 0; }
+  ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+  li { margin-bottom: 0.4em; }
+  li::marker { color: var(--rule); }
+  code {
+    font-family: var(--mono);
+    font-size: 0.84em;
+    background: #EAEEEC;
+    border-radius: 3px;
+    padding: 0.08em 0.35em;
+    word-break: break-all;
+  }
+  strong { font-weight: 600; }
+  pre {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    line-height: 1.7;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .tablewrap { overflow-x: auto; margin: 1rem 0 1.4rem; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.84rem; line-height: 1.65; }
+  th, td { text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    background: #F0F3F2;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  td.c { text-align: center; white-space: nowrap; }
+  .pr {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.15em 0.6em;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .pr-high { background: var(--rule); color: #fff; }
+  .pr-mid  { background: var(--rule-bg); color: var(--rule); }
+  blockquote {
+    margin: 1.2rem 0;
+    padding: 0.8rem 1.2rem;
+    border-left: 3px solid var(--rule);
+    background: var(--card);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+  }
+  blockquote p { margin: 0 0 0.5em; }
+  blockquote p:last-child { margin: 0; }
+  .keypoints { display: flex; flex-direction: column; gap: 0.9rem; margin: 1.2rem 0; padding: 0; list-style: none; }
+  .keypoints li {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.9rem 1.3rem;
+    margin: 0;
+    font-size: 0.92rem;
+  }
+  .keypoints strong { display: block; margin-bottom: 0.15rem; color: var(--rule); }
+  .steps { counter-reset: st; list-style: none; padding: 0; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .steps li {
+    counter-increment: st;
+    position: relative;
+    padding: 0.35rem 0 0.35rem 2.6rem;
+    margin: 0;
+    font-size: 0.94rem;
+  }
+  .steps li::before {
+    content: counter(st);
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    background: var(--rule-bg);
+    color: var(--rule);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps li.ai::before { background: var(--llm-bg); color: var(--llm); }
+  .steps .tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.05em 0.55em;
+    border-radius: 999px;
+    margin-left: 0.5em;
+    vertical-align: 0.12em;
+    background: var(--rule-bg);
+    color: var(--rule);
+  }
+  .steps li.ai .tag { background: var(--llm-bg); color: var(--llm); }
+  details.appx {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 0.9rem;
+  }
+  details.appx > summary {
+    cursor: pointer;
+    padding: 0.85rem 1.3rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    list-style: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+  details.appx > summary::-webkit-details-marker { display: none; }
+  details.appx > summary::before {
+    content: "+";
+    font-family: var(--mono);
+    color: var(--rule);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  details.appx[open] > summary::before { content: "−"; }
+  details.appx > summary:focus-visible { outline: 2px solid var(--rule); outline-offset: 2px; border-radius: 8px; }
+  details.appx > .appx-body { padding: 0 1.3rem 1.1rem; border-top: 1px solid var(--line); font-size: 0.92rem; }
+  details.appx > .appx-body > :first-child { margin-top: 1rem; }
+  details.appx code { font-size: 0.82em; }
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.2rem;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc-head">
+  <div class="eyebrow">調査資料 — リポジトリ調査 SKILL 検討</div>
+  <h1>Understand-Anything の<br>「LLM を使わない処理」調査資料</h1>
+  <p class="lede">
+    テスト支援エージェントに「リポジトリ調査 SKILL」を組み込むにあたり、
+    Understand-Anything のうち LLM(AI)を使わないルールベース処理から取り込むべきものを整理した。
+  </p>
+  <dl class="meta">
+    <dt>対象</dt><dd><code>github.com/Egonex-AI/Understand-Anything</code>(コミット <code>0e8ad84a</code>、2026-07-03 時点)</dd>
+    <dt>作成日</dt><dd>2026-07-04</dd>
+    <dt>構成</dt><dd>1章: エグゼクティブサマリ / 2章: 仕組みの解説 / Appendix: 技術詳細(エンジニア向け・折りたたみ)</dd>
+  </dl>
+</header>
+
+<section id="summary">
+  <h2><span class="secno">1</span>エグゼクティブサマリ</h2>
+
+  <h3>結論 — 取り込む価値のある「LLM なし処理」</h3>
+  <p>
+    Understand-Anything は「AI がリポジトリを理解するツール」に見えますが、中身を精査すると、
+    <strong>調査の土台になる事実の収集はすべて AI を使わない機械的な処理(ルールベース)で行い、
+    AI は説明文の作成だけを担当</strong>しています。
+    この「機械でできることは機械でやる」部分こそが、今回のテスト支援エージェントに取り込むべき資産です。
+  </p>
+  <p>取り込み候補は以下の 6 つです。上から順に「実装が軽く、テスト支援に直接効く」ものです。</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>処理</th><th>できること</th><th>テスト支援への効果</th><th>優先度</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="c">1</td><td><strong>リポジトリの棚卸し</strong></td>
+        <td>全ファイルを一覧化し、言語・種類(コード/設定/ドキュメント等)・行数を機械的に判定</td>
+        <td>エージェントが調査を始める前に「正確な地図」を持てる。推測で探し回らなくなる</td>
+        <td class="c"><span class="pr pr-high">高</span></td>
+      </tr>
+      <tr>
+        <td class="c">2</td><td><strong>テストと実装の対応付け</strong></td>
+        <td>ファイル名と配置のルール(例: <code>foo.test.ts</code> は <code>foo.ts</code> のテスト)から、どのテストがどの実装を検証しているかを特定</td>
+        <td><strong>最も直接効く</strong>。「この変更に関係するテストはどれか」を AI の推測なしで答えられる</td>
+        <td class="c"><span class="pr pr-high">高</span></td>
+      </tr>
+      <tr>
+        <td class="c">3</td><td><strong>フォルダ名からの役割推定</strong></td>
+        <td>フォルダ名(controllers, models, tests など)から各ファイルの役割(API/画面/データ/テスト等)を推定</td>
+        <td>コードの「どのあたりを見ればよいか」の当たりを付けられる。ルール表を渡すだけでも効果あり</td>
+        <td class="c"><span class="pr pr-high">高</span></td>
+      </tr>
+      <tr>
+        <td class="c">4</td><td><strong>ファイル間の依存関係の解決</strong></td>
+        <td>「どのファイルがどのファイルを読み込んでいるか」を言語ごとのルールで正確に特定</td>
+        <td>変更点の周辺を正確に辿れる。対象言語を自社スタックに絞れば小さく作れる</td>
+        <td class="c"><span class="pr pr-mid">中</span></td>
+      </tr>
+      <tr>
+        <td class="c">5</td><td><strong>変更の影響範囲の算出</strong></td>
+        <td>変更ファイルから依存関係を辿り、影響し得る箇所を提示</td>
+        <td>「どのテストを実行すべきか」の選定に直結</td>
+        <td class="c"><span class="pr pr-mid">中</span></td>
+      </tr>
+      <tr>
+        <td class="c">6</td><td><strong>再調査要否の自動判定</strong></td>
+        <td>ファイルの構造変化だけを見て「調査結果を作り直す必要があるか」を判定</td>
+        <td>毎回ゼロから調査し直さなくなる。AI 利用料ゼロで判定できる</td>
+        <td class="c"><span class="pr pr-mid">中</span></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h3>なぜ「LLM なし」の部分に価値があるのか</h3>
+  <ul class="keypoints">
+    <li><strong>正確</strong>AI にファイル一覧や依存関係を推測させると、間違えたり取りこぼしたりします(Understand-Anything の実測では、AI は依存関係の約 25% を取りこぼす)。機械的な処理なら取りこぼしゼロです。</li>
+    <li><strong>毎回同じ結果</strong>同じリポジトリに対して常に同じ結果が出ます(AI は実行のたびに答えが揺れる)。</li>
+    <li><strong>コストゼロ・高速</strong>AI の API 利用料がかからず、数秒で終わります。</li>
+    <li><strong>検証可能</strong>ルールが明文化されているので、間違っていれば直せます。Understand-Anything はこの部分に 2,500 行超のテストを備えています。</li>
+  </ul>
+
+  <h3>取り込みの進め方(提案)</h3>
+  <ol>
+    <li>まず優先度「高」の 3 つ(棚卸し・テスト対応付け・役割推定)を SKILL に組み込む。いずれも依存が薄く、単体で移植できる規模。</li>
+    <li>効果を確認後、優先度「中」(依存関係 → 影響範囲 → 再調査判定)を対象言語を絞って追加する。</li>
+    <li>ライセンスは MIT のため、コードの流用・改変は可能。ただし丸ごと導入は実行環境の前提(Node 22 以上等)が重いため、必要な処理だけ移植する方が現実的。</li>
+  </ol>
+</section>
+
+<section id="how">
+  <h2><span class="secno">2</span>Understand-Anything では何が行われているのか</h2>
+
+  <h3>2.1 全体の仕組み</h3>
+  <p>
+    Understand-Anything は、リポジトリを解析して「知識グラフ」(ファイル・関数とそれらの関係を表した地図)を作るツールです。
+    処理は 7 段階のパイプラインで進みます。
+  </p>
+  <ol class="steps">
+    <li><strong>準備</strong> — 調査対象から外すファイル(ライブラリ置き場、ビルド成果物など)を決める<span class="tag">機械</span></li>
+    <li><strong>棚卸し</strong> — 全ファイルを列挙し、言語・種類・行数・依存関係を調べる<span class="tag">機械</span></li>
+    <li><strong>仕分け</strong> — 関係の深いファイル同士をグループにまとめ、AI が調査しやすい単位に分割する<span class="tag">機械</span></li>
+    <li class="ai"><strong>調査</strong> — グループごとに AI が「このファイルは何をしているか」の説明文を書く<span class="tag">AI</span></li>
+    <li><strong>検品</strong> — AI の出力を機械的にチェックし、書式の揺れや間違いを自動修正する<span class="tag">機械</span></li>
+    <li class="ai"><strong>整理</strong> — アーキテクチャの層分けや「読む順番のガイド」を AI が作る<span class="tag">AI</span></li>
+    <li><strong>保存</strong> — 結果を保存し、次回以降の差分更新に備えた「指紋」を取っておく<span class="tag">機械</span></li>
+  </ol>
+  <p>
+    このうち <strong>AI が働くのは 4 と 6 だけ</strong>です。それ以外はすべてルールベースの機械処理で、
+    さらに 4 と 6 の前後にも機械処理が挟まっています。
+  </p>
+
+  <h3>2.2 機械(ルールベース)が担っている 4 つの仕事</h3>
+  <p>
+    <strong>(1) 事実の収集</strong> —
+    ファイルの一覧、各ファイルの言語や種類、行数、「どのファイルがどのファイルを使っているか」、関数やクラスの一覧。
+    こうした「調べれば確実に分かる事実」は、すべて機械が収集します。
+    AI には「この事実を自分で調べ直すことを禁止する」という指示まで明文化されています。
+  </p>
+  <p>
+    <strong>(2) AI の下ごしらえ</strong> —
+    数百ファイルを AI に一度に渡すことはできないため、依存関係の近いファイル同士を数学的な手法(コミュニティ検出)でグループ化し、
+    「一緒に読むと理解しやすい単位」に分けてから AI に渡します。グループの大きさにも上限(35 ファイル)を設けて暴走を防いでいます。
+  </p>
+  <p>
+    <strong>(3) AI の出力の検品と修正</strong> —
+    AI の書いた結果には決まったパターンの間違いが混ざります。ID の書式が揺れる、「テスト → 実装」の関係の向きを逆に書く、
+    依存関係を約 25% 取りこぼす、などです。Understand-Anything はこれらを「よくある間違いのカタログ」として蓄積し、機械的に自動修正します。
+    <strong>AI を賢くしようとするのではなく、AI の出力を機械で直す</strong>という発想です。
+  </p>
+  <p>
+    <strong>(4) 再調査の要否判定</strong> —
+    コードが変更されたとき、各ファイルの「構造の指紋」(関数の名前や引数など、地図に影響する情報だけ)を取って前回と比較し、
+    「調査のやり直しが必要か / 一部だけ更新すればよいか / 何もしなくてよいか」を判定します。
+    この判定自体に AI は一切使わないため、変更のたびに AI 利用料が発生しません。
+  </p>
+
+  <h3>2.3 AI が担っている仕事</h3>
+  <p>
+    AI の担当は「人間向けの説明」に限定されています。各ファイルの要約文とタグ付け、アーキテクチャの層への命名、
+    初学者向けの「読む順番ガイド」の作成です。つまり <strong>事実は機械、解釈と言語化は AI</strong> という分担です。
+  </p>
+
+  <h3>2.4 テスト支援エージェントへの示唆</h3>
+  <p>
+    エージェントの回答精度が低く見える原因の多くは、リポジトリの事実(何がどこにあり、何と繋がっているか)を
+    毎回 AI の推測で補っていることにあると考えられます。Understand-Anything の答えは明快で、
+    <strong>推測させる前に、正確な事実を機械が用意して渡す</strong>ことです。
+    特に「テストと実装の対応付け」は、ファイル名のルールだけで機械的に導けるうえテスト支援の核心に直結するため、
+    最初に取り込む価値があります。
+  </p>
+</section>
+
+<section id="appendix">
+  <h2><span class="secno">Appendix</span>技術詳細(エンジニア向け)</h2>
+  <p style="font-size: 0.9rem; color: var(--ink-soft);">
+    以降は実装調査の詳細です。各処理の入力・アルゴリズム・定数をコード根拠(ファイル名・関数名)付きで記載します。
+    各項目をクリックすると展開されます。
+  </p>
+
+  <details class="appx" id="a1">
+    <summary>A.1 パイプラインと LLM/非LLM の境界</summary>
+    <div class="appx-body">
+<pre><code>Phase 0    Pre-flight            … git worktree 判定、増分/全量の決定     【ルールベース】
+Phase 0.5  Ignore 設定           … generate-ignore.mjs                   【ルールベース】
+Phase 1    SCAN (project-scanner agent)
+            ├ Step A: README/manifest から name/description/frameworks    【LLM】
+            ├ Step B: scan-project.mjs (列挙/言語/カテゴリ/行数)          【ルールベース】
+            └ Step C: extract-import-map.mjs (import 解決)               【ルールベース】
+Phase 1.5  BATCH                 … compute-batches.mjs (Louvain 分割)    【ルールベース】
+Phase 2    ANALYZE (file-analyzer agent ×並列)
+            ├ 前処理: extract-structure.mjs (tree-sitter 構造抽出)       【ルールベース】
+            ├ summary/tags/complexity/意味的エッジの生成                 【LLM】
+            └ 後処理: merge-batch-graphs.py (正規化/修復/マージ)         【ルールベース】
+Phase 3    ASSEMBLE REVIEW (assemble-reviewer agent)                     【LLM】
+Phase 4    ARCHITECTURE (レイヤ分け)                                     【LLM】(+決定的正規化)
+Phase 5    TOUR (ガイドツアー生成)                                       【LLM】(+決定的正規化)
+Phase 6    REVIEW               … デフォルトはインライン検証スクリプト   【ルールベース】
+Phase 7    SAVE                 … build-fingerprints.mjs                 【ルールベース】</code></pre>
+      <p>境界はエージェント定義に明文化されている:</p>
+      <blockquote>
+        <p>"Deterministic (file enumeration, language detection, category assignment, line counting, complexity estimation, import resolution) is handled by two bundled scripts. <strong>Do NOT re-implement any of this logic.</strong>" — <code>agents/project-scanner.md</code></p>
+        <p>"The output edge count for this file MUST equal <code>batchImportData[filePath].length</code>. Not 90% of it. Not 'the meaningful ones'. All of them." — <code>agents/file-analyzer.md</code>(imports エッジは LLM に判断させず機械転記を強制)</p>
+      </blockquote>
+    </div>
+  </details>
+
+  <details class="appx" id="a2">
+    <summary>A.2 ignore 設定生成(generate-ignore.mjs / ignore-generator.ts / ignore-filter.ts)</summary>
+    <div class="appx-body">
+      <ul>
+        <li><code>.gitignore</code> 互換の <code>ignore</code> npm ライブラリを使用。パターンは 3 層マージ(後勝ち、<code>!</code> 否定可): ①<code>DEFAULT_IGNORE_PATTERNS</code>(<code>node_modules/ dist/ coverage/</code> 等のハードコード、ロックファイル、バイナリ拡張子、<code>*.min.js *.generated.*</code> 等)→ ②<code>.understand-anything/.understandignore</code> → ③ルートの <code>.understandignore</code>。</li>
+        <li>generator は <code>.gitignore</code> の取り込み提案、実在するテスト系ディレクトリ(<code>EXACT_DIR_NAMES</code>: <code>__tests__ test tests fixtures testdata docs examples scripts migrations</code> 等)、言語別テストパターン(JS/TS: <code>*.test.*</code>、Go: <code>**/*_test.go</code>、Java: <code>**/src/test/**</code>、C#: <code>**/*Tests.cs</code> 等)を全行コメントアウトで提案(自動有効化しない)。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a3">
+    <summary>A.3 プロジェクトスキャン(scan-project.mjs)</summary>
+    <div class="appx-body">
+      <ol>
+        <li><strong>列挙</strong>: <code>git ls-files -z -co --exclude-standard</code>(NUL 区切りで非 ASCII パス対応)。git 不在時は再帰ウォーク(<code>HARD_SKIP_DIRS = {node_modules, .git, .svn, .hg, __pycache__}</code>、シンボリックリンク無視、<code>localeCompare</code> ソートで決定性確保)。</li>
+        <li><strong>言語検出</strong>(<code>detectLanguage</code>): <code>Dockerfile*</code> 特別扱い → dotfile キー(<code>.env.local</code>→<code>.env</code>)→ 約 60 拡張子の <code>LANGUAGE_BY_EXT</code> → 未知拡張子はそのまま小文字で返す(null を返さない契約)→ ファイル名テーブル(Makefile 等)→ <code>unknown</code>。</li>
+        <li><strong>カテゴリ分類</strong>(<code>detectCategory</code>): <code>LICENSE</code>→code 例外 → infra ファイル名 → infra パス(<code>.github/workflows/</code>、<code>/(^|\/)(k8s|kubernetes)\//</code>)→ 拡張子テーブル(docs/config/infra/data/script/markup)→ <code>code</code>。</li>
+        <li><strong>行数</strong>: バッファ内 <code>0x0a</code> バイト直接カウント。読取失敗は Warning + そのファイルのみドロップ。</li>
+        <li><strong>複雑度</strong>: ファイル総数のみで <code>≤30: small / ≤150: moderate / ≤500: large / &gt;500: very-large</code>。</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="appx" id="a4">
+    <summary>A.4 import 解決(extract-import-map.mjs, 1,874 行)</summary>
+    <div class="appx-body">
+      <p>tree-sitter で raw import を抽出し、12 言語の言語別ルールで内部ファイルへ写像。リゾルバの契約: throw しない・ディスクを読まない(全パス Set 照合のみ)・解決不能 = external。起動時に tsconfig(JSONC 対応・モノレポ per-package)、go.mod、composer.json PSR-4、Package.swift、Java/Kotlin/C# サフィックス索引を一括構築。</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>言語</th><th>解決ルール</th></tr></thead>
+        <tbody>
+          <tr><td>TS/JS</td><td><code>TS_EXT_PROBES</code>(<code>.ts .tsx .js .jsx .mjs .cjs /index.*</code> の 10 種)を順に照合。NodeNext の <code>./foo.js</code>→<code>.ts</code> 書き換え。tsconfig <code>paths</code> + <code>baseUrl</code>。CJS <code>require()</code> は正規表現補完</td></tr>
+          <tr><td>Python</td><td>ドット数で相対/絶対判別。絶対は祖先ディレクトリを深い順にルート候補試行。<code>a.b.c</code> → <code>a/b/c.py</code> / <code>a/b/c/__init__.py</code></td></tr>
+          <tr><td>Go</td><td>最近接 <code>go.mod</code> の module プレフィックスを剥がし、ディレクトリ内全 <code>.go</code> へ展開</td></tr>
+          <tr><td>Java/Kotlin/C#</td><td>FQN の <code>.</code>→<code>/</code> をサフィックス索引で照合</td></tr>
+          <tr><td>Ruby</td><td><code>require</code>/<code>require_relative</code> を正規表現判別、<code>lib/</code>→<code>app/</code>→ルートの順に probe</td></tr>
+          <tr><td>PHP</td><td>PSR-4 最長プレフィックス一致</td></tr>
+          <tr><td>Rust</td><td><code>crate::</code>/<code>super::</code>/<code>self::</code> 解釈、<code>x.rs</code>→<code>x/mod.rs</code> probe、<code>mod x;</code> 補完</td></tr>
+          <tr><td>C/C++</td><td>importer-dir → <code>include/</code> → <code>src/</code> → ルートの順に probe</td></tr>
+          <tr><td>Swift</td><td>モジュール名 → SwiftPM ターゲット/規約からモジュール内全 <code>.swift</code> へ展開</td></tr>
+        </tbody>
+      </table></div>
+      <p>フォールバック: tree-sitter 初期化失敗時は全 importMap を <code>[]</code> にして継続。</p>
+    </div>
+  </details>
+
+  <details class="appx" id="a5">
+    <summary>A.5 セマンティックバッチング(compute-batches.mjs)</summary>
+    <div class="appx-body">
+      <ul>
+        <li>importMap から <code>graphology</code> の無向グラフ(重みなし・code ファイルのみ)を構築し、<code>graphology-communities-louvain</code> でコミュニティ検出。失敗時はアルファベット順 12 ファイル/バッチに機械分割(<code>algorithm: 'count-fallback'</code>)。</li>
+        <li>定数: <code>MAX_COMMUNITY_SIZE = 35</code>(超過は均等分割)、<code>MIN_BATCH_SIZE = 3</code> 未満はプールして <code>MAX_MERGE_TARGET = 25</code> ずつ misc バッチに再パック(87 個のサイズ 1 コミュニティ→87 回のサブエージェント起動になった実測が動機)。制御は件数のみで、トークン/行数見積もりは不使用。</li>
+        <li>非 code ファイルは Groups A–E(Dockerfile+compose / GitHub Actions / GitLab+CircleCI / migrations SQL / 残りは親ディレクトリごと最大 20)。</li>
+        <li>neighborMap: 各ファイルの 1 ホップ近傍(import 先 + 被 import 元)のうち他バッチ分を export シンボル付きで最大 <code>MAX_NEIGHBORS = 50</code> 件記録(超過は次数降順)。</li>
+        <li><code>--changed-files</code> モードは変更ファイルを含むバッチのみ出力、batchIndex は振り直さない(参照整合性)。</li>
+        <li>テストに「produces deterministic output across runs」ケースあり。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a6">
+    <summary>A.6 構造抽出(extract-structure.mjs + core extractor/parser 群)</summary>
+    <div class="appx-body">
+      <ul>
+        <li><strong>言語検出</strong>(<code>language-registry.ts</code>): ファイル名完全一致 → 拡張子一致の 2 段のみ。shebang・内容ベース検出は未実装(コメントに将来課題と明記)。builtin 約 40 言語。</li>
+        <li><strong>フレームワーク検出</strong>(<code>framework-registry.ts</code>): マニフェスト内容の小文字化 + <code>detectionKeywords</code> の単純部分一致(<code>includes()</code>)。10 フレームワーク。false positive の余地あり。<code>layerHints</code>/<code>promptSnippetPath</code> は定義のみで未配線。</li>
+        <li><strong>コード言語</strong>(extractor 12 種): 正規表現ではなく tree-sitter AST 走査。WASM 文法ロード失敗言語は空結果でスキップし LLM に委譲。関数(名前・行範囲・パラメータ・戻り型。Python は <code>self</code>/<code>cls</code> 除外)、クラス(Go は struct/interface を写像し receiver からメソッド紐付け)、export 判定は言語慣習のコード化(Go: 先頭大文字、Python: トップレベル定義すべて)、call graph(関数スタック DFS)。</li>
+        <li><strong>非コードパーサ 12 種</strong>: ライブラリ+正規表現。YAML はパース失敗時に行正規表現 <code>/^(\w[\w-]*)\s*:/</code> へフォールバック。Dockerfile は <code>/^FROM\s+(\S+)(?:\s+[Aa][Ss]\s+(\S+))?/i</code> 等。SQL は <code>CREATE TABLE/VIEW/INDEX</code> の正規表現 3 種。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a7">
+    <summary>A.7 マージ・修復(merge-batch-graphs.py, 約 1,165 行)</summary>
+    <div class="appx-body">
+      <p>LLM 出力(batch-*.json)の系統的エラーを機械修復する「バリデータ/修復器」。</p>
+      <ol>
+        <li><strong>ファイル名検証</strong>: <code>batch-(\d+)(?:-part-(\d+))?\.json</code> 非一致は除外して警告。マルチパート欠番も警告。</li>
+        <li><strong>ノード ID 正規化</strong>(4 段階): 二重プレフィックス除去 → プロジェクト名プレフィックス除去 → <code>func:</code>→<code>function:</code> 正準化 → 裸パスへ type からプレフィックス付与。</li>
+        <li><strong>complexity 正規化</strong>: 文字列エイリアス(<code>low/easy</code>→<code>simple</code> 等)+ 数値スケール(<code>≤3</code>→simple、<code>≤6</code>→moderate、<code>7+</code>→complex)。不明値は <code>moderate</code> + 要レビュー報告。</li>
+        <li><strong>エッジ参照書き換え</strong> → <strong>ノード重複排除</strong>(後勝ち)。</li>
+        <li><strong><code>tested_by</code> リンカ(2 パス)</strong>: LLM は方向を系統的に逆に書くため、エッジを捨てず方向だけ反転する。
+          <ul>
+            <li>テストファイル判定: JS/TS は stem が <code>.test</code>/<code>.spec</code> 終端、Go <code>_test</code>、Python <code>test_*</code>/<code>*_test</code>、Java <code>*Test/*Tests/*IT</code>、Kotlin/C# <code>*Test/*Tests</code>、C/C++ <code>test_*</code>/<code>*_test</code>。<code>__tests__/helpers.ts</code> のように命名が合わなければディレクトリ内でも非テスト扱い。</li>
+            <li>Pass 1: 端点分類し <code>test→prod</code> は反転+監査マーカー、<code>test↔test</code>/<code>prod↔prod</code>/orphan は drop。重複は weight 大が勝つ。</li>
+            <li>Pass 2: パス規約でペア補完(weight 0.5)。同ディレクトリ兄弟(<code>foo.test.ts</code>→<code>foo.ts</code>)→ <code>__tests__</code> からの 1 段ウォークアウト → <code>tests/</code> ルートから <code>src/ app/ lib/</code> へのミラーツリー。Java は <code>src/test/java</code>→<code>src/main/java</code>、.NET は <code>My.App.Tests</code>→<code>My.App</code> 兄弟プロジェクトミラー。</li>
+            <li>カバレッジのある production ノードへ <code>"tested"</code> タグ。冪等性はテストで保証。</li>
+          </ul>
+        </li>
+        <li><strong>エッジ重複排除</strong>: キー <code>(source, target, type, direction)</code>、weight 大勝ち。dangling エッジは drop してレポート。</li>
+        <li><strong>imports エッジ復元</strong>: scan-result.json の importMap を真実源に、LLM の取りこぼし(実測 ~25%)を weight 0.7・<code>recoveredFromImportMap: true</code> で再発行。</li>
+      </ol>
+      <p>テスト: <code>test_merge_batch_graphs.py</code>(1,187 行・約 70 ケース)。</p>
+    </div>
+  </details>
+
+  <details class="appx" id="a8">
+    <summary>A.8 検証と多層修復(Phase 6 / schema.ts / normalize-graph.ts)</summary>
+    <div class="appx-body">
+      <ul>
+        <li>Phase 4/5 の LLM 出力には決定的正規化手順を規定(エンベロープ剥がし、フィールド名変更、<code>file:</code> プレフィックス付与、dangling 除去、order ソート)。</li>
+        <li>Phase 6 デフォルト検証はインライン Node スクリプト(非LLM): 必須フィールド、重複 ID、エッジ参照整合性、レイヤ網羅性、孤児検出、統計。<code>--review</code> 時のみ LLM レビュアー。</li>
+        <li><code>schema.ts</code>(zod)の多層修復: null 除去・小文字化 → エイリアス正規化(ノード型 約 50 種、エッジ型 約 40 種)→ auto-fix(欠損 type→"file"、weight 欠損→0.5、[0,1] clamp)→ 個別検証で不正要素のみ drop → 有効ノード 0 件のみ fatal。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a9">
+    <summary>A.9 増分更新(fingerprint.ts / change-classifier.ts / hooks)</summary>
+    <div class="appx-body">
+      <ul>
+        <li><strong>fingerprint</strong>: SHA-256 contentHash + tree-sitter 由来のシグネチャ(関数名・パラメータ・戻り型・export・行数、クラス構成、import/export 一覧)。関数本体はハッシュしない。</li>
+        <li><strong>変更分類</strong>: <code>NONE</code>(ハッシュ一致)/ <code>COSMETIC</code>(内容変化だが構造一致)/ <code>STRUCTURAL</code>(構造変化、または行数比 1.5 倍超 or 0.5 倍未満)。tree-sitter 非対応言語は常に STRUCTURAL(保守的)。</li>
+      </ul>
+      <div class="tablewrap"><table>
+        <thead><tr><th>条件</th><th>アクション</th></tr></thead>
+        <tbody>
+          <tr><td>構造変更 0 件</td><td><code>SKIP</code>(LLM トークン消費ゼロ)</td></tr>
+          <tr><td>構造変更 &gt;30 件 または グラフ内ファイルの &gt;50%</td><td><code>FULL_UPDATE</code></td></tr>
+          <tr><td>構造変更 &gt;10 件 または 新トップレベルディレクトリ出現</td><td><code>ARCHITECTURE_UPDATE</code></td></tr>
+          <tr><td>それ以外</td><td><code>PARTIAL_UPDATE</code>(変更ファイルのみ再解析)</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><strong>hooks</strong>: PostToolUse で <code>grep -qE 'git\s+(commit|merge|cherry-pick|rebase)'</code> 判定、SessionStart でコミットハッシュ比較。auto-update の Phase 0–1 はゼロトークンで、SKIP/FULL 判定ならそこで停止。</li>
+        <li><strong>反映</strong>(<code>staleness.ts</code> <code>mergeGraphUpdate</code>): 旧ノード削除 → dangling エッジ削除 → 追加 → メタ更新。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a10">
+    <summary>A.10 その他のルールベース機能</summary>
+    <div class="appx-body">
+      <ul>
+        <li><strong>レイヤ検出</strong>(<code>layer-detector.ts</code>): パスセグメントを <code>LAYER_PATTERNS</code>(先勝ち・複数形許容)と照合 — API(<code>routes controller handler endpoint api</code>)、Service(<code>service usecase business</code>)、Data(<code>model entity schema repository migration</code>)、UI(<code>component view page screen</code>)、Middleware、External、Background(<code>worker job queue cron</code>)、Utility(<code>util helper lib common shared</code>)、Test、Config。不一致は "Core"。</li>
+        <li><strong>diff 影響分析</strong>(<code>src/diff-analyzer.ts</code>): 変更ファイル → ノードマップ → <code>contains</code> で関数/クラス展開 → 1 ホップ近傍を blast radius として収集。リスク判定はハードコード規則(complex ノードあり / 影響レイヤ &gt;1 / 影響ノード &gt;5 / 未マップあり / それ以外 Low risk)。</li>
+        <li><strong>検索</strong>(<code>search.ts</code>): fuse.js ファジー検索(重み name 0.4 / tags 0.3 / summary 0.2 / languageNotes 0.1、threshold 0.4)。semantic 検索(<code>embedding-search.ts</code>)は受け皿のみで embedding 生成コードは不在。ダッシュボードは常に fuzzy にフォールバック。</li>
+        <li><strong>サブドメイングラフ統合</strong>(<code>merge-subdomain-graphs.py</code>): ID 後勝ち、エッジ <code>(source, target, type)</code> キー + weight 大勝ち。layers は和集合、tour はタイトルキー結合。</li>
+        <li><strong>ドメイン文脈抽出</strong>(<code>extract-domain-context.py</code>): エントリポイント検出の正規表現 11 種(Express/Flask/FastAPI/Spring ルート、Next.js HTTP export、CLI、イベント、cron、GraphQL、gRPC)、パスキーワード 25 語のスコアリングで上位 40 ファイルのシグネチャ抽出、出力 512KB 上限。</li>
+        <li><strong>ナレッジベース解析</strong>(<code>parse-knowledge-base.py</code>): wikilink 正規表現 <code>\[\[([^\]|]+)(?:\|([^\]]+))?\]\]</code>、wikilink 密度で complexity 算出(&gt;15=complex、&gt;5=moderate)。</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="appx" id="a11">
+    <summary>A.11 横断的な設計思想</summary>
+    <div class="appx-body">
+      <ol>
+        <li><strong>事実と解釈の分離</strong>: 機械的に取れる事実は 100% 決定的スクリプトが生成し、LLM には再導出を禁止。LLM は要約・タグ・命名・低確度の意味的エッジのみ。</li>
+        <li><strong>LLM 出力の決定的修復層</strong>: 系統的エラーをカタログ化して機械修復。「LLM を賢くする」のではなく「出力を機械で直す」。</li>
+        <li><strong>ゼロトークンのゲート</strong>: 変更検知と更新分類を完全ルールベースにし、LLM を呼ぶかどうか自体を決定的に判断。</li>
+        <li><strong>劣化継続</strong>: throw せず Warning + 空値で継続(per-file resilience)。フォールバックも決定的。</li>
+        <li><strong>決定性の徹底</strong>: 全出力ソート済み・再実行時バイト一致。テスト 2,500 行超が閾値を固定化。</li>
+        <li><strong>ディスパッチ単位の設計</strong>: LLM 呼び出し粒度を import グラフのコミュニティ構造で決め、件数定数(35/25/20/3)で暴走を防止。</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="appx" id="a12">
+    <summary>A.12 注記・調査の限界</summary>
+    <div class="appx-body">
+      <ul>
+        <li>本資料は <code>/understand</code>(コード調査)パイプラインが主対象。ダッシュボード描画系は対象外。</li>
+        <li>実装上の気づき: <code>staleness.ts</code> の <code>getChangedFiles</code> は git 失敗を握り潰して「stale でない」に倒れる一方、auto-update 側は「失敗時は全て STRUCTURAL」と保守的で、失敗時方針が非対称。framework-registry の <code>layerHints</code>/<code>promptSnippetPath</code> は未配線。</li>
+        <li>動作検証(実際の <code>/understand</code> 実行)は未実施。コード読解とテストコードの整合確認に基づく。</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<footer>
+  Understand-Anything「LLM を使わない処理」調査資料 — 対象コミット <code>0e8ad84a</code> / 作成 2026-07-04。
+  Markdown 版: <code>docs/understand-anything-rulebase.md</code>
+</footer>
+
+</div>
+</body>
+</html>
