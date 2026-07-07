@@ -537,6 +537,207 @@
     margin: 0;
     color: var(--muted);
   }
+  .tool-demo {
+    margin-top: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .tool-demo header {
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, var(--ops-soft), #FFFFFF 78%);
+  }
+  .tool-demo header h3 { margin: 0; font-size: 1.08rem; }
+  .tool-demo header p {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .demo-shell {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.45fr) minmax(240px, 0.83fr);
+    min-height: 31rem;
+  }
+  .demo-tools {
+    border-right: 1px solid var(--line);
+    background: #F8FAF9;
+    max-height: 36rem;
+    overflow: auto;
+    padding: 0.75rem;
+  }
+  .demo-tool-button {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink);
+    border-radius: 7px;
+    padding: 0.58rem 0.62rem;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    display: grid;
+    gap: 0.16rem;
+    margin-bottom: 0.22rem;
+  }
+  .demo-tool-button:hover,
+  .demo-tool-button[aria-selected="true"] {
+    background: var(--surface);
+    border-color: var(--line-strong);
+  }
+  .demo-tool-button[aria-selected="true"] {
+    box-shadow: inset 4px 0 0 var(--ops);
+  }
+  .demo-tool-button strong {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: var(--rule-ink);
+  }
+  .demo-tool-button span {
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+  .demo-main {
+    padding: 1rem;
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+  }
+  .demo-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+  }
+  .demo-title h4 {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+  .demo-summary {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .demo-command {
+    border: 1px solid var(--line);
+    background: #172126;
+    color: #EEF4F2;
+    border-radius: 8px;
+    padding: 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+  .demo-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .demo-panel {
+    border: 1px solid var(--line);
+    background: #FBFCFB;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .demo-panel h5 {
+    margin: 0;
+    padding: 0.56rem 0.72rem;
+    border-bottom: 1px solid var(--line);
+    background: #F0F4F2;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .demo-panel pre {
+    margin: 0;
+    padding: 0.72rem;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .demo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .demo-run {
+    border: 1px solid var(--ops);
+    background: var(--ops);
+    color: #FFFFFF;
+    border-radius: 6px;
+    min-height: 2.45rem;
+    padding: 0 0.85rem;
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+  }
+  .demo-run:hover { background: #1F4F7E; }
+  .demo-copy {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 6px;
+    min-height: 2.45rem;
+    padding: 0 0.85rem;
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+  }
+  .demo-side {
+    border-left: 1px solid var(--line);
+    background: #FBFCFB;
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+    align-content: start;
+  }
+  .demo-side-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 0.85rem;
+  }
+  .demo-side-card h5 {
+    margin: 0 0 0.35rem;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .demo-side-card p,
+  .demo-side-card li {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+  .demo-side-card p { margin: 0; }
+  .demo-side-card ul { margin: 0; padding-left: 1.15rem; }
+  .demo-log {
+    min-height: 8rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #172126;
+    color: #DDE7E3;
+    padding: 0.78rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
   .mode-compare {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -769,7 +970,13 @@
       pointer-events: auto;
     }
     .toc small { display: none; }
-    .concept-grid, .cards-2, .spec-grid, .io-grid, .tool-grid, .mode-compare { grid-template-columns: 1fr; }
+    .concept-grid, .cards-2, .spec-grid, .io-grid, .tool-grid, .mode-compare, .demo-shell, .demo-panels { grid-template-columns: 1fr; }
+    .demo-tools {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+      max-height: 18rem;
+    }
+    .demo-side { border-left: 0; border-top: 1px solid var(--line); }
     .flow-system { grid-template-columns: 1fr; }
     .flow-rail {
       position: static;
@@ -802,6 +1009,7 @@
         <a href="#no-llm">LLMなし</a>
         <a href="#safety">Security</a>
         <a href="#flow">固定Flow</a>
+        <a href="#tool-demo">Component Demo</a>
         <a href="#tech-stack">技術スタック</a>
         <a href="#responsibility">責任境界</a>
         <a href="#artifacts">生成物</a>
@@ -816,7 +1024,7 @@
         <h1>Tech leader が先に見るべき論点</h1>
         <p class="lede">
           この資料は、Understand-Anything の採用提案ではありません。
-          Tech leader がまず確認したい <strong>LLM なしでの到達範囲、security、処理 flow、各 step の input/output、技術スタック</strong>を先頭に置いた分解資料です。
+          Tech leader がまず確認したい <strong>LLM なしでの到達範囲、security、処理 flow、各 step の input/output、component 実装、技術スタック</strong>を先頭に置いた分解資料です。
         </p>
         <div class="meta-row" aria-label="資料メタ情報">
           <span class="meta-chip">対象: Egonex-AI/Understand-Anything</span>
@@ -859,7 +1067,8 @@
         <a href="#overview">1. Tech leader 向け要点</a>
         <a href="#no-llm">2. LLMなしの範囲</a>
         <a href="#safety">3. 安全・制約</a>
-        <a href="#flow">4. Flow + Step + Function</a>
+        <a href="#flow">4. Flow + Step + Component</a>
+        <a href="#tool-demo">4.1 Component mock</a>
         <a href="#tech-stack">5. 技術スタック</a>
         <a href="#responsibility">6. 責任境界</a>
         <a href="#artifacts">7. 生成物</a>
@@ -1058,12 +1267,12 @@
               <tr>
                 <td>読み取り範囲</td>
                 <td><code>projectRoot</code> 配下を読む。<code>.understandignore</code> と既定除外を適用。</td>
-                <td>root を許可 workspace に閉じる。任意絶対パスや <code>..</code> を tool API で通さない。</td>
+                <td>root を許可 workspace に閉じる。任意絶対パスや <code>..</code> を処理 API で通さない。</td>
               </tr>
               <tr>
                 <td>コード実行</td>
                 <td>解析処理は source を読むだけ。test/build/package script は実行しない。</td>
-                <td>解析 tool と実行 tool を分ける。解析側で project scripts を起動しない。</td>
+                <td>解析処理と実行処理を分ける。解析側で project scripts を起動しない。</td>
               </tr>
               <tr>
                 <td>外部コマンド</td>
@@ -1094,11 +1303,10 @@
       </section>
 
       <section id="flow" class="band">
-        <h2>4. 固定フローと Step / Function 解剖</h2>
+        <h2>4. 固定フローと Step / Component 解剖</h2>
         <p class="section-lede">
           Repository path の入力から graph 保存までの処理 chain です。
-          表示上の <code>Phase 2/7</code> は「7 つの主 phase のうち第 2 phase」という進捗表記です。
-          下では各 phase を分けて、input / process / output / guardrail、関連 function/tool、「LLMあり」「LLMなし」の到達点を比較します。
+          下では各 phase を分けて、input / process / output / guardrail、関連 component、「LLMあり」「LLMなし」の到達点を比較します。
         </p>
         <div class="flow-system">
           <aside class="flow-rail" aria-label="Understand-Anything fixed processing flow">
@@ -1180,7 +1388,7 @@
                 <div><h4>Guardrail</h4><p>誤った root を渡すと別 repo を読む。path 境界と許可 workspace が重要。</p></div>
               </div>
               <div class="phase-tools">
-                <h4>対応 function / tool</h4>
+                <h4>対応 component / 実装</h4>
                 <div class="tool-grid">
                   <article class="tool-card">
                     <strong>classifyRepositoryUpdate(changeAnalysis)</strong>
@@ -1232,7 +1440,7 @@
                 <div><h4>Guardrail</h4><p>file facts は script。project description/framework 推定は LLM 補助として扱う。</p></div>
               </div>
               <div class="phase-tools">
-                <h4>対応 function / tool</h4>
+                <h4>対応 component / 実装</h4>
                 <div class="tool-grid">
                   <article class="tool-card">
                     <strong>scanProject(projectRoot)</strong>
@@ -1274,7 +1482,7 @@
                 <div><h4>Guardrail</h4><p>batch は実行効率と context サイズの制御。意味理解そのものではない。</p></div>
               </div>
               <div class="phase-tools">
-                <h4>対応 function / tool</h4>
+                <h4>対応 component / 実装</h4>
                 <div class="tool-grid">
                   <article class="tool-card">
                     <strong>computeBatches(projectRoot)</strong>
@@ -1307,7 +1515,7 @@
                 <div><h4>Guardrail</h4><p>source snippet が LLM context に入る可能性がある。merge は形式を直すが、意味の正しさまでは保証しない。</p></div>
               </div>
               <div class="phase-tools">
-                <h4>対応 function / tool</h4>
+                <h4>対応 component / 実装</h4>
                 <div class="tool-grid">
                   <article class="tool-card">
                     <strong>extractFileStructure(batchFiles)</strong>
@@ -1377,7 +1585,7 @@
                 <div><h4>Guardrail</h4><p>layer は解釈。厳密な依存順や業務上の真実ではない。</p></div>
               </div>
               <div class="phase-tools">
-                <h4>対応 function / tool</h4>
+                <h4>対応 component / 実装</h4>
                 <div class="tool-grid">
                   <article class="tool-card">
                     <strong>extractDomainContext(projectRoot)</strong>
@@ -1454,6 +1662,328 @@
             </article>
           </div>
         </div>
+
+        <h3>処理コンポーネントごとの機能と実装方法</h3>
+        <p class="section-lede">
+          Understand-Anything には、MCP tool や function calling のような一等公民としての <code>Tool</code> 定義はありません。
+          ここでは説明上の処理単位として、<strong>Skill / Agent / Script / Core API / Dashboard</strong> をまとめて「処理コンポーネント」と呼びます。
+          Rule-based は機械的に source/metadata を読む処理、LLM は意味づけや説明生成、Mixed は script で事実を作って LLM が解釈する処理です。
+        </p>
+
+        <h3>Graph を生成する pipeline components</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Component / agent</th>
+                <th>種別</th>
+                <th>主な機能</th>
+                <th>実装方法</th>
+                <th>Input → Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/understand</code><br><code>skills/understand/SKILL.md</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>全 phase の orchestration。root 解決、worktree redirect、incremental/full 判定、agent dispatch、保存処理をつなぐ。</td>
+                <td>Skill prompt が shell/script/agent を順に呼ぶ。処理順は固定で、途中生成物は <code>.understand-anything/intermediate/</code> に置く。</td>
+                <td><code>projectRoot</code>、flags → <code>knowledge-graph.json</code>、<code>meta.json</code>、<code>fingerprints.json</code></td>
+              </tr>
+              <tr>
+                <td><code>generate-ignore.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>starter <code>.understandignore</code> を作り、解析前の除外境界を用意する。</td>
+                <td>core の ignore generator を呼び出す Node.js script。既に file がある場合は上書きしない。</td>
+                <td><code>projectRoot</code> → <code>.understand-anything/.understandignore</code></td>
+              </tr>
+              <tr>
+                <td><code>project-scanner</code><br><code>agents/project-scanner.md</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>project 名、説明、主要 framework、file inventory、importMap をまとめる。</td>
+                <td>README/manifest の自然言語 metadata は LLM。file list と importMap は下位 script の deterministic 出力を採用。</td>
+                <td>README、manifest、repo files → <code>scan-result.json</code></td>
+              </tr>
+              <tr>
+                <td><code>scan-project.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>解析対象 file、言語、file category、行数、規模、ignore 適用結果を作る。</td>
+                <td><code>git ls-files</code> を優先し、失敗時は recursive walk。extension/filename table と ignore filter で分類する。</td>
+                <td><code>projectRoot</code> → <code>files[]</code>、<code>stats</code>、<code>filteredByIgnore</code></td>
+              </tr>
+              <tr>
+                <td><code>extract-import-map.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>source file 間の project 内部 import edge を作る。</td>
+                <td>core <code>PluginRegistry</code>、<code>TreeSitterPlugin</code>、言語別 resolver で import を AST から抽出し、相対/alias path を解決する。</td>
+                <td><code>projectRoot</code>、<code>files[]</code> → <code>importMap</code>、<code>totalEdges</code></td>
+              </tr>
+              <tr>
+                <td><code>compute-batches.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>LLM/context に渡す解析単位と cross-batch 参照情報を作る。</td>
+                <td><code>graphology</code> + Louvain community detection。non-code は Docker/CI/SQL/path group で分割し、tree-sitter で exported symbols を拾う。</td>
+                <td><code>scan-result.json</code>、<code>importMap</code> → <code>batches.json</code>、<code>neighborMap</code></td>
+              </tr>
+              <tr>
+                <td><code>file-analyzer</code><br><code>agents/file-analyzer.md</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>batch 内 file を node/edge に変換し、summary、tags、semantic relation を付ける。</td>
+                <td>最初に <code>extract-structure.mjs</code> を実行し、抽出結果を LLM が解釈して <code>batch-*.json</code> を書く。</td>
+                <td><code>batchFiles</code>、<code>neighborMap</code>、structure → <code>batch-*.json</code></td>
+              </tr>
+              <tr>
+                <td><code>extract-structure.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>functions/classes/exports/callGraph と、config/docs/infra/data の構造を抽出する。</td>
+                <td>core <code>PluginRegistry</code> に tree-sitter plugin と非コード parser を登録して構造抽出する。</td>
+                <td><code>projectRoot</code>、<code>batchFiles[]</code> → <code>results[]</code></td>
+              </tr>
+              <tr>
+                <td><code>merge-batch-graphs.py</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>batch graph を結合し、ID/edge/type/complexity/test relation を修復する。</td>
+                <td>Python JSON merge。node ID canonicalize、duplicate edge merge、dangling edge drop、importMap 補完、test 命名規約 link を実施する。</td>
+                <td><code>batch-*.json</code>、scan result → <code>assembled-graph.json</code>、merge report</td>
+              </tr>
+              <tr>
+                <td><code>assemble-reviewer</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>merge 後の graph に、script だけでは拾いにくい欠落や semantic mismatch がないか確認する。</td>
+                <td>merge report、assembled graph、batch 出力、importMap を LLM が review する。形式修復そのものは前後の script が担当。</td>
+                <td><code>assembled-graph.json</code>、merge warnings → <code>assemble-review.json</code></td>
+              </tr>
+              <tr>
+                <td><code>architecture-analyzer</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>file-level graph から architecture layers を作る。</td>
+                <td>agent が一時 script で directory/import/topology signals を作り、LLM が layer 名・責務・所属 node を解釈する。</td>
+                <td>nodes/edges、directory signals → <code>layers[]</code></td>
+              </tr>
+              <tr>
+                <td><code>tour-builder</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>初回読者向けの learning tour を作る。</td>
+                <td>一時 script で fan-in/out、entry point、BFS chain、clusters を抽出し、LLM が 5-15 step の読む順にする。</td>
+                <td>README、layers、graph topology → <code>tour[]</code></td>
+              </tr>
+              <tr>
+                <td><code>graph-reviewer</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td><code>--review</code> 時の追加 quality gate。</td>
+                <td>generated validation script で schema/refs/coverage を確認し、その結果を LLM が approve/reject としてまとめる。</td>
+                <td>final graph、warnings → <code>review.json</code></td>
+              </tr>
+              <tr>
+                <td><code>build-fingerprints.mjs</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>次回 incremental update 用の structural fingerprint baseline を作る。</td>
+                <td>tree-sitter + core fingerprint API で source file の構造 fingerprint を作り保存する。</td>
+                <td><code>sourceFilePaths[]</code>、git hash → <code>fingerprints.json</code></td>
+              </tr>
+              <tr>
+                <td><code>merge-subdomain-graphs.py</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>分割生成された subdomain graph を 1 つの <code>knowledge-graph.json</code> に統合する。</td>
+                <td>node/edge/layer/tour を dedupe し、dangling refs を落とす Python merge script。</td>
+                <td><code>*knowledge-graph*.json</code> → merged <code>knowledge-graph.json</code></td>
+              </tr>
+              <tr>
+                <td><code>extract-domain-context.py</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>business/domain 分析用の軽量 context を作る。</td>
+                <td>Python scanner。file tree、HTTP route、CLI、event、cron、GraphQL/gRPC/exported handler、metadata、短い snippet を抽出する。</td>
+                <td>repo files → <code>domain-context.json</code></td>
+              </tr>
+              <tr>
+                <td><code>domain-analyzer</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>business domain、flow、step を graph 化する。</td>
+                <td>既存 <code>knowledge-graph.json</code> があれば graph から推論。なければ <code>domain-context.json</code> を LLM に渡して分析する。</td>
+                <td>knowledge graph または domain context → <code>domain-graph.json</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>下位 core API</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Core API</th>
+                <th>種別</th>
+                <th>使われ方</th>
+                <th>実装方法</th>
+                <th>Input → Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>createIgnoreFilter</code><br><code>generateStarterIgnoreFile</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>scan 前に解析対象 file を絞り、starter ignore file を生成する。</td>
+                <td><code>.gitignore</code>、<code>.understandignore</code>、default deny patterns を path matcher に変換する。</td>
+                <td><code>projectRoot</code>、ignore patterns → filter predicate、ignore file</td>
+              </tr>
+              <tr>
+                <td><code>PluginRegistry</code><br><code>TreeSitterPlugin</code><br><code>registerAllParsers</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>import 解決、構造抽出、fingerprint 作成の共通 parser layer。</td>
+                <td>language config と extractor を registry に登録し、code は tree-sitter、non-code は専用 parser で処理する。</td>
+                <td>file path、language、source text → functions/classes/imports/exports/callGraph/non-code structures</td>
+              </tr>
+              <tr>
+                <td><code>GraphBuilder</code><br><code>normalizeBatchOutput</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>raw analysis から graph fragments を作り、node ID と complexity を canonical に寄せる。</td>
+                <td>file/function/class node と contains/calls/imports edge を組み立て、alias や prefix を正規化する。</td>
+                <td>file analysis、raw batch output → normalized nodes/edges</td>
+              </tr>
+              <tr>
+                <td><code>KnowledgeGraphSchema</code><br><code>sanitizeGraph</code><br><code>autoFixGraph</code><br><code>validateGraph</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>保存前や dashboard 読み込み時に graph の型と参照整合性を確認する。</td>
+                <td>Zod schema と alias maps で node/edge/type/direction/complexity を検証し、直せる値は自動補正する。</td>
+                <td>raw graph → validation result、fixed graph、issues</td>
+              </tr>
+              <tr>
+                <td><code>extractFileFingerprint</code><br><code>buildFingerprintStore</code><br><code>analyzeChanges</code><br><code>classifyUpdate</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>次回実行時に full rebuild が必要か、partial update で足りるかを判定する。</td>
+                <td>source content hash と構造 signature を比較し、NONE/COSMETIC/STRUCTURAL を集計して update decision に変換する。</td>
+                <td>old/new fingerprints、file set → change analysis、update decision</td>
+              </tr>
+              <tr>
+                <td><code>SearchEngine</code><br><code>SemanticSearchEngine</code></td>
+                <td><span class="badge b-rule">Rule</span></td>
+                <td>dashboard/search 系で graph node を探すための検索 layer。</td>
+                <td>Fuse.js 的な fuzzy search と embedding 類似度計算を使い、node name/summary/tags/type で ranking する。</td>
+                <td>query、graph nodes、optional embedding → ranked nodes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Graph を利用する補助 components</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Component / skill</th>
+                <th>種別</th>
+                <th>主な機能</th>
+                <th>実装方法</th>
+                <th>Input → Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/understand-dashboard</code><br><code>packages/dashboard</code></td>
+                <td><span class="badge b-rule">Rule + UI</span></td>
+                <td>knowledge graph、domain graph、diff overlay を可視化する。</td>
+                <td>React/Vite dashboard。<code>GRAPH_DIR</code> から graph を読み、Vite middleware が <code>127.0.0.1</code> binding、one-time token、path sanitization、source preview 制限を行う。</td>
+                <td><code>.understand-anything/*.json</code> → browser dashboard</td>
+              </tr>
+              <tr>
+                <td><code>/understand-chat</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>codebase への自然言語質問に答える。</td>
+                <td>UI ではなく agent skill。<code>knowledge-graph.json</code> を grep で部分検索し、関連 node/edge/layer だけを読んで回答する。</td>
+                <td>query、knowledge graph → 回答</td>
+              </tr>
+              <tr>
+                <td><code>/understand-explain</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>特定 file/function/module を deep-dive 説明する。</td>
+                <td>graph で対象 node と近傍 edge/layer を探し、最後に実 source file も読んで context 付きで説明する。</td>
+                <td>file path/function 名 → component explanation</td>
+              </tr>
+              <tr>
+                <td><code>/understand-diff</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>git diff/PR の変更 component、影響範囲、risk を出す。</td>
+                <td><code>git diff --name-only</code> で変更 file を取り、graph の file node と 1-hop edges/layers を検索する。結果は dashboard 用 overlay に保存。</td>
+                <td>git diff、knowledge graph → analysis、<code>diff-overlay.json</code></td>
+              </tr>
+              <tr>
+                <td><code>/understand-onboard</code></td>
+                <td><span class="badge b-llm">LLM</span></td>
+                <td>新規 joiner 向け onboarding guide を作る。</td>
+                <td>project metadata、layers、tour、file-level nodes、complexity hotspots を graph から抽出し、Markdown guide にする。</td>
+                <td>knowledge graph → onboarding markdown</td>
+              </tr>
+              <tr>
+                <td><code>/understand-domain</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>business domain flow view を生成して dashboard で開く。</td>
+                <td>既存 graph があればそこから domain-analyzer に渡す。<code>--full</code> または graph 不在時は <code>extract-domain-context.py</code> で軽量 scan する。</td>
+                <td>knowledge graph または repo scan → <code>domain-graph.json</code>、dashboard</td>
+              </tr>
+              <tr>
+                <td><code>/understand-knowledge</code></td>
+                <td><span class="badge b-mix">Mixed</span></td>
+                <td>Karpathy-pattern LLM wiki を knowledge graph 化する。</td>
+                <td><code>parse-knowledge-base.py</code> が index/wikilinks/frontmatter/headings/categories を deterministic scan。<code>article-analyzer</code> が implicit entity/claim を補い、<code>merge-knowledge-graph.py</code> が統合する。</td>
+                <td>wiki directory → <code>knowledge-graph.json</code>、dashboard</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="tool-demo" class="tool-demo" aria-label="Processing component call mock demo">
+          <header>
+            <h3>処理コンポーネント呼び出し mock</h3>
+            <p>
+              この repo には、UI から直接呼べる MCP tool / function calling 的な <code>tool</code> 定義はありません。
+              この demo は、説明用に Skill、Agent、Script、Core API、Dashboard を同じ形式で並べ、何を受け取り、どんな構造の output を返すかを確認する mock です。
+              本物の shell command、LLM agent、file read は実行しません。
+            </p>
+          </header>
+          <div class="demo-shell">
+            <div class="demo-tools" role="listbox" aria-label="Tool list"></div>
+            <div class="demo-main">
+              <div class="demo-title">
+                <h4 data-demo-name></h4>
+                <span data-demo-badge></span>
+              </div>
+              <p class="demo-summary" data-demo-summary></p>
+              <div class="demo-command" data-demo-command></div>
+              <div class="demo-panels">
+                <section class="demo-panel" aria-label="Mock input">
+                  <h5>Input</h5>
+                  <pre data-demo-input></pre>
+                </section>
+                <section class="demo-panel" aria-label="Mock output">
+                  <h5>Output</h5>
+                  <pre data-demo-output></pre>
+                </section>
+              </div>
+              <div class="demo-actions">
+                <button class="demo-run" type="button" data-demo-run>Run mock</button>
+                <button class="demo-copy" type="button" data-demo-copy>Copy command</button>
+              </div>
+            </div>
+            <aside class="demo-side" aria-label="Tool constraints and log">
+              <div class="demo-side-card">
+                <h5>分類</h5>
+                <p data-demo-kind></p>
+              </div>
+              <div class="demo-side-card">
+                <h5>Phase</h5>
+                <p data-demo-phase></p>
+              </div>
+              <div class="demo-side-card">
+                <h5>実装境界</h5>
+                <p data-demo-guardrail></p>
+              </div>
+              <div class="demo-side-card">
+                <h5>Demo log</h5>
+                <div class="demo-log" data-demo-log>component を選んで Run mock を押すと、呼び出し log がここに出ます。</div>
+              </div>
+            </aside>
+          </div>
+        </div>
       </section>
 
       <section id="tech-stack" class="band">
@@ -1518,7 +2048,7 @@
       <section id="responsibility" class="band">
         <h2>6. 責任境界</h2>
         <p class="section-lede">
-          この tool を説明するときは、「誰が何を保証しているか」を分けて話す必要があります。
+          この仕組みを説明するときは、「誰が何を保証しているか」を分けて話す必要があります。
         </p>
         <div class="cards-2">
           <article class="info-card">
@@ -1707,14 +2237,823 @@
 
 <script>
   const evidence = [...document.querySelectorAll("details.evidence")];
+  const toolDemos = [
+    {
+      id: "understand",
+      name: "/understand",
+      componentKind: "Skill / slash command",
+      type: "Mixed",
+      phase: "Phase 0-7 / orchestration",
+      summary: "repository path を受け取り、scan、batch、analysis、review、save までを固定 flow で実行する入口。",
+      command: "/understand /repo/path --ja",
+      input: { projectRoot: "/repo/path", flags: ["--ja"], mode: "full or incremental" },
+      output: {
+        artifacts: [
+          {
+            path: ".understand-anything/knowledge-graph.json",
+            schema: "KnowledgeGraph",
+            fields: {
+              version: "graph format version",
+              project: "name, description, languages, frameworks, analyzedAt, gitCommitHash",
+              nodes: "GraphNode[]: file/function/class/config/document/service/table/endpoint/pipeline/schema/resource/domain/flow/step",
+              edges: "GraphEdge[]: imports/contains/calls/depends_on/tested_by/configures/documents/etc.",
+              layers: "Layer[]: architecture groupings for file-level nodes",
+              tour: "TourStep[]: recommended reading path"
+            },
+            consumedBy: ["/understand-dashboard", "/understand-chat", "/understand-diff", "/understand-onboard"],
+            meaning: "UI と後続 skill が読む中心 artifact。LLM summary と rule-based structure が混在する。"
+          },
+          {
+            path: ".understand-anything/meta.json",
+            fields: { lastAnalyzedAt: "ISO timestamp", gitCommitHash: "HEAD hash", version: "plugin output version", analyzedFiles: "number" },
+            consumedBy: ["auto update check", "dashboard metadata"],
+            meaning: "いつ、どの commit を解析したかを記録する軽量 metadata。"
+          },
+          {
+            path: ".understand-anything/fingerprints.json",
+            fields: { files: "path -> structural fingerprint", gitCommitHash: "baseline commit", generatedAt: "ISO timestamp" },
+            consumedBy: ["incremental update classifier"],
+            meaning: "次回実行時に full rebuild / partial update / skip を決めるための baseline。"
+          }
+        ]
+      },
+      guardrail: "実行 root と ignore 境界が最重要。LLM agent を使うため、source/metadata が context に入る可能性がある。"
+    },
+    {
+      id: "generate-ignore",
+      name: "generate-ignore.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 0.5 / ignore",
+      summary: "starter .understandignore を作り、解析前の除外対象を明示する。",
+      command: "PLUGIN_ROOT=<plugin> node skills/understand/generate-ignore.mjs /repo/path",
+      input: { projectRoot: "/repo/path", existingFile: false },
+      output: {
+        artifact: {
+          path: ".understand-anything/.understandignore",
+          format: "plain text ignore patterns",
+          sections: ["generated artifacts", "dependencies", "large/binary files", "secrets candidates", "logs/cache"],
+          samplePatterns: ["node_modules/", "dist/", ".env*", "*.pem", "coverage/"],
+          consumedBy: ["scan-project.mjs", "createIgnoreFilter"],
+          meaning: "解析対象を決める security boundary。既存 file がある場合は上書きしない。"
+        }
+      },
+      guardrail: "secret、生成物、巨大 file の除外は人間が確認する。既存 file は上書きしない。"
+    },
+    {
+      id: "project-scanner",
+      name: "project-scanner",
+      componentKind: "Agent",
+      type: "Mixed",
+      phase: "Phase 1 / scan",
+      summary: "README/manifest の説明情報と、deterministic scan/importMap をまとめて scan-result.json を作る。",
+      command: "dispatch agent: project-scanner",
+      input: { projectRoot: "/repo/path", readme: "README.md", manifests: ["package.json", "pyproject.toml"] },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/scan-result.json",
+          fields: {
+            name: "project name from manifest or directory",
+            rawDescription: "README/manifest から LLM が要約した project description",
+            languages: "detected language list + narrative",
+            frameworks: "manifest dependency/framework inference",
+            files: "FileInventory[] from scan-project.mjs",
+            importMap: "file path -> internal import targets",
+            stats: "total files, category counts, language counts"
+          },
+          consumedBy: ["compute-batches.mjs", "file-analyzer", "architecture-analyzer"],
+          meaning: "Phase 1 以降の真実源。file/import facts は deterministic、description/framework narrative は LLM。"
+        }
+      },
+      guardrail: "project description/framework 推定は LLM 解釈。file list と importMap は script 出力を真実源にする。"
+    },
+    {
+      id: "scan-project",
+      name: "scan-project.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 1 / file inventory",
+      summary: "file list、language、category、line count、規模、ignore 適用結果を作る。",
+      command: "node skills/understand/scan-project.mjs /repo/path scan-result.raw.json",
+      input: { projectRoot: "/repo/path", ignore: [".gitignore", ".understandignore"] },
+      output: {
+        scriptCompleted: true,
+        totalFiles: 142,
+        filteredByIgnore: 38,
+        estimatedComplexity: "moderate",
+        files: [
+          { path: "src/app.ts", language: "typescript", fileCategory: "code", sizeLines: 120 },
+          { path: "README.md", language: "markdown", fileCategory: "document", sizeLines: 84 },
+          { path: ".github/workflows/ci.yml", language: "yaml", fileCategory: "infrastructure", sizeLines: 42 }
+        ],
+        stats: {
+          byLanguage: { typescript: 74, markdown: 12, yaml: 8 },
+          byCategory: { code: 108, document: 12, infrastructure: 11, config: 11 },
+          largestFiles: ["src/generated/client.ts"],
+          ignoredSamples: ["node_modules/", "dist/", ".env.local"]
+        },
+        consumedBy: ["project-scanner", "compute-batches.mjs", "file-analyzer"]
+      },
+      guardrail: "source を実行しない。git ls-files 優先、fallback は recursive walk。symlink や既定除外に注意。"
+    },
+    {
+      id: "extract-import-map",
+      name: "extract-import-map.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 1 / import map",
+      summary: "AST と言語別 resolver で project 内部 import を解決する。",
+      command: "node skills/understand/extract-import-map.mjs import-input.json import-output.json",
+      input: { projectRoot: "/repo/path", files: [{ path: "src/app.ts", language: "typescript" }] },
+      output: {
+        scriptCompleted: true,
+        importMap: {
+          "src/app.ts": ["src/router.ts", "src/config.ts"],
+          "src/router.ts": ["src/handlers/user.ts", "src/middleware/auth.ts"]
+        },
+        stats: {
+          filesScanned: 142,
+          filesWithImports: 88,
+          totalEdges: 311,
+          unresolvedImports: ["@runtime/plugin"],
+          unsupportedLanguages: ["vue-template"]
+        },
+        edgeMeaning: "source file -> project-internal imported file",
+        consumedBy: ["compute-batches.mjs", "merge-batch-graphs.py", "assemble-reviewer"]
+      },
+      guardrail: "解決できるのは主に静的 import。動的 require や runtime plugin loading は取りこぼす可能性がある。"
+    },
+    {
+      id: "compute-batches",
+      name: "compute-batches.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 1.5 / batching",
+      summary: "import graph から解析 batch と neighborMap を作る。",
+      command: "node skills/understand/compute-batches.mjs /repo/path",
+      input: { scanResult: "scan-result.json", importMap: "scan-result.importMap" },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/batches.json",
+          fields: {
+            schemaVersion: 1,
+            batches: "Batch[] grouped by Louvain community or path/category fallback",
+            neighborMap: "file -> related external files/symbols near the batch",
+            exportsByPath: "file -> exported top-level symbols",
+            batchStats: "size, category mix, import density"
+          },
+          sample: {
+            batches: [{ id: 1, reason: "import community", files: ["src/app.ts", "src/router.ts"], externalNeighbors: ["src/config.ts"] }],
+            neighborMap: { "src/app.ts": [{ file: "src/config.ts", symbols: ["loadConfig"] }] }
+          },
+          consumedBy: ["file-analyzer"],
+          meaning: "LLM context を小さくしつつ、cross-batch relation を失わないための解析単位。"
+        }
+      },
+      guardrail: "batch は context 制御のための機械的分割。意味的な module 境界そのものではない。"
+    },
+    {
+      id: "file-analyzer",
+      name: "file-analyzer",
+      componentKind: "Agent",
+      type: "Mixed",
+      phase: "Phase 2 / batch analysis",
+      summary: "batch 内 file を graph fragment に変換し、summary/tags/semantic edges を付ける。",
+      command: "dispatch agent: file-analyzer --batch 1",
+      input: { batchFiles: ["src/app.ts", "src/router.ts"], neighborMap: {}, structure: "extract-structure output" },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/batch-1.json",
+          fields: {
+            nodes: "GraphNode[] for files, functions, classes, config/docs/infra/data structures",
+            edges: "GraphEdge[] for contains/imports/calls/depends_on/configures/documents/etc.",
+            warnings: "agent uncertainty or missing context notes"
+          },
+          sampleNodes: [
+            { id: "file:src/app.ts", type: "file", name: "app.ts", summary: "Application bootstrap and route registration", tags: ["entrypoint"], complexity: "moderate" },
+            { id: "function:src/app.ts:createApp", type: "function", name: "createApp", summary: "Creates the HTTP app instance", complexity: "simple" }
+          ],
+          sampleEdges: [
+            { source: "file:src/app.ts", target: "function:src/app.ts:createApp", type: "contains", weight: 1.0 },
+            { source: "file:src/app.ts", target: "file:src/router.ts", type: "imports", weight: 0.7 }
+          ],
+          consumedBy: ["merge-batch-graphs.py"],
+          meaning: "LLM が semantic summary を付けた graph fragment。保存前に merge/validation が必要。"
+        }
+      },
+      guardrail: "構造抽出は script、summary と semantic relation は LLM。出力は merge script で修復する前提。"
+    },
+    {
+      id: "extract-structure",
+      name: "extract-structure.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 2 / structure extraction",
+      summary: "functions/classes/exports/callGraph と non-code structures を抽出する。",
+      command: "node skills/understand/extract-structure.mjs structure-input.json structure-output.json",
+      input: { projectRoot: "/repo/path", batchFiles: ["src/app.ts"], batchImportData: {} },
+      output: {
+        scriptCompleted: true,
+        filesAnalyzed: 1,
+        filesSkipped: 0,
+        results: [
+          {
+            path: "src/app.ts",
+            language: "typescript",
+            structures: {
+              functions: [{ name: "createApp", lineStart: 12, lineEnd: 54, params: ["config"], async: false }],
+              classes: [],
+              imports: [{ source: "./router", resolvedPath: "src/router.ts" }],
+              exports: [{ name: "createApp", kind: "named" }],
+              callGraph: [{ caller: "createApp", callee: "registerRoutes" }]
+            }
+          }
+        ],
+        consumedBy: ["file-analyzer", "build-fingerprints.mjs"]
+      },
+      guardrail: "AST/parser が対応していない言語や文法では空結果になる。空でも処理は継続する。"
+    },
+    {
+      id: "merge-batch-graphs",
+      name: "merge-batch-graphs.py",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 2 / merge",
+      summary: "batch graph を統合し、ID、edge、complexity、tested_by を正規化する。",
+      command: "python skills/understand/merge-batch-graphs.py /repo/path",
+      input: { intermediate: ["batch-1.json", "batch-2.json"], scanResult: "scan-result.json" },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/assembled-graph.json",
+          fields: {
+            version: "1.0.0",
+            project: "copied/enriched project metadata",
+            nodes: "deduplicated node list",
+            edges: "deduplicated and repaired edge list",
+            layers: "empty at this phase",
+            tour: "empty at this phase"
+          },
+          report: {
+            fixed: ["node ID prefixes", "complexity aliases", "duplicate edges", "dangling edges", "test edge direction", "missing import edges"],
+            couldNotFix: ["semantic mismatch", "ambiguous missing node"]
+          },
+          consumedBy: ["assemble-reviewer", "architecture-analyzer", "tour-builder"],
+          meaning: "batch fragments を 1 つの graph candidate にしたもの。まだ final artifact ではない。"
+        }
+      },
+      guardrail: "形式修復はできるが、summary の真偽や edge の意味妥当性までは保証しない。"
+    },
+    {
+      id: "assemble-reviewer",
+      name: "assemble-reviewer",
+      componentKind: "Agent",
+      type: "LLM",
+      phase: "Phase 3 / assembled graph review",
+      summary: "merge 済み graph を batch 出力、importMap、merge warning と照合して review する。",
+      command: "dispatch agent: assemble-reviewer",
+      input: { assembledGraph: "assembled-graph.json", mergeReport: "stderr report", importMap: {} },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/assemble-review.json",
+          fields: {
+            approved: "boolean",
+            warnings: "semantic or cross-batch concerns",
+            suggestedFixes: "node/edge fixes the orchestrator may apply or report",
+            recoveredEdges: "edges restored from batch data/importMap when justified"
+          },
+          sample: {
+            approved: true,
+            warnings: ["2 config files have weak summaries"],
+            recoveredEdges: [{ source: "file:src/app.ts", target: "file:src/router.ts", type: "imports" }]
+          },
+          consumedBy: ["Phase 6 final review", "operator report"],
+          meaning: "script merge の結果を LLM が review した補助 report。"
+        }
+      },
+      guardrail: "LLM review は補助。構造的な必須 validation は別途 deterministic validator で行う。"
+    },
+    {
+      id: "architecture-analyzer",
+      name: "architecture-analyzer",
+      componentKind: "Agent",
+      type: "Mixed",
+      phase: "Phase 4 / architecture",
+      summary: "file-level graph から architecture layers を作る。",
+      command: "dispatch agent: architecture-analyzer",
+      input: { nodes: "file-level nodes", edges: "imports/calls/contains", directoryTree: true },
+      output: {
+        artifactField: "knowledge-graph.json.layers[]",
+        schema: {
+          id: "layer:<slug>",
+          name: "human-readable layer name",
+          description: "why these nodes belong together",
+          nodeIds: "file-level node IDs only"
+        },
+        sample: [
+          { id: "layer:api", name: "API Layer", description: "HTTP routing and request handling", nodeIds: ["file:src/routes.ts", "endpoint:openapi.yaml:/users"] },
+          { id: "layer:data", name: "Data Layer", description: "Persistence schemas and repositories", nodeIds: ["table:migrations/001.sql:users"] }
+        ],
+        consumedBy: ["dashboard layer filters", "/understand-onboard", "/understand-chat"],
+        meaning: "architecture を人間が読める単位に切る LLM 解釈。"
+      },
+      guardrail: "layer 名と責務説明は解釈。依存規約の正式定義として扱う場合は人間 review が必要。"
+    },
+    {
+      id: "tour-builder",
+      name: "tour-builder",
+      componentKind: "Agent",
+      type: "Mixed",
+      phase: "Phase 5 / tour",
+      summary: "entry point、layers、README を使って読む順番を作る。",
+      command: "dispatch agent: tour-builder",
+      input: { readme: "README.md", layers: [], graphTopology: "fan-in/out, BFS chains" },
+      output: {
+        artifactField: "knowledge-graph.json.tour[]",
+        schema: {
+          order: "number",
+          title: "tour step title",
+          description: "what to read and why",
+          nodeIds: "nodes to highlight in this step",
+          languageLesson: "optional language/framework note"
+        },
+        sample: [
+          { order: 1, title: "Start at App entry", description: "Begin with the app bootstrap and route registration.", nodeIds: ["file:src/app.ts"], languageLesson: "Express apps usually compose middleware before routes." }
+        ],
+        consumedBy: ["dashboard tour panel", "/understand-onboard"],
+        meaning: "onboarding 用の読む順。依存順や実行順ではない。"
+      },
+      guardrail: "tour は onboarding 用。実行順、依存順、責任境界そのものではない。"
+    },
+    {
+      id: "graph-reviewer",
+      name: "graph-reviewer",
+      componentKind: "Agent",
+      type: "Mixed",
+      phase: "Phase 6 / optional final review",
+      summary: "--review 指定時に final graph の quality gate を追加する。",
+      command: "dispatch agent: graph-reviewer --review",
+      input: { graph: "final candidate graph", phaseWarnings: [] },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/review.json",
+          fields: {
+            decision: "approve | reject | approve_with_warnings",
+            validationSummary: "schema/ref/layer/tour checks from generated script",
+            issues: "quality or coverage issues",
+            requiredFixes: "blocking fixes before save"
+          },
+          sample: { decision: "approve_with_warnings", issues: ["tour step 4 references a low-signal config node"], requiredFixes: [] },
+          consumedBy: ["Phase 7 save gate", "operator report"],
+          meaning: "--review 時だけ作られる追加品質確認。default path では inline deterministic validator が中心。"
+        }
+      },
+      guardrail: "default path は deterministic validation。LLM review は追加確認で、実行必須ではない。"
+    },
+    {
+      id: "build-fingerprints",
+      name: "build-fingerprints.mjs",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Phase 7 / save",
+      summary: "次回 incremental update 用の structural fingerprint baseline を保存する。",
+      command: "node skills/understand/build-fingerprints.mjs fingerprint-input.json",
+      input: { projectRoot: "/repo/path", sourceFilePaths: ["src/app.ts"], gitCommitHash: "abc123" },
+      output: {
+        artifact: {
+          path: ".understand-anything/fingerprints.json",
+          fields: {
+            version: "fingerprint schema version",
+            gitCommitHash: "baseline commit hash",
+            generatedAt: "ISO timestamp",
+            files: {
+              "src/app.ts": {
+                contentHash: "sha256 hash",
+                functions: "name + params + returnType + exported",
+                classes: "name + methods + exported",
+                imports: "source + specifiers",
+                exports: "exported symbol names"
+              }
+            }
+          },
+          consumedBy: ["fingerprint.ts analyzeChanges", "change-classifier.ts classifyUpdate"],
+          meaning: "実装詳細全文ではなく、構造変化を検出するための compact baseline。"
+        }
+      },
+      guardrail: "fingerprint は構造比較用。source code の全文を公開用 artifact として扱わない。"
+    },
+    {
+      id: "merge-subdomain",
+      name: "merge-subdomain-graphs.py",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "Pre-flight / subdomain merge",
+      summary: "複数の subdomain graph を 1 つの knowledge graph に統合する。",
+      command: "python skills/understand/merge-subdomain-graphs.py /repo/path",
+      input: { graphs: ["payments-knowledge-graph.json", "admin-knowledge-graph.json"] },
+      output: {
+        artifact: {
+          path: ".understand-anything/knowledge-graph.json",
+          fields: {
+            nodes: "merged and deduplicated by id",
+            edges: "deduplicated by source/target/type, higher weight wins",
+            layers: "same layer id gets unioned nodeIds",
+            tour: "steps concatenated, duplicate title steps merged"
+          },
+          report: { inputGraphs: 3, outputNodes: 340, outputEdges: 920, droppedDanglingRefs: 6 },
+          consumedBy: ["dashboard", "chat/diff/onboard skills"],
+          meaning: "subdomain ごとの graph を 1 つの dashboard-readable graph にまとめる。"
+        }
+      },
+      guardrail: "同じ ID は後勝ち。dangling refs は落とす。semantic conflict の解消は人間 review が必要。"
+    },
+    {
+      id: "understand-domain",
+      name: "/understand-domain",
+      componentKind: "Skill / slash command",
+      type: "Mixed",
+      phase: "Graph generation / business domain",
+      summary: "既存 knowledge graph または軽量 scan から business domain flow graph を生成し、dashboard を開く。",
+      command: "/understand-domain --full",
+      input: { projectRoot: "/repo/path", mode: "derive from knowledge graph or lightweight scan", flags: ["--full optional"] },
+      output: {
+        artifacts: [
+          {
+            path: ".understand-anything/domain-graph.json",
+            schema: "DomainGraph subset of KnowledgeGraph",
+            fields: { nodes: "domain/flow/step nodes", edges: "contains_flow, flow_step, cross_domain", project: "metadata" },
+            consumedBy: ["/understand-dashboard domain view"],
+            meaning: "business flow を横方向 graph として見せるための artifact。"
+          },
+          {
+            path: ".understand-anything/intermediate/domain-context.json",
+            createdWhen: "--full or no knowledge graph",
+            fields: { fileTree: "bounded tree", entryPoints: "HTTP/CLI/event/cron/etc.", fileSignatures: "exports/imports", snippets: "short code snippets" },
+            retention: "Phase 5 後に cleanup 対象"
+          }
+        ]
+      },
+      guardrail: "既存 graph からの推論は低コスト。--full は snippet を含む domain-context を作るため公開範囲に注意。"
+    },
+    {
+      id: "extract-domain-context",
+      name: "extract-domain-context.py",
+      componentKind: "Script",
+      type: "Rule",
+      phase: "understand-domain / lightweight scan",
+      summary: "business/domain 推論用に file tree、entry point、metadata、短い snippet を集める。",
+      command: "python skills/understand-domain/extract-domain-context.py /repo/path",
+      input: { projectRoot: "/repo/path", mode: "no existing knowledge graph or --full" },
+      output: {
+        artifact: {
+          path: ".understand-anything/intermediate/domain-context.json",
+          fields: {
+            metadata: "project manifests and README hints",
+            fileTree: "bounded directory tree respecting ignore rules",
+            entryPoints: "HTTP routes, CLI commands, event handlers, cron jobs, GraphQL/gRPC/exported handlers",
+            fileSignatures: "per-file exports/imports and detected patterns",
+            snippets: "signature + first lines for selected entry points",
+            limits: "max depth/files/output bytes"
+          },
+          sampleEntryPoint: { kind: "http_route", method: "GET", path: "/users/:id", file: "src/routes/users.ts", line: 42 },
+          consumedBy: ["domain-analyzer"],
+          meaning: "LLM が repo 全体を何度も読まなくて済むように作る domain 分析用 cheat sheet。"
+        }
+      },
+      guardrail: "snippet が含まれる可能性があるため、公開 demo では intermediate を出さない。"
+    },
+    {
+      id: "domain-analyzer",
+      name: "domain-analyzer",
+      componentKind: "Agent",
+      type: "LLM",
+      phase: "understand-domain / domain graph",
+      summary: "domain、flow、step node を作り、business process として可視化できる形にする。",
+      command: "dispatch agent: domain-analyzer",
+      input: { source: "knowledge-graph.json or domain-context.json" },
+      output: {
+        artifact: {
+          path: ".understand-anything/domain-graph.json",
+          fields: {
+            nodes: {
+              domain: "business area, e.g. User Management",
+              flow: "business process, e.g. Login Flow",
+              step: "ordered process step, e.g. Validate password"
+            },
+            edges: {
+              contains_flow: "domain -> flow",
+              flow_step: "flow -> step",
+              cross_domain: "relationship between domains/flows"
+            },
+            references: "optional code node ids or file paths used as evidence"
+          },
+          sample: {
+            nodes: ["domain:user-management", "flow:user-login", "step:validate-credentials"],
+            edges: ["domain:user-management -> flow:user-login", "flow:user-login -> step:validate-credentials"]
+          },
+          consumedBy: ["dashboard domain view"],
+          meaning: "業務理解用の LLM 推論 graph。code structure graph より主観的。"
+        }
+      },
+      guardrail: "business flow は LLM 推論。業務正本ではなく、説明・探索用 graph として扱う。"
+    },
+    {
+      id: "dashboard",
+      name: "/understand-dashboard",
+      componentKind: "Skill + Dashboard UI",
+      type: "Rule + UI",
+      phase: "Graph consumption / dashboard",
+      summary: "knowledge graph、domain graph、diff overlay をブラウザで表示する。",
+      command: "GRAPH_DIR=/repo/path npx vite --host 127.0.0.1",
+      input: { graphDir: "/repo/path", files: ["knowledge-graph.json", "domain-graph.json", "diff-overlay.json"] },
+      output: {
+        runtime: {
+          url: "http://127.0.0.1:5173/?token=<one-time-token>",
+          host: "127.0.0.1",
+          server: "Vite dev server",
+          env: { GRAPH_DIR: "/repo/path" }
+        },
+        servedFiles: {
+          "knowledge-graph.json": "sanitized graph JSON with relative filePath values",
+          "domain-graph.json": "optional business flow graph",
+          "diff-overlay.json": "optional changed/affected node overlay",
+          "file-content.json": "source preview endpoint, limited to files in graph and max 1MB"
+        },
+        uiState: {
+          views: ["graph", "domain", "file explorer", "search", "path finder", "code viewer"],
+          tokenStorage: "sessionStorage after URL token validation"
+        },
+        meaning: "保存済み graph を読む UI。pipeline を実行する backend ではない。"
+      },
+      guardrail: "localhost binding、one-time token、path sanitization、file preview size limit がある。public demo では raw source preview を慎重に扱う。"
+    },
+    {
+      id: "chat",
+      name: "/understand-chat",
+      componentKind: "Skill / slash command",
+      type: "LLM",
+      phase: "Graph consumption / Q&A",
+      summary: "自然言語 query に対し、graph の relevant subgraph を読んで回答する。",
+      command: "/understand-chat \"Where is auth handled?\"",
+      input: { query: "Where is auth handled?", graph: ".understand-anything/knowledge-graph.json" },
+      output: {
+        response: {
+          answer: "natural-language answer grounded in selected graph nodes",
+          citedGraphContext: {
+            matchedNodes: ["file:src/auth/login.ts", "function:src/auth/login.ts:verifyToken"],
+            connectedEdges: ["calls", "imports", "depends_on"],
+            layers: ["layer:api", "layer:security"]
+          },
+          limitations: "If no node matches query keywords, answer should say no match and suggest related terms."
+        },
+        sideEffects: "none; does not write files",
+        meaning: "dashboard UI の chat ではなく、agent が graph を局所検索して返す Q&A。"
+      },
+      guardrail: "UI dashboard 内の chat ではない。agent skill が graph を grep して必要部分だけ読む。"
+    },
+    {
+      id: "explain",
+      name: "/understand-explain",
+      componentKind: "Skill / slash command",
+      type: "LLM",
+      phase: "Graph consumption / deep dive",
+      summary: "特定 file/function/module を graph と source file の両方から説明する。",
+      command: "/understand-explain src/auth/login.ts",
+      input: { target: "src/auth/login.ts", graph: "knowledge-graph.json", sourceFile: true },
+      output: {
+        response: {
+          component: "src/auth/login.ts",
+          role: "architecture layer and why it exists",
+          internalStructure: "functions/classes from contains edges",
+          externalConnections: "incoming/outgoing imports/calls/dependencies",
+          dataFlow: "inputs -> processing -> outputs from source reading",
+          riskOrComplexity: "complexity and patterns worth noting"
+        },
+        sideEffects: "none; reads source file for deep dive",
+        meaning: "graph だけでは足りない説明を、実 source と graph 近傍を合わせて作る。"
+      },
+      guardrail: "deep dive では実 source file も読む。公開環境で実行する場合は file access policy が必要。"
+    },
+    {
+      id: "diff",
+      name: "/understand-diff",
+      componentKind: "Skill / slash command",
+      type: "Mixed",
+      phase: "Graph consumption / diff analysis",
+      summary: "git diff から changed nodes、affected nodes、risk を作る。",
+      command: "/understand-diff",
+      input: { gitDiff: "git diff --name-only", graph: "knowledge-graph.json" },
+      output: {
+        response: {
+          changedComponents: [{ nodeId: "file:src/app.ts", summary: "Application bootstrap changed" }],
+          affectedComponents: [{ nodeId: "file:src/router.ts", reason: "imported by changed file" }],
+          affectedLayers: ["layer:api"],
+          riskAssessment: { blastRadius: "medium", complexityHotspots: ["function:src/app.ts:createApp"] }
+        },
+        artifact: {
+          path: ".understand-anything/diff-overlay.json",
+          fields: {
+            version: "1.0.0",
+            baseBranch: "main",
+            generatedAt: "ISO timestamp",
+            changedFiles: "string[]",
+            changedNodeIds: "node IDs directly mapped from changed files",
+            affectedNodeIds: "1-hop neighboring node IDs"
+          },
+          consumedBy: ["dashboard diff overlay"]
+        },
+        meaning: "git diff と graph の近傍探索を合わせた impact candidate。runtime impact の完全解析ではない。"
+      },
+      guardrail: "差分取得は git に依存。影響範囲は graph の 1-hop 近傍であり、完全な runtime impact ではない。"
+    },
+    {
+      id: "onboard",
+      name: "/understand-onboard",
+      componentKind: "Skill / slash command",
+      type: "LLM",
+      phase: "Graph consumption / onboarding",
+      summary: "layers、tour、file-level nodes から onboarding guide を作る。",
+      command: "/understand-onboard",
+      input: { graph: "knowledge-graph.json", sections: ["overview", "layers", "tour", "file map"] },
+      output: {
+        response: {
+          format: "Markdown",
+          sections: {
+            projectOverview: "metadata from graph.project",
+            architectureLayers: "layers[] and key files",
+            keyConcepts: "tags and summaries",
+            guidedTour: "tour[]",
+            fileMap: "file-level nodes organized by layer",
+            complexityHotspots: "high complexity file-level nodes"
+          }
+        },
+        optionalArtifact: {
+          path: "docs/ONBOARDING.md",
+          writtenOnlyIfUserConfirms: true
+        },
+        meaning: "knowledge graph から人間向け onboarding document を生成する補助 skill。"
+      },
+      guardrail: "guide は説明資料。最新コードとの同期は graph の更新頻度に依存する。"
+    },
+    {
+      id: "knowledge",
+      name: "/understand-knowledge",
+      componentKind: "Skill / slash command",
+      type: "Mixed",
+      phase: "Knowledge wiki / graph generation",
+      summary: "Karpathy-pattern LLM wiki を knowledge graph に変換する。",
+      command: "/understand-knowledge /wiki/path",
+      input: { wikiDirectory: "/wiki/path", expected: ["index.md", "markdown files with wikilinks"] },
+      output: {
+        artifacts: [
+          {
+            path: ".understand-anything/intermediate/scan-manifest.json",
+            producer: "parse-knowledge-base.py",
+            fields: {
+              nodes: "article/topic/source base nodes",
+              edges: "wikilink related edges and categorized_under edges",
+              categories: "index.md section headings",
+              unresolvedWikilinks: "links that did not resolve to article IDs"
+            }
+          },
+          {
+            path: ".understand-anything/intermediate/analysis-batch-N.json",
+            producer: "article-analyzer",
+            fields: { nodes: "implicit entity/claim nodes", edges: "cites/builds_on/related/contradicts/etc." }
+          },
+          {
+            path: ".understand-anything/knowledge-graph.json",
+            producer: "merge-knowledge-graph.py",
+            fields: {
+              kind: "knowledge",
+              nodes: "article/entity/topic/claim/source nodes",
+              edges: "wikilink + implicit relation edges",
+              layers: "categories from index.md",
+              tour: "category ordering from index.md"
+            },
+            consumedBy: ["/understand-dashboard"]
+          }
+        ],
+        meaning: "code repository ではなく LLM wiki を graph 化する別系統 pipeline。"
+      },
+      guardrail: "codebase 解析ではなく wiki 解析。parse は deterministic、implicit entity/claim は LLM 推論。"
+    }
+  ];
+
+  let activeTool = toolDemos[0];
+
+  function badgeClass(type) {
+    if (type.startsWith("Rule")) return "b-rule";
+    if (type === "LLM") return "b-llm";
+    return "b-mix";
+  }
+
+  function pretty(value) {
+    return JSON.stringify(value, null, 2);
+  }
+
+  function renderToolList() {
+    const list = document.querySelector(".demo-tools");
+    if (!list) return;
+    list.innerHTML = "";
+    toolDemos.forEach((tool) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "demo-tool-button";
+      button.setAttribute("role", "option");
+      button.setAttribute("aria-selected", String(tool.id === activeTool.id));
+      button.dataset.toolId = tool.id;
+      const name = document.createElement("strong");
+      name.textContent = tool.name;
+      const meta = document.createElement("span");
+      meta.textContent = `${tool.componentKind || "Component"} · ${tool.type}`;
+      button.append(name, meta);
+      list.append(button);
+    });
+  }
+
+  function renderActiveTool() {
+    const name = document.querySelector("[data-demo-name]");
+    const badge = document.querySelector("[data-demo-badge]");
+    const summary = document.querySelector("[data-demo-summary]");
+    const command = document.querySelector("[data-demo-command]");
+    const input = document.querySelector("[data-demo-input]");
+    const output = document.querySelector("[data-demo-output]");
+    const kind = document.querySelector("[data-demo-kind]");
+    const phase = document.querySelector("[data-demo-phase]");
+    const guardrail = document.querySelector("[data-demo-guardrail]");
+    if (!name || !badge || !summary || !command || !input || !output || !kind || !phase || !guardrail) return;
+
+    name.textContent = activeTool.name;
+    badge.innerHTML = "";
+    const badgeEl = document.createElement("span");
+    badgeEl.className = `badge ${badgeClass(activeTool.type)}`;
+    badgeEl.textContent = activeTool.type;
+    badge.append(badgeEl);
+    summary.textContent = activeTool.summary;
+    command.textContent = activeTool.command;
+    input.textContent = pretty(activeTool.input);
+    output.textContent = pretty(activeTool.output);
+    kind.textContent = activeTool.componentKind || "Component";
+    phase.textContent = activeTool.phase;
+    guardrail.textContent = activeTool.guardrail;
+    renderToolList();
+  }
+
+  function runMock() {
+    const log = document.querySelector("[data-demo-log]");
+    if (!log) return;
+    const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
+    log.textContent = [
+      `[${time}] selected: ${activeTool.name}`,
+      `[mock] component kind: ${activeTool.componentKind || "Component"}`,
+      `[mock] validate input keys: ${Object.keys(activeTool.input).join(", ") || "(none)"}`,
+      `[mock] command preview only: ${activeTool.command}`,
+      `[mock] no shell / no LLM / no file read executed`,
+      `[mock] output keys: ${Object.keys(activeTool.output).join(", ") || "(none)"}`,
+      `[mock] status: success`
+    ].join("\n");
+  }
+
+  function copyCommand() {
+    const text = activeTool.command;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
 
   document.addEventListener("click", (event) => {
+    const toolButton = event.target.closest("[data-tool-id]");
+    if (toolButton) {
+      activeTool = toolDemos.find((tool) => tool.id === toolButton.dataset.toolId) || activeTool;
+      renderActiveTool();
+      return;
+    }
+    if (event.target.closest("[data-demo-run]")) {
+      runMock();
+      return;
+    }
+    if (event.target.closest("[data-demo-copy]")) {
+      copyCommand();
+      return;
+    }
     const button = event.target.closest("[data-action]");
     if (!button) return;
     const action = button.dataset.action;
     if (action === "expand-evidence") evidence.forEach((item) => { item.open = true; });
     if (action === "collapse-evidence") evidence.forEach((item) => { item.open = false; });
   });
+
+  renderActiveTool();
 </script>
 </body>
 </html>
