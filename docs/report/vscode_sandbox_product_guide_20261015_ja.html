@@ -1,0 +1,872 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="VS Code 1.141 の Copilot Agent Sandbox。実際の画面、設定手順、JSON、承認削減の活用例と制約。"><title>VS Code Sandbox｜実際の機能・設定・活用例</title><style>
+:root{--ink:#17283c;--muted:#5d6b7b;--blue:#0064a7;--blue-soft:#e9f3fa;--line:#dbe4eb;--page:#f4f7fa;--paper:#fff;--warn:#7b4b0a;--warn-bg:#fff7e8;--body:16px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;background:var(--page);color:var(--ink);font:var(--body)/1.85 'Noto Sans CJK JP','Yu Gothic UI','Meiryo',sans-serif;-webkit-font-smoothing:antialiased}a{color:var(--blue);text-underline-offset:3px}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #d99526;outline-offset:3px}button{font:inherit;cursor:pointer}button:disabled{cursor:default}.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px;white-space:nowrap}.brand-mark{width:26px;height:26px;background:var(--blue);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}.actions{display:flex;gap:8px}.actions button{border:1px solid var(--line);border-radius:7px;padding:6px 12px;background:#fff;font-size:12px;color:var(--ink)}.actions button[aria-pressed=true]{background:var(--blue-soft);border-color:var(--blue)}.layout{max-width:1510px;margin:auto;display:grid;grid-template-columns:226px minmax(0,1fr);gap:30px;padding:30px 32px 80px}.side{position:sticky;top:91px;align-self:start;max-height:calc(100vh - 115px);overflow:auto;padding:8px 0}.side-label{font-size:11px;font-weight:700;letter-spacing:.13em;color:var(--muted);margin:12px 12px}.side nav{display:flex;flex-direction:column;gap:5px}.side a{display:block;color:#536476;text-decoration:none;font-size:13px;font-weight:500;line-height:1.55;padding:11px 12px;border-radius:7px}.side a.active{color:var(--blue);background:var(--blue-soft);font-weight:700}.side a:hover{background:#eaf0f5}.side-foot{border-top:1px solid var(--line);font-size:11px;line-height:1.9;color:var(--muted);padding:16px 12px;margin-top:20px}.side-group{margin-top:24px!important}main{min-width:0}.hero{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:26px}.hero-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(380px,470px);gap:22px;padding:34px 30px 22px;align-items:center}.eyebrow{font-size:11px;letter-spacing:.09em;font-weight:700;color:var(--blue);margin:0 0 13px}.hero h1{font-size:clamp(31px,3.2vw,43px);font-weight:800;line-height:1.24;letter-spacing:-.025em;margin:0 0 12px}.hero-sub{font-size:20px;font-weight:650;margin:0 0 18px;line-height:1.5}.hero-lead{font-size:15px;color:var(--muted);margin:0 0 17px;line-height:1.9}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:10px;line-height:1.6;border:1px solid #cee1ef;color:#135c8a;background:#f2f8fc;border-radius:4px;padding:4px 7px}.product-shot{margin:0;min-width:0}.image-button{background:#181818;border:0;padding:0;display:block;width:100%;border-radius:8px;overflow:hidden}.image-button img{display:block;width:100%;height:auto}.product-shot figcaption{color:var(--muted);font-size:10px;line-height:1.8;padding-top:9px}.hero-meta{border-top:1px solid var(--line);padding:13px 30px;background:#fbfcfe;color:#526275;font-size:11px;line-height:1.9}.hero-meta strong{font-weight:700;color:#243c55}.reading-order{display:flex;gap:0;flex-wrap:wrap;margin:0 0 23px;background:var(--blue);border-radius:8px;padding:13px 17px;color:#fff;font-size:12px}.reading-order span{white-space:nowrap}.reading-order span:not(:last-child):after{content:'→';margin:0 12px;color:#bcdaef}.chapter{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 32px 34px;margin:0 0 24px;scroll-margin-top:84px}.chapter h2{font-size:24px;line-height:1.5;margin:0 0 22px;padding-bottom:15px;border-bottom:2px solid #cee1ef;letter-spacing:-.015em}.chapter h3,.appendix h3{font-size:18px;line-height:1.65;margin:30px 0 12px;font-weight:700}.chapter h4{font-size:15px;line-height:1.7;margin:24px 0 11px;color:#214e70}.chapter p,.appendix p{margin:12px 0;max-width:100%;overflow-wrap:break-word}.chapter p strong{color:#173b5b}.table-scroll{overflow:auto;width:100%;margin:17px 0 18px;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;line-height:1.75}th{text-align:left;vertical-align:top;font-weight:700;background:#edf3f8;color:#25415b;padding:12px 14px;border-bottom:1px solid #c7d7e4}td{vertical-align:top;padding:13px 14px;border-bottom:1px solid #e5ebf0;overflow-wrap:anywhere}tr:last-child td{border-bottom:0}tr:nth-child(even) td{background:#fbfcfe}th:first-child{width:27%}th:nth-child(2){width:36%}th:only-child{width:auto}table:has(th:nth-child(4)) th{width:auto}td strong{font-weight:700}code{font-family:'Cascadia Code','Noto Sans Mono CJK JP','DejaVu Sans Mono',monospace;font-size:.85em;line-height:1.8;border-radius:3px;background:#eef3f7;color:#194567;padding:2px 4px;overflow-wrap:anywhere;word-break:normal}a.setting-link{text-decoration:none}a.setting-link:hover code{background:#dcebf6;text-decoration:underline}pre{margin:0;padding:18px 20px;overflow:auto;white-space:pre;font-size:13px;line-height:1.8;background:#132435;color:#e7f1f9;tab-size:2}pre code{font-size:inherit;background:transparent;color:inherit;border-radius:0;padding:0;white-space:pre;overflow-wrap:normal}.codebox{margin:18px 0;border-radius:9px;overflow:hidden;border:1px solid #213b52}.codehead{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 14px;background:#213b52;color:#d8e7f3;font-size:11px}.copy{font-size:10px;padding:3px 9px;color:#f4f8fc;background:#35536e;border:1px solid #658097;border-radius:4px}.ref{display:inline-block;vertical-align:baseline;font-size:10px;margin:0 2px;color:#41677f;text-decoration:none;border-radius:3px;background:#edf4f8;padding:0 3px;font-family:Arial,sans-serif;line-height:1.5}.ref:hover{background:#d8eaf7;color:#00548c}.notice{margin:20px 0;padding:15px 19px;border-left:4px solid #d8a140;background:var(--warn-bg);border-radius:0 7px 7px 0;font-size:14px;color:#624619}.notice p{margin:0}.notice strong{color:#674009!important}.appendix{border:1px solid var(--line);border-radius:10px;background:var(--paper);margin:14px 0;scroll-margin-top:85px}.appendix summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;list-style:none;gap:14px;padding:20px 24px;font-size:16px;font-weight:700;line-height:1.6}.appendix summary::-webkit-details-marker{display:none}.expand-label{font-size:11px;font-weight:400;color:var(--blue);flex:none}.expand-label:after{content:' ＋'}.appendix[open] .expand-label:after{content:' −'}.appendix[open] summary{border-bottom:1px solid var(--line);background:#f8fbfd}.appendix-content{padding:10px 28px 26px;font-size:14px}.appendix-content table{font-size:12px}.appendix-content h3{font-size:16px}#appendix-b th:first-child{width:47%}#appendix-b th:nth-child(2){width:22%}#sources th:first-child{width:10%}#sources th:nth-child(2){width:35%}.doc-footer{text-align:left;font-size:11px;color:var(--muted);padding:20px 2px}.doc-footer a{text-decoration:none}.large{--body:18px}.large .chapter h3{font-size:20px}.large table{font-size:15px}.large .chapter{padding-top:34px}dialog{border:0;padding:20px;border-radius:12px;max-width:min(95vw,810px);background:#fff;color:var(--ink);box-shadow:0 20px 100px #0006}dialog::backdrop{background:#0a172ab8}dialog img{width:100%;height:auto;display:block;border-radius:7px;max-height:75vh;object-fit:contain;background:#181818}dialog .dialog-caption{font-size:12px;margin:12px 0 0}.dialog-close{float:right;margin-bottom:12px;border:1px solid var(--line);border-radius:5px;background:#fff;padding:3px 10px;font-size:12px}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#173c56;color:#fff;padding:10px 18px;border-radius:8px;z-index:99;font-size:13px;opacity:0;transition:opacity .15s;pointer-events:none}.toast.show{opacity:1}.skip-link{position:absolute;top:-70px;left:10px;z-index:100;background:#fff;padding:8px 14px}.skip-link:focus{top:4px}
+@media(min-width:1550px){.hero-top{grid-template-columns:minmax(0,1fr) 470px}.chapter{padding-left:40px;padding-right:40px}}
+@media(max-width:1150px){.layout{grid-template-columns:188px minmax(0,1fr);gap:20px;padding:24px 20px 60px}.hero-top{grid-template-columns:1fr;gap:22px;padding:28px}.product-shot{max-width:470px}.hero h1{font-size:37px}.hero-lead{max-width:640px}.hero-top{align-items:start}.chapter{padding:25px}.side a{font-size:12px}.reading-order{font-size:11px}}
+@media(max-width:800px){.layout{display:block;padding:18px 14px 50px}.side{position:static;max-height:none;padding:0 0 17px}.side-label,.side-foot{display:none}.side nav{display:flex;flex-direction:row;overflow:auto;gap:6px;padding-bottom:6px}.side a{white-space:nowrap;flex:none;background:#fff;border:1px solid var(--line);font-size:11px;padding:8px 10px}.side a.appendix-nav{display:none}.topbar{padding:0 15px;height:56px}.brand{font-size:12px;gap:8px}.actions button{font-size:11px;padding:5px 8px}.actions .print{display:none}.hero-top{padding:25px 20px;grid-template-columns:1fr}.hero h1{font-size:35px}.hero-sub{font-size:19px}.hero-lead{font-size:14px}.hero-meta{padding:13px 20px;font-size:10px}.chapter{padding:23px 19px 26px}.chapter h2{font-size:21px;line-height:1.6}.chapter h3{font-size:17px}.chapter p{font-size:14px}table{font-size:12px;min-width:580px}th,td{padding:11px 12px}.codehead{font-size:10px}pre{font-size:11px;padding:15px}.appendix summary{font-size:14px;padding:18px}.appendix-content{padding:8px 18px 20px}.appendix-content p{font-size:13px}.reading-order{display:none}.large .chapter p{font-size:16px}.large table{font-size:13px}.topbar .brand .subtitle{display:none}html{scroll-padding-top:76px}}
+@media print{body{background:white;color:#111;font-size:10pt}.topbar,.side,.actions,.reading-order,.copy,.toast,.expand-label{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.chapter,.appendix{border:0;border-radius:0;margin:0;padding:0}.hero{margin-bottom:18px}.hero-top{grid-template-columns:1fr 270px;padding:0;gap:18px}.hero h1{font-size:27pt}.hero-sub{font-size:15pt}.hero-lead{font-size:10pt}.hero-meta{padding:10px 0;font-size:8pt}.product-shot figcaption{font-size:7pt}.chapter{break-before:page}.chapter h2{font-size:18pt;padding:0 0 8px;margin:0 0 14px}.chapter h3{font-size:12pt;break-after:avoid}.chapter p{font-size:10pt}.chapter table,.appendix table{font-size:8pt;min-width:0}.table-scroll{overflow:visible;border-radius:0}table{table-layout:fixed}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow:visible;font-size:8pt;background:#f2f5f7!important;color:#111!important;padding:10px}pre code{color:#111!important}.codebox{break-inside:avoid;border-color:#bdcad5}.codehead{background:#e8eef3!important;color:#111!important}.appendix{break-before:page}.appendix summary{padding:0 0 12px;display:block;font-size:16pt}.appendix-content{padding:0}.notice{break-inside:avoid;font-size:9pt}a{color:inherit}.ref{font-size:7pt}.doc-footer{margin-top:15px}dialog{display:none!important}}
+</style></head><body>
+<a class="skip-link" href="#main">本文へ移動</a>
+<header class="topbar"><div class="brand"><span class="brand-mark">VS</span>VS Code Sandbox <span class="subtitle" style="font-weight:400;color:#617184"> / チーム共有資料</span></div><div class="actions"><button id="font-toggle" aria-pressed="false">文字を大きく</button><button class="print" id="print-button">印刷</button></div></header>
+<div class="layout"><aside class="side" aria-label="目次"><div class="side-label">CONTENTS</div><nav><a href="#section-1" class="">1. VS Codeのどの機能か</a><a href="#section-2" class="">2. 実際にできること</a><a href="#section-3" class="">3. 設定手順とJSON</a><a href="#section-4" class="">4. 活用例：承認削減</a><a href="#section-5" class="">5. 制約・対応環境</a><a href="#appendix-a" class="appendix-nav">A. 最近の変更</a><a href="#appendix-b" class="appendix-nav">B. 設定早見表</a><a href="#appendix-c" class="appendix-nav">C. 検証手順</a><a href="#sources" class="appendix-nav">公式資料・調査範囲</a></nav><div class="side-foot">確認日：2026.10.15<br>対象：VS Code 1.141系<br>Copilot harness・標準ツール<br><br>青い設定名は、VS Codeの設定を開くリンクです。<br>公式画面以外のJSONは設定例です。</div></aside>
+<main id="main"><header class="hero"><div class="hero-top"><div><p class="eyebrow">VISUAL STUDIO CODE · PRODUCT GUIDE</p><h1>VS Code<br>Sandbox</h1><p class="hero-sub">実際の機能・設定・活用例</p><p class="hero-lead">Copilot が実行するコマンドの<br>ファイル・通信アクセスを、<br>VS Code から設定する。</p><div class="chips"><span class="chip">Copilot Agent向け</span><span class="chip">実際の設定名・JSON付き</span><span class="chip">2026.10.15 確認</span></div></div><figure class="product-shot"><button class="image-button" id="open-image" aria-label="VS Codeの公式画面を拡大"><img src="data:image/webp;base64,UklGRhoqAABXRUJQVlA4IA4qAAAwtACdASrWAVABPpFCnEuloyKhopBbELASCWdu/GPYw+jNS2nXj/8Z33ipfjtEvuofrB7Mufl6JfMB+zPrA/8D9jPdz52/pLeoP/RfUA/Tf1vfVN/0P/a/Zn2mfUA///BLeUf8P6f++z8B9wPpn+NfO/4j+4/tz66eTvqd/0/Qr+Ufc7+L/dvN3/bf4nxN99/91/c/yb+QX8l/nP/C8VX/C7YPPP8n/1/UC9gPoP/J/vP+a/ZL0Gf6v/F+pf5//Wf+P/bPyQ+wD+a/2f/h/3P1r/1/7FeRT9w/zP/d/w/wBf0P+3f9j/Efm79J/85/7/9H/p/3b9qf0p/7v9b8A389/tX/h/xXaT/eD//+7z+6///JcPRIeiQ9Eh6JD0SHokPRIeiQ9Eh6JD0SHokPRIeiQ9Eh6JD0GzXt7K6vAViy+kJ+yt2MNahHfojw36rdLKgM6OVcecqAETzdBbWjUD7dhy6OSOXV3shQkema4EorYr+8Yx2tVpgtdbOIdbvDt1kPTa8gICm/SHEsfx+lA0ukSXyEvVkXI3cHEI9lSIn79IWufojw9VdYQ1+EhKl9kAztQBopOL7j1AonMSl47jyhq+Q9Eg/9u7hdYQpPyukBEh9tf3zX82gLmGxAaQ16nZ7e2T9F6xcqMIFGy4v5UtzPWZpib5CXyE42xAaQl/ldl0J2J0ieYEAuIeB/L0cHwfWTnEXM3Dlw3626TNnTLJcEl8uU7SEvkO5xWeX6OnwtiXrg5P/Cy96AGCMIfgbLOWgI5LVW4yDsvi1wh/Hhf2c7sEjhL42TQD+GNAE//PmpAh3I66I8O3an9dyxM2F3UvlcWD5ZUFGCwrHf2ivqbIjuBaSi4/NaVK1BKy6I8PGaZegFo+ULuCcBpCXysBupn1ltsIWg+1yLG36MFdGedFYz/2BDfe3EIPL6biTbyqFpCtvy++whyCcVRdNTxj+bVbTUUdEeHbrRObOWowPcj3wrhH7Gar+c9LSedA7P2ZqjcYkvjl9T/S96dVhezh+Xttl4QmlmqPz/TXxxd8t+BpD6ZfSE/ZNRJBeo4EBjUbFhWOpaatQp5p4+zMEE1LnPGny4zsKunq0Z0qKUBLNr94FSgwngYZTJaoDjqWkfYtIx6CLNlaYIJ1kr585uklfAEydz4gnXdaym0uCE5WMh8PgXGTH3mWU7zuiRBfJ2AntbNefUgqZWydxA1zm+CfG2e1OIcfaSwCrppIyc3zgkpm97ueS64ZCaCs2w7evLQzkTKunEDLsHtgq+czzOHv8x62y1WPej9orYGtkN6jCpD4Ny+Ql7jhp0LkFwg32y4rmGd7MCwVgFA6f6m4B5WyrXVogEVA/myWors+iaI2h4PZ8D0RvkmvrtRdIcKaihukrzH3X3Nj9avPneKeCM9E9uYEcnHIGYemEvj/5r8XBKCuRgMxcoWTcRyGNGb0xLUqH8xgXvn1/swMQh2Pw4SgV7FWRvt0KfW34u/3PlaJXmiFoxho60RRMuMhxXcndROCIZTC6rnLjZXri1vls+7Z3rl10Rg8CR5KqzaFpcUqHg9n0TRG+PB3U6D0j8TUAW0bBteogSgD1X9D1AHi4R9tf8TVg+o0rTCdLDooklxNNeZ7MVEc4N2lfuhi8uCYjqzR4MbEZau6ko1gPqQDijLvpGMMJv60TIBIn7BS4P9hvmylZ/St0LvTkM6u+ALfvaQQbp8Dk1MOXKan8XzmpaLteOQW+Rh3wcKVrh6Shk+CM4JFEHfh4iwH2C5scwSLt+VNpwQnIw/Gnbvoj/uFAiP1u36buOk/dXKxZDXixzkmR4heL6ZpNkt4dkDwKxa1Bgd0BsnFHWkWR4pJqLb4yxUeTv6m3TYFejhqpxXBzevwMw+/U40XNbp5NMQogsqfcLyq6qdhvfTY7fqDYhlsqVE5EDCYvEPo8rFl9IT16gAP7+rZgAAAAczpttiw6qYlHfghzzfQanmNEAhVUbWpIzkXos622Q5Ek2u4WRdWmuzz+bQsksxHvG77R8EHhXXXKsfs15qh9bO7Pg7kgartIUOoKu0l0v9DHb1gcpAMZf3OIZ9+aqEYnHhl7vUQotosMU1lizmHQhrDLPBi04gPDzthZrMNkIk8qCJAzV9206SVVIFWIqaOi0fjVeHmzQe2EBdaBeFINwaCND4fi3IxZBCXtzwC+TWWYgjUn6e7ocdlD7r3mmcppXE9P36OvpCBtQ19gDgMeK+vSBHTHfq0sTUsJdxc+fZ3MHRqbUUWlRMIXuIYM8y8v2cg+EWiaBS+0yz77oY3H1xg1n9rvA7HAiQVaBAKVd2YgrrNPLRKgjpZo1O8HJ8RA92q7TUiB+bevzYSGxCRNcgXixIW5NXENwiRjoNHdrNqStYMJ49LF2dVmMM6h8Sg1AHUiCuPWZ8lor2kyDyuboEI03X+ymnuhNfzU0G/a99L+nY70MMK51CAr3CIGkNqdoj8t8QX9g6zzd/4cc8QghlKmBsosKjutO4+OVE/I7dTOb2tyuhLrirWtos4PKhSgpS0IwO+OZfkmTVAABuzxiKXatvJsJBqI56HeEOCBDov1dFCQ2HYbnlhcrMke1ybh+ELHiZpZtrN8ZDRUwpVctCvtN8JHqODF4mwPzsIqXe14pT4m2QKAjmn/pZSyTx2J3y+5vQql8irZ2nd9iXR9n8HDO54wBTTF0WhTXM/jZWbZtG/UynVASnGnM5YnNJZk2asIYmCD5lvgIsDL0bKUqWJCeWoGPNiNGEmKOhBpjo5z4JoCdp5p8N97l8xrrZAW98YaKTREdDUYJFZxXsAZ6Gs0x0se779j8kAVu/iXot6W6pywjMrEMR5jt551LF8uhme9KM3KsNSWEFKjNPOwkLtWMDy62E34T/2ipLBFdVJKwTD9BNGvSyGT0ICCsSJyc7S1E9s3FbfcNG6JuCJCyogONr6H+nA7+gVROrgbzJQa06wGJt6GTPk5bti4UyzcHqBLkQVXR3XvP25kPC3sy9kf+LaZwxBG9n8WGdsOMv9pQitqo0BCAxF5wMfTtxnLwNYer50iUZl4uw+Qnzy8t13DS7QpmgBjZIenAFkVqMYHzC328hnyB5dMkAS5UrHzOQvJfR9Ag42sWq4lh73ujrXtNrLVTawg05k3700cRiK53dDswIyvGu8pWjbkvuMVLZPMEgaaWjFxYMdg2x80vLpcZpsZR7J9EMuj6PYOH+cOuwvJFoCYGuZy/+q/tX8LoAQUQx4MDjtQ0TaHy/KDk2tTrnLmyKEObm7gJruaMMBKGRbUScWRtVRDboMSMDDvmesAovsb0o+0hIWEff9wcH8rFQT1oGXFyDYCz7us5w52Y7sc8lt4mzPxnY+Z5lvSPp5+oUYvM0yFiOnZr2svpblxIrTB2cSKKgX31VZ2jN/vVj6CqrbhU09kccVIRZ9nZPG54+O5TyoOaxo+KJA1FsBTX2YJipDD8tAabuvkKW2dNSLH/M0wHA6yhaPllzPYDmHqwaIrXf6Kw9zSBtRrdq/qOffUFi9GDmVmrK2NWKjLJERNWzlaKJApZHldWUwUJTxfybFd4+MYecq+FykcrLJeJwoBkNXCkswD53n8jpxD+J3j0AaHRKdkq1f35Z4/B8X1L2F4jhf/wQQsSmysSDRjniUgwH/QeoTZt22+lf2NJvhlB+zuqxYlyAMUOkvGPZ1VjlGR8vn0XKsMrET/3v6tI4xZ3z6RcDYVFa31VYwHlTl0VU7eebqlNuNJDfcnKwmkRKn8lphARunPbFPPVp9rUN+MX3GEFI0raiiOOToCG9S35RRCR4fCZtIoGyWCsU29QqQHGMcBmy/aKirUnKjzRg4kHWsjM416xJ5tKUBqI4BRapkHaXg/zI/Edl2OJW/tXe5m/xjK2Uhd3MnVm1w4nn9LnDf5j1GdT/QOzea8FmO536Sgbh9t+Myr2n3Fz849N5JGGsKMBsb/8S1uu8YZKXKH5Upv1quy0ASLknuZWgRfRbY68dz+32EzM5/xQ7SoQuD5owOd+jAnVsGhS30TBorpO9De50jIaWleaZ5nhvc8AcFtLQZcfedll4SUGyT5KEyW4bggJBWGN2CMKIh78BC+KCQ4shMkGzKXfhVKtUvorXXCDK3/zhA/Rwoo4tRJ5/yIRbdRgnNYARg9QFK9mThPFtu0Xx/uwZb03np9OtIhs8vyAGU6jf0yy1nlLBsyzDoqWCd1ucE9KE8RcsjTp9DbhNEd2j+YzgoJpOAf4B289fOdQij3AJGPXeJnWr++3AHjVYlDXAYc7C/YA6gKgbFlKSFfa8GYDY982v6oldLYiGiHhnbi4bYy/srHhWRe98hMTEMTtbfQtzsOo16BZT5izUdo4Nky1hHcXFFDN95Z1ZRuNiRxaCeB9IUVEXWXYQibOKL2e52M/xtJqBoNi4fGd9Y6PY1IENJWpb2/mViuJfXugOk6H7AjJ0Ptyl07AHslnnED3ckODGvQdQ15z6eErpis4iWeZhEnFyfaczL2DGdEMnVVG/eEYluXDnXEc/Th/+E/aNyCj5xT+FYPlYPuGR4WQxJrW/gT5kIPd3qbrbIddyEG2q6OKi/wz8rhtNo/Ra+LBqM4t4Au9YOwepWpxcnHWTsKCmZWbM7l0fjgqwB5kqkiibg/w7xjtepbkUm2a5lK11hHaTdUd6AaeH/9fotISpgprpcIdwR11kqwBYnWiOXFK2k4KBf8DmFVuvWA1AyGkMwrckSCqkRJbz1KnJMRcE7/dhOJINwFAdMVJdiFT785/iSr0eyezQroVkBbPWLW9uFqOMYRoGBbibM4na29LBkVGQMt/KaToeksM0DAsMKRpLXRxLrN9gEQ2MbH7kyzr0vF6uSITGi0L65YmWRu+nfQ+tnRhWvKZHZIFhIebbZeKsGSo4OxZGQyJvCXvUIybq8qgLq3wVxvYFfilCKcO2snc1TnPvSBVftzI1vQyy3odW2S+q4m8zpn9BWZwy4hFwJacrqJo3K4uD63MLnlB/wPzVlg+rZNKruKnCfGfJXA7p+zCCOm+AhX8JNdKJW2tiGnMao0bDItAlfX+ZJbiJ1XxnSg7R5qc7DQDLA5TzFHaxVJPaE/VyNFS/S9vH7Z2O9lGHwR2+aTzoADkLCixacHG0P7csZfsZDui115RoOD+OVXyOF3HOT3C5ocJHLzEYvlYq8yYsMf1kmcB774UD9Mx8BOrmO3NuxHT9U4io/VkztyIQLhw8t5QZNHn0jgxDvys9T6SImnBVKWxAA8X0zy1aRVpDLdLHBnzbxxrnElN0BsNzVI4BnhIhNqSCylxIIliP4myzxBPfjxvb20Y6evqhnNEebugGcKZuVAcE+Bm2Qpse0y7JTX+gk5qmX5uJpHh/eG8L20V2JsuXvZmTTYVocrSWPOgG2+pqCnXjhdg7z6eAQHq4xWPOCXDLvOLKh0JMmEZLEkyjAZRImFjCYZrmFdBu5GqxTZyZD/DfCcu7+tg6xM7setDXS3v7rBRxqXPZmx8d6RHeDpkvH8xEa+oX34Kzd11zehkxwCJBtFlbays2ut2Sr+tm9VsFMA19EEK1K0GKNCHaFtU5PEDiA4CokS3eOjuNtmrPQpX890H601UiAGx2iMAmKUwSA5t0HaW72cyn0pPrcqDzEE6kEalS/ZSUS6wvu3fIxfrTqtC3ukoI+c+Z1EQbdr/7Maras5YdiObzO5gdTTcapOz/0gzMCQXYARMYZyWMbpDozCBrR3zMDs7REDxox9+IUBpkak/xdewzlGvTHoEKkwYehjwefgVGEn7Dv81XrtSXteqZ4n4EO1sr7O9Z7yNWeXI2JUfKNwztrUn2emN/xBzAknbFeOyPoaBC0qKOEnCg2mFo8d36db7ksDjs0ZfVFYD7HCsMohuop8A0kOxlDcrRSd2NZ0mnpaPOoYt2FTE8FWGmiQmLC90t/mQqmLOdXywQJ7UE8S2ewArxAEM+kkMNYIsaKkMmWAYPw5Bs+7abzeGRmXyAGU6kA/gbkogjcZ+4epzm1O0Rbh08K179qv3c242Jz+5Z9C92yu0bwwfimnACbpFSnpLLt1ZooSiI/TzQ8i+D2rFTukmPI0T2WDaqqUri8ZKkhsWS3eYYmljbtaZEiWV2XQZ+EdZwajBFdUacuakKbhx4hS1bonuB9LHW2wRBXAuJrjpqoHhCV/PZ0Vb9MFf1FGtGdd2O2Pi7/F4SWE8fLE63UnZA1MfVkhqTFiQHhifwJmNg2ecMj47AJ7ituBqF3glxWFKrQ32m1NIIW91hs3A/LGrPqBHBFNVJMshwDonipcIJDamVLsMp3NqakblgiMjndkwd7gRM/zfwvnhXbzm6yxRkQxWnTAntdlaL9A2OuaYjpXmVNG1o7dKxkv3rNDBynxryjCUchn6Cb/2ELiLwfQKajG35gA0GrAV978vT6lcRu8Or86QLrMZmnDyvjy4nHSYc33GLtNADGplzR+OBW72wYPNhVExjHuHLqdRiq3D657i0nuQEonxOdCgcvmm+5hSgRFwYxtLj70ECCLnzwDH5Nabj59lURi79ABgIitxW+g+Csic14+4xxhwK2cA+4rVvC2POXcwGHjHK9cwSWsrCnbEHiV53yFhhCfJ70VfJ4ZgZn7hXl7FU+14Y56zPtLm/HThE147FKDw6YH08T5OTx3KwAsjN46yBBZAO2RRUbSZedHjYNMDKLSB0oupT8bvnyVm4AzDEnfRBBxUxf3m+1QIoimLlLJ7T4BOaM6eyNKNQxE9WlUgxImfbB8Nzml/BJ6vT465fmcQnStaWShuDNr1QLircm7rLF/URrD9ZhWHq1bh6HYHPyQTUlKoElkTgKoVYcbkBF23qkdfUtkNN6wgL+6MLvLGFxG4rdMs0sY/Zj3Z4glgBQ+AgbUnAElyUVOOrgOMwJBxVQR4YAf+/bl28KvV9uEOj2rtxBFyFPt9ghb07ORbkLQifEhN3/HSd1IapKgCGPJ/GRdpU5T7GHNeHGw6eSp+MRpKWX8RpJ9ORfkqDOyv98Oe0Hzcsn/UitbbiM3coKExKrJEkAersmywsqgdYu9D9s5HgOF1vmjmGQbZp6QUSdFtuvlwHVKYIyPxXWlFDYEAo4N6eClG29Q3ZAdOd3W1k2nBuIj0d32YrxjAgyAAEufjHZ+626yHo5mpzckvQyu+SXnaKYaKkwtXzrObI9Hfnczvw8/lPScINSAAAQgI5z33Z0JQ4gak1w1GLYSIGogrylBx418E1rsf6HYcd5mXkYnYW7lpN92V57lbRzSGf6XAeFKjFjduTDgKMnUdlcAPVcAX58FzvBiW/dzk3QmCC9JFL40m4iZUZFFzK8nBDTkRQAa8ftDzx6hzwVcWZPvgMiB9RMfAFEsJ6KpRLfYcjDt2YSJXXVdOBLcBssOrMpPhdQksm3UGMucev/tAXAERZxR2EjuPxuVI23Oh/bhkqcr2u+sD5hFW3RYKB8nk5/LgvYTlrt3bsD+DaYytRpI4jdCBcnYzKljD0v4heL9SPNFQUjzcxRS+1MpIvU3q1J3v10hBBhqF6C+T1R6vMXPXb3u/DTkRdfSIn/MPixebX3gxvJF6EpsaCvuDjT7dETEU2QdNCK6MxunngdeIrXUK/p4Hyyrt3eN2wEB0lcWZgG0B5NVhkQwk7YuGoBrhC02TQcql7Sj6eM7Tw7Tg/9nHq8Ro5tMEjnNJxGqny28I3T7Ap1tPJDhIOHKxQ6GKEfK+rYiNIvERC94lDNpcOsnJEPsUaiEiGezbKEG5xo2zGSNsomVlZG5nuqTCYwJVI5E+VgF1Oe5MveYaGuQVauzvBJUYUJFPP4hBBkbzpJEhufMKIsCZWsrUOce1BXGKkmd2g5nDNSpmmpqO4l7Sb6FsnV/qWQ+GmiuTt5gROOwFSd1EZG2Q2f7JfygAxsmH+fQJqPKVZj86plAGu2nUUkWlnRraiqXtv6aZu7VdACl66Nysld1wTnjscRSA+kZgh+JGvai5QVEkqI9QlPYJy5oneNtFDK7FK4Zok7FaYJ/4NtkhTlrCQxSm/V6/OBRLZ2bFblWBIzuMRwcElqh1i/5+O3tlorUCFuVYHsX5Qn8GpnYWotkkFVU2Rsew9kAqsvZcx1Vc3joIMD4ud5NYeqevbhQ/BOYuRQGXIRdDiaaYLt5GoOLoYx1UUnKv1Yn8fWWByeQaNaG6hlyeWOHuYNdnkLDhDdqt1svhvJbotyeBiUl+XjnKPsY7wQxiCWSg1Gqx/14PGosG1lK08mG87CuCnIJqGyBMjRX5UGFwmrU2aLcUDOl3s1Svx3tAVZ5KXwgzCyD4/Ktq1RwsM8EIzbxrOP1T+wNKUwGg2ZXHxhWhvtu6yzm5w6HxfXFBWcn0s7APVsOYdjkYLp4shHJFtsxi987dWRrREZGOxofUByfzI+KGq90SGIiQDAnQ5qLBm8ntvQg+T97+oOhU/e+4moyiqNjxKtm2QfGeLzMZuvHaJ1HznjlWtNdwqzI75au3KY52cwiHFe6t2MlSdPpM/gsLSYkuRidpDyOHkU2Y0hiQn2B6PN+1YgxCczVgqcFyFXo3KvBVTXuhLe0EgD35KK9Ypxw+VRtKHPzNjSz+ugKlhrI2TQ5LspwG2HlBd/JZLhnW1FVt0W0DGuRJY3S8Kwf2GfR0axsML6erUOHNnuvaxuGNynW2TOEL127/U4bFIfjKFka7McaCfyl2N05G00y8H/23KN7z3lDJAPosU+6vRlbFenJck4C72nWpczG1udvd3wiP+jEXNnAuA0FZ26BVfXSNILAoEGUtCC9NF7Lplsw9BKYj00OqP34vxIUUafv1w3bVWjfc8+aVlJT/dU3np0UG/dWaPj0ikCAanmsFsvuLOzvJCnSvQoE0iKqHgA3gL73FkZr7isurIITb+kSuJUTuEXC0nr35fue+CXT1/VtDR1RwB474pPdWQ7CowZLxNpfkmUNoLnFuxS6vYJikwlMbT98IY0iQ9W6CCBBVNbi9l1T5pO5+Q1BrAOnJ8uY8qQqLrwDV2APHNuDVA4WiSve6pRXpwCC8OB8Inb886ecVe1W57jj6+mJKOnL1NIf9uOrgwfIiB5bQWXlsl2Omo42BXqsgAPT1dJ3SP1NY7PWIwEqZM5YKvYIcldr0T6DxOFJxgNQfJa/A96G2JbcEmGoBGuTXAxJbUCkUJzYe4DYkMw81Lqc6SrXXCttrEZUhGdaT8d+PUPJ5k9LMq9zAbehdWbStukuTA/uK+VoagOfDWxraXUgHNztzF+46W1cEmr5mJMmwUHy6Q/R6YbHw6AxzkofhzF1yO02y4AbabDChEiuwT7urv6avL5ENZbzPsTH21uWzvyH7gggmgwBo7gwn3oL//sdT7zPv6tMIAQjY7/9OHi5tfqv2wBasA5fZpFWwI8Nx/CsBDtcjj0UjWBfskY5OkXSvjqCf9LDxwUZo1oNtf2rged2j3TtJL/K16iqpEIR9IQ2+8Ryfgxipp34gdtlp9aj/Tc+tm/XVpjkSDhBXDeB53qwBePL8PuUzLeiQAL7Mg8o50LNOpZnyxqKYTKFBs4mXoSvNXzD+1mSaZMPQN1seVSBBIZB6zmAnPXS5Ud5Nli+2ZWUCPxFttzf98qzzv4b4oKD2I98BcpOPF5kRniTWNWcGL6wcfHDkB3jqioZZY09+zYwaeHP1f/S+4V5Bp5y7+EgMrh3x6wF0AeHBTu3oQZkYaj69ay0Bvy9ZOc0sWnleWewu0DNaCRMwz7P5U91gO7R4Av8ozsKAOqwyII7W0aQ5l2aluFFZoqwQTzW4FDFJ5MCU+aV+Z5FbK834js7cQpXMEw5QN6JnJp1uoyeerLckRnPNy/FYBK4bUy8QPLMfZximngPjdyVzBxcoz0Fp5YSYvwtSxrUOp/mNzA9vmZ9n5vzOXU09ll+VVqs2bjR/v4xNxFyfK3aaCcvACOqhqi4Lc6atsVSpwWftFdOr0sz7MYH12i2LbPsXM3Hy+na1EhFrbTyQLAuuXmDa7LgUM9aOWY92JUggsP1wz8hBigLsfXJKQg78/V8yxzVQszkXHA2t7lt4B9QB8eC6axLJZ5ip2zYN3i5vuKmxkIRiS7ouSIG3JKkIo7zA9en8II03T9oE9rmuI3DDcHtMQj4Fife+nELRK6ZT5oP/wEz665IidxoTou3mNM/entE/G/XNzAE9uiC+1VlYslk8qFpOFYF9ZElYdtAk/dxE2/YYKx1t2kdtWMixNYuNn0VvhOIYoHyjmbvXME6aR5ULeO30RT9f4iM7Aj0QSnvzis8eAHNJ4xUb4dv9KcJo8ciiFon7AsuJQt54vawOwBLGCeczyUKFZLXHg6QbAAB2fnyEOEuJM2j9J/hd5Blhe0G6LwUbpjmgJsfO1lbkh1LSih8VkE1ZKvYuDEoFoqvVv/cm9ClRFjVsEvg/UOneu5fLNB7HsVzfj7jGqNheR/V42yWxmw79S3Tv1fEsCVu2/QjwD3gWKQ6oqofSIw98paszfsB6nxi+s8jFKZaoSK27i6gxJfH8xMvoWNw7CKw7dKUHnptT+OEN6KGaeW3wyikDqlF+5kV/keCxnG9fXBTdDdLhTd0g16PUp1ELuzuPqdcT4nELt+M20rUKxWLHeEq4nBX2P6thtsVUpc4sZ4MGL7KcwnkBpfuO4/4QzaNCr1E66m3ZwXYk8CDfwhUgDIsvFN1b0+6S3SlyycjQ0tv7s2UI0tB/08o5UJoBLgB3G2Ku/NlhmznDIof1uUU8in200RSVpBqUMjwGQQEQPgVzBwTmQgPpdLqML+1Ly+/kRhSrlVzT99b1ST3mvk2KehaxjNOVNTT5M9zWddSygvkLvjst4m5yhS79w9piPdk8avUd2UoLL75r5Wi5/aUaEZ5jaUyuUUGg/u3q9iE4UN/NfnK+JI8Yv4K9OohbTWK3pSk5AMqpnHTLnmpp2MTFi/orFZiDNWEdwXhlVng/uGDL4KG9P8Csq42316yC0rKk7Y0elBcmA19De5tSSwkR/9Lnktp2wkvxHDleoFaS5szlneCHyznR7UEoj0pwhrrdwSLT45wDXbYc8YVU5uwydcHfkQjs89sEVx8+aN7FRXfXnih/4GPHJwgjlABce7jKlgIw07pQ0QQN3O7uc3c7u4ypX7Sv2lftK/aVkJxEFajO0+0BUJQeL2vfg6EcQXM1u75J7lrtPdIT8qB+8SqaOXgn6iNcjKqTqxwyWWUmk7r7vePvp9vWIMHX/fY3xOANqUBsHqIpiUK/IE8TO+kdyCpKRVfTC75/rI7lUFqBJRnF3a5773LYlE4MC4fjf8Y9leSe+c5rjTmqV2U/GbOEH/daHVMa5D7pBN7u9XDImoueUgxONOHgt0kGdB46zs7H3aso4Gj0Bxn9lmeSEWEYjgMvn1p+tr4ARBrTwzqOlXtwFvoKVOezg+IvjaWlP9kjf1OAirPJxhyxvePZjPlvv2zjXrGaQkcs1Kc2xojtCANQoV0fEv/sINw0TMqA8/m+izkTUZCLXdYet2HQ5BuBs6z7qnLyqO6YKiRz4BETY4YrDjHYMiPRxJCspc+5qSE6sFsZ9MnxB+mRa+BBGwq8047Z6AiC+CV78E1XPvugSqZNwlPrc9vAcivXHaFWtVDqERJrJsi+lTsdcHrD2NH5mZgJqrH4s/VFeiAdvhO250S5FPrJ/q76Rg55n6WuOVif3YvTKtehq/ngvh8lDG/kvnue72Q4+3jjk2RkCFVdr6CceUOPXPZVMjj/zqciVBIyZdqQkXp3c8A0dQpEfhOzChamXWME85ngOf9Ox0I4xHPlZR2m3SMImVMIFxr36jvO6D30EmiR4cO2gmmVvxZG3PKJKNYADf8EvXWu74ryzpgxt1YDS72BXxAo3kt/QdQKqxYQjres+McUgBq49NZs4jpOppKnKcWdgk2K6rGIZwxff6BANUU9s1VnUao7Bi3JSUgSLue81GO8netO9ZLbBxde1YOlL6g9hFCbMElilfnjuUf0rFuIzy5rUj84edh2u1E1TyrU43z+tC8rvCsbjQnUEhtGAJTbeywWs902+d+pPH/gT2/ebisdIKCjROH96Tx5J1WtOjw1SpAa+FpFJjUjBcJF6tt1pFSJIFv54kZ7+Y0xMguVSPea6UH8xMlYOmnBpjL4U0fn9dmObeZTFSzRxTXKYO1aL4jna8KFsesb8mro3dFPsPSqYxY6yCNCyLUHX3TAN2JIAdHVD3UHy/tU9sAJp6kkcZIFakmX4Gca14gTQXGBCBFcT3oFnfyjPLgVnI7ddz0zLz2w+CBfuInmNzhJ5vU0PueHAHjJHAwajohD1RUeYgO47/nUtJWpxGQ8b0YPxC2InBM5fl8VyDMktGjQ9qLYEnkABs7JJKPqComnrTOW6om8TNAGRfyjzrTZR/9XEHyGs0FtnhnWd0IrDc/zERO2K77fh6JNOrkqs+quDsSVHYNtNJ9wYtd5Xl5FKaKmlvQcAoYuqjxiyqKNjGA26I5RcnKJf+a83rE7UdDnU2hhelBLhdYp8tPUVh1wfESzmUS6o7OpWhN5AZDXFFtpVaiEKvhltkc/Dr/ZVilPfu1gADQdeUlYa19E1Q8ASoamtcvF6Cc5DXGjT5i7wuzcLrptabVERgXXDF99Cv2ndBgjZT7rHPonEMw7+vi92KRm2/1eEfgCgYXzPh+JYKk7+zG9L6Mh+UFWkq1a3LYhd2iUuKstvcEnr/8kmTEfWb8QvKTimRPp7kyPdUkZkGJx0KhGm9DF0op/uWXbWKedEge+S4pOFy8CLYRGL07Tkj209VIjmKhllSPPEKXEEj182V92yrJUtWmsgJZ3CfHemnvdenG2o/HTjVRaNh/BAET6WsJYEoqtaxNcASK9BgU+Hx9TEr7zNYn/nRjMr5IkJ893pXmW/wtUnDlP8wU+7qXWc5P/mitK6dWB/yUHBSf8VvvG8yRFQhc/cc9LCgOgPM0Maq/kL2jeHKv781GvtIS/a38zPVd+HnVwZZRsx1F/1P++BX5MaiukuXyoq0JkYfW+C3dORuG3cHFuzXX5/a/BSCm7ooeJUZfZ4o/YxTMf9h8B5Fm7lMKiBuCJxRAZMPl/5L64BiDs+eYPnrXitahp5XCN7n/K4Y3x22lAy76E/VJy+DctyLwifvvYxbf6hgUck+AqjOXSgO2qGYE9Y1Ggiu/j+MqNyTEgiHZbnw819PIJvIYFMrZzAJYdtBdb1u84Y4+uHQRoNbkRHQkMME26+WX5RjHbCOe6yrlq85rfr7z5xHk4kKAdoHyeI8nLAS9rCW2eXIF69bFNJA4wx9Xe1s9nlipplG8Q43zl1PcaUAPvfn07XxSBGDOP8H9Pn2wTqnDFPqKxP8MlLprd5XzQ5M1VEbZk2y61KaxnNLymcYIC3rj5rLaMHGsAjqhWzKbM2kCV8/y5JwWD5pIccEBh81V2DY2CC5VnDqlVvgIjGJkGlpL6KfeQ9m77Tvetg8RKBONxq1YSu5NJIqR4Y5bSmJXqLr9ZET/yqFAiNVkJVAu9Dd7D0tZqAxXID3AWMhdibMgIxUKedGlTJRCHmZLUrCtNYtUzVbqEPACZj3aAeTsp6MRkYbE/388GXb1+JLDl2jw0ItQgV+KL2WYlNR8jMi0Np/PmU46udGcrCmIY6p6rHaWiyFtjv8209IXopBsba4KgYi/03ZJ0EE6g+A33yyAy5Pu3uFiC46lZtUF9odecvWJufXpCQaUnbcpaIrDoZFx3d4lEkfNovXhl/4eofmFF4ktgtLPWmwedCcGwrsRVwlB82Y+HVQIYCpDRtwQg3U84+ndv70tc9k6sdt2aB4GsPlAV7JW7G0MptPL+X4IUy+wN+QsTuucyqo1qjQc4ixGBEG/ejZIeC89A9dCpS9wSFEb4Rx7BO0A8py+SeDsZQ0I5+U3gdBvWkSoQBJ2TpRmt4pMRwYOYmNo4R62NV9i2ZceQ1saUPyWHJc4BFkYFzLptLfm4y9gxn3oaPYxm/BUpnuZMhMMQRN/v+CtS4IY5cIzIZHgSU4KBdcvFtZ/Qh1f2rPAHv0rsOlMJHIRNqIp6K/EBGZpstYx2iSYkJw/zP6Hc4tRSUnIXSxGDQFZIovDtuP2fVjs3YcO1Ewb2OiuJT8mYIlY3at7yLd2LmFLYE7YjXPahR6/mg04IPT2coGyAcS/SxUp1Mesln2UcorVywFnZptiTt1hKG3BuhShfnqbfDXesRL9ShgpTJpkhIElFVI63FGL13nGEhb686LPc0dvTnnSpx/EDA2dnxO1GeQsB/hNfNoESmmeoahBpUsm6b5WiX+KbF3KBpn8/e9b1Ry4eyA+g9doONfpNIQkWVtC3V9XEAuWt+gDLryrBqgPLPP7U9LjbUaXbXxJ1/wpW/jMd/kF+4A0XZXn0oAAAAA==" alt="VS Code 1.141公式画面。Permissionsメニュー下部にSandboxing for terminalがあり、Manual permissionsの状態でONになっている。" width="470" height="336"></button><figcaption>公式画面：VS Code 1.141 リリースノート（クリックで拡大）。赤枠は原画像のものです。社内端末での実機キャプチャではありません。<a class="ref" href="https://github.com/microsoft/vscode-docs/blob/main/release-notes/images/1_141/sandbox-toggle.webp" target="_blank" rel="noopener">S10</a></figcaption></figure></div><div class="hero-meta"><strong>今回の対象：</strong> VS CodeのGitHub Copilot Agent用「Sandboxing for terminal」。本文は <strong>Copilot harness の標準ツール</strong>を基準とし、Local harnessは別記します。<br><strong>調査範囲：</strong> 1.141の公開内容＋2026年10月14日更新の公式ガイド。設定例はJSON構文を確認済み。社内端末での稼働・承認削減は未検証です。</div></header>
+<div class="reading-order" aria-label="読む順序"><span>製品の場所</span><span>機能</span><span>設定と効果</span><span>活用例</span><span>制約</span></div>
+<section class="chapter" id="section-1"><h2>1. VS Code の、どの機能か</h2>
+<p><strong>チャットの Permissions メニューにある「Sandboxing for terminal」が、今回紹介する機能です。</strong> Copilot が実行するシェルコマンドに、利用できるファイル・通信先などの制限をかけます。VS Code 自体の Electron プロセス用 Sandbox や、Windows Sandbox の紹介ではありません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/updates/v1_141" rel="noopener noreferrer" target="_blank" title="Visual Studio Code 1.141">S2</a></p>
+<h3 id="section-1-sub-1">開く場所と、設定後に変わること</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>見る場所</th>
+<th>実際の操作・表示</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>チャット入力欄の実行方式選択</td>
+<td><strong>Copilot</strong> を選択</td>
+<td>本文の設定が適用される実行方式を確認する</td>
+</tr>
+<tr>
+<td><strong>Permissions</strong> メニュー</td>
+<td><strong>Sandboxing for terminal</strong> をON</td>
+<td>現在のセッションで、対応するコマンド・プロセスを制限する</td>
+</tr>
+<tr>
+<td>VS Code の設定</td>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.enabled" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.enabled</code></a> を <code>"on"</code></td>
+<td>実行ホストで、新規セッションのSandbox既定値を設定する</td>
+</tr>
+<tr>
+<td>チャット入力欄</td>
+<td><code>/sandbox policy</code> を実行</td>
+<td>有効な制限を <code>sandbox-policy.md</code> で確認する</td>
+</tr>
+</tbody>
+</table></div>
+<p>入口・適用範囲：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/updates/v1_141" rel="noopener noreferrer" target="_blank" title="Visual Studio Code 1.141">S2</a>。Copilot harness は「Copilot の実行方式」、Agent Host はそのセッションのコマンドやツールを動かすプロセスを指します。</p>
+<h3 id="section-1-sub-2">同じコマンドでも、ON/OFFで変わるのは「アクセスできる範囲」</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>例：Copilot が開発スクリプトを実行</th>
+<th>Sandbox OFF</th>
+<th>Sandbox ON ＋ 対応する制限を設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>作業フォルダーに成果物を書く</td>
+<td>OS・通常の権限に従う</td>
+<td>許可された作業領域に出力できる</td>
+</tr>
+<tr>
+<td>参照専用にしたフォルダーを書き換える</td>
+<td>Sandboxによる追加制限はない</td>
+<td>対象のシェル処理からの書き込みを制限する</td>
+</tr>
+<tr>
+<td>拒否対象のフォルダーを読む</td>
+<td>Sandboxによる追加制限はない</td>
+<td>対象のシェル処理からのアクセスを制限する</td>
+</tr>
+<tr>
+<td>不要な外部通信を行う</td>
+<td>Sandboxによる追加制限はない</td>
+<td>設定した通信制限が適用される</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>設定例を用いた説明です。</strong> ONにするだけで、この表のすべてが自動設定されるわけではありません。現在の既定値では外向き通信は許可されています。また、実行前のApprovalは別に判定されます。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></p>
+</section><section class="chapter" id="section-2"><h2>2. 何ができるか：VS Code の実装と設定項目</h2>
+<h3 id="section-2-sub-1">機能一覧</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>機能</th>
+<th>VS Code で指定する項目</th>
+<th>設定すると何ができるか</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ファイルアクセスの分離</strong></td>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.fileSystem.userConfiguredPaths" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.fileSystem.userConfiguredPaths</code></a></td>
+<td>パスごとに「読み書き」「読み取りのみ」「アクセス禁止」を指定する</td>
+</tr>
+<tr>
+<td><strong>ネットワークの制限</strong></td>
+<td><code>chat.agent.sandbox.network.*</code></td>
+<td>外向き通信、ローカルネットワーク、許可・拒否する接続先を指定する</td>
+</tr>
+<tr>
+<td><strong>開発ツール・認証連携の調整</strong></td>
+<td><code>fileSystem.allowDevToolAccess</code>、<code>credentials.authenticategit</code>、<code>credentials.authenticategh</code></td>
+<td>ツール設定・キャッシュの自動アクセスやGit／ghの認証連携を必要に応じて外す</td>
+</tr>
+<tr>
+<td><strong>関連サーバーへの適用</strong></td>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.mcpServers" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.mcpServers</code></a>、<a class="setting-link" href="vscode://settings/chat.agent.sandbox.lspServers" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.lspServers</code></a></td>
+<td>Agent Hostが起動・管理するローカルMCP／言語サーバーにも制限を適用する</td>
+</tr>
+<tr>
+<td><strong>Sandbox外実行の制御</strong></td>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.allowUnsandboxedCommands" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.allowUnsandboxedCommands</code></a></td>
+<td>制限外での実行を確認付きで認めるか、要求自体を認めないかを選ぶ</td>
+</tr>
+<tr>
+<td><strong>セッション操作・状態確認</strong></td>
+<td><strong>Sandboxing for terminal</strong>、<code>/sandbox policy</code></td>
+<td>今の会話だけON/OFFし、実際に適用中の制限を調べる</td>
+</tr>
+</tbody>
+</table></div>
+<p>3行目の設定名は <code>chat.agent.sandbox.</code> 以降を省略表示。完全な名前・値は第3章と附録Bに掲載。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/reference/ai-settings" rel="noopener noreferrer" target="_blank" title="AI settings reference">S4</a></p>
+<h3 id="section-2-sub-2">対象になる処理・ならない処理</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>処理</th>
+<th>このSandboxとの関係</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Copilotの標準シェルと、それが起動するスクリプト・子プロセス</td>
+<td><strong>対象</strong></td>
+</tr>
+<tr>
+<td>Agent Hostが起動・管理するローカルMCP／言語サーバー</td>
+<td><strong>対応設定がONなら対象</strong>。両設定の既定値は <code>true</code></td>
+</tr>
+<tr>
+<td>組み込みのRead／Edit／Writeなど、OSプロセスを起動しないツール</td>
+<td><strong>同じプロセスSandboxの対象外</strong>。別の権限チェックを使う</td>
+</tr>
+<tr>
+<td>自分で別途起動したサーバー、リモート側で動くMCPサーバー</td>
+<td><strong>この設定で一括隔離されるわけではない</strong></td>
+</tr>
+<tr>
+<td>ユーザーが通常のターミナルへ手入力する任意のコマンド</td>
+<td><strong>VS Codeの全ターミナルを一括でSandbox化する設定ではない</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>適用対象：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a>。たとえば <code>readonlyPaths</code> にフォルダーを追加しても、<strong>別経路の編集ツールまで同時に読み取り専用になるとは限りません</strong>。</p>
+</section><section class="chapter" id="section-3"><h2>3. どう使うか：画面操作 → JSON → 実効確認</h2>
+<h3 id="section-3-sub-1">3.1 有効化する</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>手順</th>
+<th>VS Code で行う操作</th>
+<th>確認ポイント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. 実行先を確認</strong></td>
+<td>チャットの実行方式を <strong>Copilot</strong> にし、ローカル／リモートの実行先を確認</td>
+<td>本文はCopilot harnessの標準ツール向け。Localとは混用しない</td>
+</tr>
+<tr>
+<td><strong>2. 設定を開く</strong></td>
+<td>Windows／Linux：<code>Ctrl+,</code>、macOS：<code>⌘,</code>。検索欄に <code>@id:chat.agent.sandbox.enabled</code></td>
+<td>値を <code>on</code> にする。リモート実行では接続先ホストの設定・OS条件を確認</td>
+</tr>
+<tr>
+<td><strong>3. 新規セッションを開始</strong></td>
+<td>新しいCopilotセッションを開く</td>
+<td>既存セッションだけ変えるなら <strong>Permissions → Sandboxing for terminal</strong></td>
+</tr>
+<tr>
+<td><strong>4. 有効な制限を確認</strong></td>
+<td>チャットに <code>/sandbox policy</code> と入力して送信</td>
+<td>エディターで開く <code>sandbox-policy.md</code> を確認。設定変更後は再実行</td>
+</tr>
+</tbody>
+</table></div>
+<p>設定エディター操作：<a class="ref" href="https://code.visualstudio.com/docs/configure/settings" rel="noopener noreferrer" target="_blank" title="User and workspace settings">S6</a>。Sandboxの手順・適用先：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a>。機能の利用条件は第5章を参照。</p>
+<p><strong>JSONで設定する入口：</strong> コマンドパレット（Windows／Linux：<code>Ctrl+Shift+P</code>、macOS：<code>⇧⌘P</code>）から <strong>Preferences: Open User Settings (JSON)</strong> を開き、既存の設定オブジェクトに以下のキーを追加します。ファイル全体を置き換えないでください。<a class="ref" href="https://code.visualstudio.com/docs/configure/settings" rel="noopener noreferrer" target="_blank" title="User and workspace settings">S6</a></p>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.enabled": "on"
+}
+</code></pre></div>
+<p><code>"on"</code> は文字列です。<code>true</code> ではありません。既定値は <code>"off"</code>。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>変更方法</th>
+<th>適用先</th>
+<th>新しい会話の既定値も変えるか</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>実行ホストの <a class="setting-link" href="vscode://settings/chat.agent.sandbox.enabled" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.enabled</code></a></td>
+<td>そのホストで解決される設定</td>
+<td><strong>変える</strong>。新規セッションで確認する</td>
+</tr>
+<tr>
+<td>会話の <strong>Sandboxing for terminal</strong></td>
+<td>現在のセッション</td>
+<td><strong>変えない</strong>。User／Workspace設定も書き換えない</td>
+</tr>
+</tbody>
+</table></div>
+<p>リモートのセッションでは、設定パスもOS依存も<strong>コマンドが動くリモートマシン側</strong>のものです。組織管理の制限がある場合、会話の切り替えより優先されます。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<h3 id="section-3-sub-2">3.2 ファイル：参照用・出力用・禁止領域を分ける</h3>
+<p><strong>例：Windows上で、共通資料は参照のみ、成果物は別フォルダーへ出力、ダミー機密フォルダーはアクセス禁止にする。</strong> 以下のパスは説明用です。実在する必要なパスへ置き換えます。</p>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.enabled": "on",
+  "chat.agent.sandbox.fileSystem.userConfiguredPaths": {
+    "readwritePaths": ["C:\\sandbox-demo-output"],
+    "readonlyPaths": ["C:\\sandbox-demo-reference"],
+    "deniedPaths": ["C:\\sandbox-demo-private"]
+  }
+}
+</code></pre></div>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>キー</th>
+<th>上の例での効果</th>
+<th>実際に確認すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>readwritePaths</code></td>
+<td>出力先を読み書きできる</td>
+<td>シェルからファイルを作成できるか</td>
+</tr>
+<tr>
+<td><code>readonlyPaths</code></td>
+<td>参照フォルダーを読めるが書けない</td>
+<td>読み取りは成功し、書き込みは拒否されるか</td>
+</tr>
+<tr>
+<td><code>deniedPaths</code></td>
+<td>指定フォルダーへアクセスできない</td>
+<td>中のダミーファイルをシェルから読めないか</td>
+</tr>
+</tbody>
+</table></div>
+<p>同じパスが重複指定された場合の優先順位は <strong>denied → readonly → readwrite</strong>。現在の作業ディレクトリには既定で読み書きが許可されます。空のリストは「その種類のアクセスが全くない」という意味ではありません。自動付与も含め、<code>/sandbox policy</code> で確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<p><strong>macOS／Linuxの場合：</strong> キーは共通で、配列のパスだけを <code>/Users/...</code> や <code>/home/...</code> など実行ホストのパスに置き換えます。古い <code>fileSystem.mac</code> / <code>fileSystem.linux</code> の例は本文のCopilot標準ツールには使いません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<h3 id="section-3-sub-3">3.3 ネットワーク：通信を止める／必要な接続先に絞る</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>やりたいこと</th>
+<th>主な設定</th>
+<th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>シェルの処理を外向き通信なしで動かす</td>
+<td><code>network.allowNetwork: false</code></td>
+<td>対象処理の外向き通信を止める</td>
+</tr>
+<tr>
+<td>必要なAPIなどに絞って通信させる</td>
+<td><code>network.allowNetwork: true</code> ＋ <code>network.allowedDomains</code></td>
+<td>外向き通信を許可しつつ、接続先を制限する</td>
+</tr>
+<tr>
+<td>ローカル開発サーバー等への接続が必要</td>
+<td><code>network.allowLocalNetwork</code> を検討</td>
+<td>ローカルネットワークアクセスの可否を別に調整する</td>
+</tr>
+</tbody>
+</table></div>
+<p>表のキーは <code>chat.agent.sandbox.</code> 以降を表示。<strong>Copilotとモデルの通信まで止めて、オフラインAIとして使える機能ではありません。</strong> ここで扱うのはSandbox対象処理の通信制限です。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a></p>
+<h4>例A：外向き通信を止める</h4>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.enabled": "on",
+  "chat.agent.sandbox.network.allowNetwork": false,
+  "chat.agent.sandbox.network.allowLocalNetwork": false,
+  "chat.agent.sandbox.credentials.authenticategit": false,
+  "chat.agent.sandbox.credentials.authenticategh": false,
+  "chat.agent.sandbox.allowUnsandboxedCommands": false
+}
+</code></pre></div>
+<p>依存関係が導入済みのテストなどを想定した設定例です。認証が不要なため連携をOFFにし、Sandbox外への切り替えも許可しません。<strong>企業のプロキシ等が別に適用されるWindows環境では、この例のまま起動できない場合があります</strong>。次のWindows注意点を確認してください。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<h4>例B：接続先を <code>api.github.com</code> に絞る（macOS／Linuxの例）</h4>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.enabled": "on",
+  "chat.agent.sandbox.network.allowNetwork": true,
+  "chat.agent.sandbox.network.allowedDomains": ["api.github.com"],
+  "chat.agent.sandbox.network.deniedDomains": [],
+  "chat.agent.sandbox.network.allowLocalNetwork": false
+}
+</code></pre></div>
+<p>API接続先の例であり、Git操作や依存パッケージ取得がすべて動く構成ではありません。必要なリダイレクト先・配布先・社内サービスは別途確認します。<strong>許可した接続先への「読み取り専用」を保証する設定ではなく、API更新なども可能になり得ます。</strong><a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings" rel="noopener noreferrer" target="_blank" title="Enterprise managed settings">S7</a></p>
+<blockquote class="notice">
+<p><strong>Windows固有の注意：</strong> 公式ガイドでは、プロキシ・ホスト名制限・認証情報マスキングを使う構成は <code>chat.agent.sandbox.network.allowLocalNetwork: true</code> が必要です。ローカルリスナーに到達できないとコマンドが起動しません。例BをWindowsへ移す場合はこの変更と、その結果広がるローカルネットワークアクセスを確認します。「動かすためだけにON」とはしません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+</blockquote>
+<h3 id="section-3-sub-4">3.4 認証・開発ツール・MCP／言語サーバー</h3>
+<p><strong>以下は、Sandbox本体がONのときに検討する設定です。</strong> 表の設定名にはすべて <code>chat.agent.sandbox.</code> が付きます。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/reference/ai-settings" rel="noopener noreferrer" target="_blank" title="AI settings reference">S4</a></p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>設定名（接頭辞省略）</th>
+<th>既定値</th>
+<th><code>false</code> にした場合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fileSystem.allowDevToolAccess</code></td>
+<td><code>true</code></td>
+<td>開発ツール設定・キャッシュ等への自動付与を外す。ビルドや依存復元が失敗する場合は必要なパスを個別に追加</td>
+</tr>
+<tr>
+<td><code>credentials.authenticategit</code></td>
+<td><code>true</code></td>
+<td>Sandbox内Git HTTPS操作向けの認証連携を外す</td>
+</tr>
+<tr>
+<td><code>credentials.authenticategh</code></td>
+<td><code>true</code></td>
+<td>Sandbox内のGitHub CLI（<code>gh</code>）向けの認証連携を外す</td>
+</tr>
+<tr>
+<td><code>mcpServers</code></td>
+<td><code>true</code></td>
+<td>管理下MCPサーバーに対するこのSandbox適用を外す。MCPを禁止する設定ではない</td>
+</tr>
+<tr>
+<td><code>lspServers</code></td>
+<td><code>true</code></td>
+<td>管理下言語サーバーに対するこのSandbox適用を外す。言語サーバーを禁止する設定ではない</td>
+</tr>
+</tbody>
+</table></div>
+<p>開発ツール向けの自動アクセスには、レジストリトークンを含む設定や共有キャッシュが含まれ得ます。Git／gh連携をOFFにしても、許可された別ファイルや環境経由の認証情報を一括で消すわけではありません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a></p>
+<h3 id="section-3-sub-5">3.5 制限に阻まれたとき、Sandbox外実行を認めるか</h3>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.allowUnsandboxedCommands": false
+}
+</code></pre></div>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>値</th>
+<th>VS Codeでの挙動</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>true</code>（既定）</td>
+<td>必要に応じて <strong>Allow Outside Sandbox</strong> の承認を要求できる</td>
+<td>承認した操作にはSandboxのファイル・通信制限が適用されなくなる</td>
+</tr>
+<tr>
+<td><code>false</code></td>
+<td>Sandbox外実行の選択肢を出さず、その要求を失敗させる</td>
+<td>承認を省略して無制限に実行する設定ではない</td>
+</tr>
+</tbody>
+</table></div>
+<p>会話全体の例外を承認すると、その後のコマンドも再度ONにするまで制限外で実行され得ます。失敗時は、まず必要なパス・通信先を確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<h3 id="section-3-sub-6">3.6 <code>/sandbox policy</code> で「本当に効いている設定」を見る</h3>
+<p>このコマンドはCopilot harness用です。入力するとMarkdownプレビューが開き、<strong>実行ホスト、ON/OFF、OSの実装、ファイル・通信の実効ポリシー</strong>を確認できます。モデルの応答を生成させるプロンプトではなく、設定も変更しません。変更後はもう一度実行して更新します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<p><strong>確認する観点：</strong> 設定ファイルに書いた値だけでなく、作業ディレクトリ・開発ツールの自動付与や組織管理の制限が加わった結果を見ます。設定の不一致を調べる際も、このレポートを起点にします。</p>
+</section><section class="chapter" id="section-4"><h2>4. 活用例：長時間の開発タスクで、承認待ちを減らす</h2>
+<h3 id="section-4-sub-1">4.1 何と何を組み合わせるか</h3>
+<p>会社でAllow allを使えない場合でも、会社が個別の自動承認を認めていれば、<strong>Manual permissionsのまま、定型コマンドの事前許可とSandboxを組み合わせる</strong>使い方を検討できます。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a><a class="ref" href="https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings" rel="noopener noreferrer" target="_blank" title="Enterprise managed settings">S7</a></p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>制御</th>
+<th>この例での担当</th>
+<th>設定・操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sandbox</strong></td>
+<td>コマンドがアクセスできるファイル・通信先を制限</td>
+<td>第3章のSandbox設定</td>
+</tr>
+<tr>
+<td><strong>Terminal Approval</strong></td>
+<td>確認済みのテスト・Lint・ビルドの逐次確認を減らす</td>
+<td><a class="setting-link" href="vscode://settings/chat.tools.terminal.autoApprove" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.tools.terminal.autoApprove</code></a></td>
+</tr>
+<tr>
+<td><strong>組織管理</strong></td>
+<td>自動化してはいけない操作の確認・禁止を維持</td>
+<td>適用中の企業ポリシー。利用者の設定では緩和できない</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>現行Copilot harnessでは、Sandbox ONだけで全シェル承認が消えるとは説明しません。</strong> 公式の現行仕様はSandboxとApprovalを別の制御として扱っています。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></p>
+<h3 id="section-4-sub-2">4.2 VS Code の設定例</h3>
+<p>前提は、<strong>会社がTerminalの個別自動承認を許可していること</strong>と、実行するリポジトリのスクリプト内容を確認済みであることです。Permissionsでは <strong>Manual permissions</strong> を維持します。現行ガイドではWorktreeセッションはAllow allになるため、この例では <strong>Folder isolation</strong> のセッションで確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></p>
+<p>以下は第3章のファイル・通信設定へ追加する設定例です。</p>
+<div class="codebox"><div class="codehead"><span>設定例 · settings.json に統合</span><button aria-label="JSONをコピー" class="copy" type="button">コピー</button></div><pre><code class="language-json">{
+  "chat.agent.sandbox.enabled": "on",
+  "chat.agent.sandbox.allowUnsandboxedCommands": false,
+  "chat.tools.terminal.autoApprove": {
+    "/^npm (test|run lint|run build)$/": true,
+    "/^git push(?:\\s|$)/": false
+  }
+}
+</code></pre></div>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>コマンド・状態</th>
+<th>この設定例で意図する扱い</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm test</code> / <code>npm run lint</code> / <code>npm run build</code></td>
+<td>追加した許可ルールの対象。Sandboxの制限は残る</td>
+</tr>
+<tr>
+<td><code>npm test -- --watch</code> など、文字列が異なるコマンド</td>
+<td>この追加ルールの対象外。他の既定・承認設定によって判定される</td>
+</tr>
+<tr>
+<td><code>git push</code></td>
+<td><code>false</code> ルールにより自動承認せず確認する。企業のdenyがあれば禁止</td>
+</tr>
+<tr>
+<td>許可されたコマンドが拒否対象パスにアクセス</td>
+<td>自動承認の対象でも、Sandbox側でそのアクセスを制限</td>
+</tr>
+<tr>
+<td>Sandbox外での実行を要求</td>
+<td>この例では例外を許可しない</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>autoApprove</code> の <code>false</code> は「実行禁止」ではなく「確認が必要」です。</strong> 複合コマンドは原則サブコマンドごとに判定され、すべてが許可に一致し、手動承認（false）ルールに一致しない場合に自動承認されます。<a class="setting-link" href="vscode://settings/chat.tools.terminal.enableAutoApprove" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.tools.terminal.enableAutoApprove</code></a> が無効なら自動承認は使えません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></p>
+<p><code>npm test</code> などの名称だけでは安全性を判断できません。内部のスクリプトや依存関係は別の操作を行えます。承認ルールは利便性のための仕組みであり、強固な隔離そのものではありません。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a></p>
+<h3 id="section-4-sub-3">4.3 期待する変化と、残る確認</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>導入前の作業例</th>
+<th>設定後に目指す作業例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>テスト → 確認待ち → Lint → 確認待ち → ビルド</td>
+<td>事前許可した定型コマンドは継続し、未許可の操作で確認する</td>
+</tr>
+<tr>
+<td>人が毎回コマンドを見て判断</td>
+<td>実行範囲はSandboxで制限し、承認対象の操作を人が判断</td>
+</tr>
+</tbody>
+</table></div>
+<p>上表は活用イメージであり、実測結果ではありません。削減される回数は既存のルールと実行コマンド次第です。企業の <code>permissions.ask</code> はその都度の人間の承認を要求し、<code>permissions.deny</code> は実行を禁止します。単にAllow allが禁止されている場合と、各コマンドへの逐次承認が必須の場合は区別します。<a class="ref" href="https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings" rel="noopener noreferrer" target="_blank" title="Enterprise managed settings">S7</a></p>
+<h3 id="section-4-sub-4">4.4 Local harness の説明を、そのまま当てはめない</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>実行方式</th>
+<th>Sandboxと承認についての説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Copilot harness（本文）</strong></td>
+<td>アクセス制限とApprovalを分けて設定する。<code>/sandbox policy</code> で確認可能</td>
+</tr>
+<tr>
+<td><strong>Local harness</strong></td>
+<td><code>chat.agent.sandbox.allowAutoApprove</code> がTerminal承認動作を制御する。本文のCopilot Sandboxを設定するキーではない</td>
+</tr>
+</tbody>
+</table></div>
+<p>初期の1.109資料には、Sandbox内コマンドの標準確認を省略する説明があります。それを根拠に、現行Copilotのすべての実行方式で同じ動作とみなさないことが重要です。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/updates/v1_109" rel="noopener noreferrer" target="_blank" title="VS Code 1.109：初期Terminal Sandbox">S8</a></p>
+<h3 id="section-4-sub-5">ほかの活用例</h3>
+<p><strong>資料のシェル処理：</strong> 入力資料のパスを読み取り専用にし、生成結果のフォルダーだけ書き込み可能にする。<strong>ローカルMCPの利用：</strong> Agent Host管理下のサーバーに、必要なパス・接続先を限定して渡す。どちらも対象外の編集ツールや、許可した接続先での副作用には別の制御が必要です。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a></p>
+</section><section class="chapter" id="section-5"><h2>5. 制約・利用条件：どこまで任せられるか</h2>
+<h3 id="section-5-sub-1">OSと実行場所の条件</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>コマンドの実行先</th>
+<th>公式文書の状態</th>
+<th>前提・注意点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>macOS</strong></td>
+<td>Preview</td>
+<td>Sandboxガイド上、追加依存の導入は不要</td>
+</tr>
+<tr>
+<td><strong>Linux / WSL2</strong></td>
+<td>Preview</td>
+<td><code>bubblewrap</code> と <code>socat</code> が必要。WSL1は非対応</td>
+</tr>
+<tr>
+<td><strong>Windows</strong></td>
+<td>Experimental</td>
+<td>対象Windowsのセキュリティ更新が必要。プロキシ等の構成にも条件あり</td>
+</tr>
+</tbody>
+</table></div>
+<p>状態表記：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a>。前提条件：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a>。<strong>VS Code本体のStableと、Sandboxの各OSでの機能ステータスは別です。</strong></p>
+<p>Windowsについて、公式ガイドは2026年9月8日の更新として、Windows 11 24H2／25H2では <strong>KB5124008</strong>、26H1では <strong>KB5124012</strong> を挙げています。会社の配布状況と適用対象を管理部門で確認してください。リモート実行時は、接続元のPCではなく実行ホストの条件を確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></p>
+<h3 id="section-5-sub-2">できないこと・誤解しやすいこと</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>期待してはいけないこと</th>
+<th>実際の制約・必要な対応</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>VS Code全体や、全ツールの一括隔離</strong></td>
+<td>Read／Edit／Write等は別の権限チェック。手入力の全Terminalまで自動で対象になる設定ではない</td>
+</tr>
+<tr>
+<td><strong>ONだけで完全に閉じた実行環境になる</strong></td>
+<td>外向き通信、開発ツールアクセス、Git／gh連携、Sandbox外実行要求は既定で許可。必要なものを個別に調整</td>
+</tr>
+<tr>
+<td><strong>許可された場所では事故が起きない</strong></td>
+<td>読み書き可能なファイルの誤変更や、許可APIへの更新は起こり得る。差分レビューを残す</td>
+</tr>
+<tr>
+<td><strong>企業が必須にしたApprovalを消す</strong></td>
+<td>強制ask／denyは維持。管理ポリシーの回避策ではない</td>
+</tr>
+<tr>
+<td><strong>VMや別アカウント相当の完全分離</strong></td>
+<td>実行ホストのユーザーアカウント上で動作。単独の安全境界でも端末セキュリティの代替でもない</td>
+</tr>
+<tr>
+<td><strong>長時間タスクの無人完了を保証</strong></td>
+<td>追加質問、依存不足、認証、エラー、利用上限などはSandboxとは別の問題</td>
+</tr>
+</tbody>
+</table></div>
+<p>対象範囲・既定値：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a>。安全上の範囲：<a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a>。強制承認：<a class="ref" href="https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings" rel="noopener noreferrer" target="_blank" title="Enterprise managed settings">S7</a>。長時間タスクの完成率・待ち時間削減は社内環境で未測定です。</p>
+<p><strong>MCPも二種類を区別：</strong> <a class="setting-link" href="vscode://settings/chat.agent.sandbox.mcpServers" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.mcpServers</code></a> はCopilot Agent Host管理下のプロセス向けです。<code>mcp.json</code> の <code>sandboxEnabled</code> で指定する <strong>per-server MCP sandboxing</strong> は別機能で、公式資料ではmacOS／Linux対応、Windows非対応とされています。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agent-customization/mcp-servers#sandbox-mcp-servers" rel="noopener noreferrer" target="_blank" title="Sandbox MCP servers：別機能">S9</a></p>
+
+</section><details class="appendix" id="appendix-a"><summary>附録A. 最近の変更：何が、どう違うのか<span class="expand-label">開く</span></summary><div class="appendix-content">
+<h3 id="appendix-a-sub-1">A.1 1.141で説明されているポイント</h3>
+<p>1.141は2026年10月7日公開です。Sandbox自体の初登場ではありません。以下の「1.141掲載」は、そのリリースノートで紹介された内容を意味し、すべてが1.140からの新規追加であることを意味しません。<a class="ref" href="https://code.visualstudio.com/updates/v1_141" rel="noopener noreferrer" target="_blank" title="Visual Studio Code 1.141">S2</a><a class="ref" href="https://code.visualstudio.com/updates/v1_109" rel="noopener noreferrer" target="_blank" title="VS Code 1.109：初期Terminal Sandbox">S8</a></p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>区分</th>
+<th>具体的な内容・影響</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows／macOS／Linux</td>
+<td><strong>1.141掲載</strong></td>
+<td>クロスプラットフォームのCopilot Agent Host Sandboxを紹介。WindowsはOS更新要件を伴う</td>
+</tr>
+<tr>
+<td>ローカル・リモートのセッション</td>
+<td><strong>1.141掲載</strong></td>
+<td>コマンドが動くマシン側で制限。ファイルパスもそのマシンを指す</td>
+</tr>
+<tr>
+<td>会話のSandbox切り替え</td>
+<td><strong>1.141掲載</strong></td>
+<td>Permissions内の <strong>Sandboxing for terminal</strong> から操作</td>
+</tr>
+<tr>
+<td>ローカルMCP／言語サーバー</td>
+<td><strong>1.141掲載</strong></td>
+<td>Sandbox有効時、対応する管理下サーバーにも既定で適用</td>
+</tr>
+<tr>
+<td><code>ChatAgentSandboxEnabled</code> の扱い</td>
+<td><strong>1.141で明記された変更</strong></td>
+<td>Agent Hostでは強制要件ではなく、上書き可能な既定値へ。Localの動作は変更なし</td>
+</tr>
+<tr>
+<td>企業がSandboxを必須にする方法</td>
+<td><strong>1.141の移行案内</strong></td>
+<td>統一管理設定の <code>sandbox.enabled: true</code> と <code>sandbox.allowBypass: false</code> を利用する</td>
+</tr>
+</tbody>
+</table></div>
+<p>根拠：<a class="ref" href="https://code.visualstudio.com/updates/v1_141" rel="noopener noreferrer" target="_blank" title="Visual Studio Code 1.141">S2</a>。管理側のJSONはVS Codeの個人用 <code>settings.json</code> とは別物です。</p>
+<h3 id="appendix-a-sub-2">A.2 初期の説明と現行仕様を比較する</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>比較する点</th>
+<th>1.109の初期説明</th>
+<th>現行Copilot harnessの説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>対応OS</td>
+<td>macOS／Linux。Windowsでは設定が無効</td>
+<td>Windowsも対象に含むがExperimental・OS条件あり</td>
+</tr>
+<tr>
+<td>有効化</td>
+<td><code>chat.tools.terminal.sandbox.enabled: true</code></td>
+<td><code>chat.agent.sandbox.enabled: "on"</code></td>
+</tr>
+<tr>
+<td>通信の既定値</td>
+<td>全ドメインの通信を既定でブロック</td>
+<td><code>network.allowNetwork</code> は既定 <code>true</code>。別に通信範囲を設定</td>
+</tr>
+<tr>
+<td>承認</td>
+<td>Sandbox内コマンドの標準確認を省略すると説明</td>
+<td>SandboxとApprovalを別制御として説明。Local互換動作は別項目</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>隣接バージョン間の差分表ではなく、初期と現在の比較です。</strong> 古い記事の設定・既定値を、そのまま現行設定へコピーしないための表です。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/updates/v1_109" rel="noopener noreferrer" target="_blank" title="VS Code 1.109：初期Terminal Sandbox">S8</a></p>
+<h3 id="appendix-a-sub-3">A.3 古い設定を見かけたときの読み替え</h3>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>古い／互換用の設定</th>
+<th>現行Copilot標準ツールでの扱い</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat.agent.sandbox.enabledWindows</code></td>
+<td>削除済み。共通の <a class="setting-link" href="vscode://settings/chat.agent.sandbox.enabled" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.enabled</code></a> を使う</td>
+</tr>
+<tr>
+<td><code>chat.agent.sandbox.allowNetwork</code></td>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.network.allowNetwork" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.network.allowNetwork</code></a> へ移行</td>
+</tr>
+<tr>
+<td><code>chat.agent.sandbox.fileSystem.mac</code> / <code>.linux</code> / <code>.windows</code></td>
+<td>非推奨。Copilot標準ツールは無視。<code>fileSystem.userConfiguredPaths</code> を使う</td>
+</tr>
+<tr>
+<td><code>chat.agent.sandbox.allowAutoApprove</code></td>
+<td>Local harnessのTerminal承認用。Copilot Sandboxの設定にはならない</td>
+</tr>
+<tr>
+<td><code>chat.agent.sandbox.retryWithAllowNetworkRequests</code></td>
+<td>非推奨のLocal Terminal用。Copilot標準ツールへ適用しない</td>
+</tr>
+</tbody>
+</table></div>
+<p>互換性の根拠：<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a>。</p>
+</div></details><details class="appendix" id="appendix-b"><summary>附録B. 設定項目早見表<span class="expand-label">開く</span></summary><div class="appendix-content">
+<p><strong>Copilot harness・標準ツール向け。</strong> 「既定」はユーザー・組織側の上書きがない場合です。実効値はセッションで確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a><a class="ref" href="https://code.visualstudio.com/docs/agents/reference/ai-settings" rel="noopener noreferrer" target="_blank" title="AI settings reference">S4</a></p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>完全な設定名</th>
+<th>値・既定</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.enabled" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.enabled</code></a></td>
+<td><code>"off"</code> / <code>"on"</code>、既定 <code>"off"</code></td>
+<td>本体のON/OFF</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.fileSystem.userConfiguredPaths" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.fileSystem.userConfiguredPaths</code></a></td>
+<td>オブジェクト、各配列は空</td>
+<td><code>readwritePaths</code> / <code>readonlyPaths</code> / <code>deniedPaths</code></td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.fileSystem.allowDevToolAccess" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.fileSystem.allowDevToolAccess</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>開発ツール設定・キャッシュ等への自動アクセス</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.network.allowNetwork" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.network.allowNetwork</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>外向き通信</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.network.allowLocalNetwork" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.network.allowLocalNetwork</code></a></td>
+<td>Boolean、既定 <code>false</code></td>
+<td>ローカルネットワーク</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.network.allowedDomains" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.network.allowedDomains</code></a></td>
+<td>配列、既定 <code>[]</code></td>
+<td>許可する通信先</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.network.deniedDomains" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.network.deniedDomains</code></a></td>
+<td>配列、既定 <code>[]</code></td>
+<td>拒否する通信先</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.credentials.authenticategit" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.credentials.authenticategit</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>Git HTTPS認証連携</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.credentials.authenticategh" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.credentials.authenticategh</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>GitHub CLI認証連携</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.mcpServers" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.mcpServers</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>管理下ローカルMCPのSandbox適用</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.lspServers" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.lspServers</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>管理下言語サーバーのSandbox適用</td>
+</tr>
+<tr>
+<td><a class="setting-link" href="vscode://settings/chat.agent.sandbox.allowUnsandboxedCommands" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.agent.sandbox.allowUnsandboxedCommands</code></a></td>
+<td>Boolean、既定 <code>true</code></td>
+<td>Sandbox外実行の承認要求</td>
+</tr>
+</tbody>
+</table></div>
+<p>承認側の関連設定は別グループです：<a class="setting-link" href="vscode://settings/chat.tools.terminal.autoApprove" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.tools.terminal.autoApprove</code></a>（コマンドルール）、<a class="setting-link" href="vscode://settings/chat.tools.terminal.enableAutoApprove" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.tools.terminal.enableAutoApprove</code></a>（自動承認の可否）、<a class="setting-link" href="vscode://settings/chat.tools.eligibleForAutoApproval" title="VS Code の設定で開く（インストール済み環境向け）"><code>chat.tools.eligibleForAutoApproval</code></a>（ツール別の確認要否）。組織の制約を変えずに利用可能な範囲を確認します。<a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></p>
+</div></details><details class="appendix" id="appendix-c"><summary>附録C. チームで試すときの確認手順<span class="expand-label">開く</span></summary><div class="appendix-content">
+<p>以下は<strong>未実施の検証手順案</strong>です。実データ・本番API・本物の秘密情報を使わず、使い捨てのリポジトリとダミーファイルで実施します。</p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>確認</th>
+<th>実施内容</th>
+<th>観察する結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 実行方式・状態</td>
+<td>Copilot / Manual permissions / Folder isolationを確認し、<code>/sandbox policy</code> を保存</td>
+<td>正しい実行先でSandboxがONか</td>
+</tr>
+<tr>
+<td>2. 参照専用パス</td>
+<td>第3章の設定後、<strong>シェル経由で</strong>ダミーファイルを読み取り、その後書き込みを試す</td>
+<td>読み取りは成功、書き込みは拒否されるか</td>
+</tr>
+<tr>
+<td>3. 拒否パス</td>
+<td><strong>シェル経由で</strong>禁止フォルダーのダミーファイルを読む</td>
+<td>アクセスが拒否されるか</td>
+</tr>
+<tr>
+<td>4. 通信</td>
+<td>通信OFF／接続先限定の構成を別々に確認</td>
+<td>必要な接続だけ成功し、許可していない通信は制限されるか</td>
+</tr>
+<tr>
+<td>5. 定型処理</td>
+<td>同じリポジトリ・同じタスクでテスト／Lint／ビルドを実行</td>
+<td>承認ルールに一致する操作の確認回数が減るか</td>
+</tr>
+<tr>
+<td>6. 制限外要求</td>
+<td><code>allowUnsandboxedCommands: false</code> で範囲外実行を要求させる</td>
+<td>例外として実行されないか</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>二段階で比較すると原因を切り分けやすくなります。</strong> まずSandboxをONのまま、Terminal事前許可の追加前後を比較して承認削減を確認します。次に同じ承認ルールで、SandboxのON/OFFによるダミー領域へのアクセス差を確認します。実行方式・OS・組織ポリシーは固定します。</p>
+<p>記録する項目は、VS Codeバージョン、実行ホスト、実行方式、適用設定、コマンド、確認回数、待ち時間、拒否されたアクセス、タスク完了の可否です。「自動で進んだ」だけでなく、「制限対象にはアクセスできなかった」ことも確認します。</p>
+</div></details><details class="appendix" id="sources"><summary>公式資料・調査範囲<span class="expand-label">開く</span></summary><div class="appendix-content">
+<p>本資料は公開仕様の調査です。設定例は本資料用に作成し、JSON構文を検査しました。機能の稼働、OSごとの拒否動作、企業ポリシーの適用、承認削減量は社内端末で未検証です。本文は現行製品の操作・設定を先に示し、初期の仕様やLocal互換動作を混在させない構成です。</p>
+<div aria-label="横スクロールできる表" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>参照</th>
+<th>公式資料</th>
+<th>本資料で確認した内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/agents/run/agent-sandboxing" rel="noopener noreferrer" target="_blank" title="Sandbox Copilot agent sessions">S1</a></td>
+<td>VS Code / Sandbox Copilot agent sessions</td>
+<td>設定名、既定値、実効ポリシー、OS条件、Local互換性。公開リポジトリ原稿の更新日：2026-10-14</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/updates/v1_141" rel="noopener noreferrer" target="_blank" title="Visual Studio Code 1.141">S2</a></td>
+<td>VS Code / 1.141 Release notes</td>
+<td>公開日、製品画面、クロスプラットフォームと企業ポリシー変更</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/agents/run/approvals" rel="noopener noreferrer" target="_blank" title="Manage approvals and permissions">S3</a></td>
+<td>VS Code / Manage approvals and permissions</td>
+<td>Manual permissions、Terminalの個別許可、Folder／Worktree、OS別ステータス</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/agents/reference/ai-settings" rel="noopener noreferrer" target="_blank" title="AI settings reference">S4</a></td>
+<td>VS Code / AI settings reference</td>
+<td>設定一覧と既定値</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/agents/concepts/trust-and-safety" rel="noopener noreferrer" target="_blank" title="Understand trust and safety for AI agents">S5</a></td>
+<td>VS Code / Trust and safety</td>
+<td>対象外ツール、分離の限界、認証・通信のリスク</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/configure/settings" rel="noopener noreferrer" target="_blank" title="User and workspace settings">S6</a></td>
+<td>VS Code / User and workspace settings</td>
+<td>設定画面、<code>@id</code>検索、JSON編集入口</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings" rel="noopener noreferrer" target="_blank" title="Enterprise managed settings">S7</a></td>
+<td>GitHub Docs / Enterprise managed settings</td>
+<td>強制ask／deny、利用者設定で緩和できない条件</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/updates/v1_109" rel="noopener noreferrer" target="_blank" title="VS Code 1.109：初期Terminal Sandbox">S8</a></td>
+<td>VS Code / 1.109 Release notes</td>
+<td>初期の有効化キー、対応OS、通信・承認の説明</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://code.visualstudio.com/docs/agent-customization/mcp-servers#sandbox-mcp-servers" rel="noopener noreferrer" target="_blank" title="Sandbox MCP servers：別機能">S9</a></td>
+<td>VS Code / MCP servers</td>
+<td>per-server MCP Sandboxの別設定・対応OS</td>
+</tr>
+<tr>
+<td><a class="ref" href="https://github.com/microsoft/vscode-docs/blob/main/release-notes/images/1_141/sandbox-toggle.webp" rel="noopener noreferrer" target="_blank" title="1.141公式画面：Sandboxing for terminal">S10</a></td>
+<td>microsoft/vscode-docs / sandbox-toggle.webp</td>
+<td>第1章の公式スクリーンショット。原画像を埋め込み</td>
+</tr>
+</tbody>
+</table></div>
+</div></details>
+<footer class="doc-footer">VS Code Sandbox｜実際の機能・設定手順・活用例 · 2026.10.15<br>画像・スタイル・スクリプトはこのHTMLに内包。参照リンクを開くときだけネット接続が必要です。</footer></main></div>
+<dialog id="image-dialog"><button class="dialog-close" id="close-image">閉じる ×</button><img src="data:image/webp;base64,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" alt="Sandboxing for terminalの公式画面拡大"><p class="dialog-caption">VS Code 1.141 公式画面。Manual permissions と Sandbox ON が別々に選択されています。</p></dialog><div class="toast" id="toast" aria-live="polite"></div>
+<script>
+const $=s=>document.querySelector(s);
+let toastTimer;function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),1900)}
+$('#font-toggle').addEventListener('click',()=>{const on=document.body.classList.toggle('large');$('#font-toggle').setAttribute('aria-pressed',String(on));$('#font-toggle').textContent=on?'標準の文字サイズ':'文字を大きく'});
+const details=[...document.querySelectorAll('details')];let states=[];
+window.addEventListener('beforeprint',()=>{states=details.map(d=>d.open);details.forEach(d=>d.open=true)});
+window.addEventListener('afterprint',()=>{details.forEach((d,i)=>d.open=states[i]||false)});
+$('#print-button').addEventListener('click',()=>window.print());
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{const t=b.closest('.codebox').querySelector('code').textContent;try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.append(a);a.select();const ok=document.execCommand('copy');a.remove();if(!ok){toast('コードを選択してコピーしてください');return}}toast('JSONをコピーしました')}));
+const dialog=$('#image-dialog');$('#open-image').addEventListener('click',()=>dialog.showModal());$('#close-image').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+document.querySelectorAll('.side a').forEach(a=>a.addEventListener('click',()=>{const d=document.getElementById(a.hash.slice(1));if(d&&d.tagName==='DETAILS')d.open=true}));
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('active',a.hash==='#'+e.target.id))}})},{rootMargin:'-80px 0px -60% 0px',threshold:0});document.querySelectorAll('.chapter,.appendix').forEach(s=>obs.observe(s));
+function hashOpen(){const d=document.getElementById(location.hash.slice(1));if(d&&d.tagName==='DETAILS')d.open=true}window.addEventListener('hashchange',hashOpen);hashOpen();
+</script></body></html>
